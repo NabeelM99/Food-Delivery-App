@@ -3,45 +3,50 @@ package com.example.fooddeliveryapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import com.example.fooddeliveryapp.data.OrderState
-import com.example.fooddeliveryapp.ui.screen.ProductDetailsScreen
+import androidx.compose.material3.*
+import androidx.navigation.compose.*
+import com.example.fooddeliveryapp.ui.screen.* // Import all your screens here
 import com.example.fooddeliveryapp.ui.theme.AppTheme
-
-private const val PRODUCT_PRICE_PER_UNIT = 5.25
-private const val PRODUCT_CURRENCY = "$"
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
         setContent {
             AppTheme {
-                var amount by remember { mutableIntStateOf(5) }
-                val totalPrice by remember { derivedStateOf { amount * PRODUCT_PRICE_PER_UNIT }}
+                val navController = rememberNavController()
 
-                ProductDetailsScreen(
-                    onCheckOutClicked = {},
-                    orderState = OrderState(
-                        amount = amount,
-                        totalPrice = "$PRODUCT_CURRENCY$totalPrice"
-                    ),
-                    onAddItemClicked = {
-                        amount = amount + 1 },
-                    onRemoveItemClicked = {
-                        if (amount > 0) {
-                            amount = amount - 1
+                NavHost(navController = navController, startDestination = "splashScreen") {
+                    // Splash Screen
+                    composable("splashScreen") {
+                        SplashScreen {
+                            navController.navigate("signInScreen") {
+                                popUpTo("splashScreen") { inclusive = true }
+                            }
+                        }
+                    }
 
-                        } }
-                )
+                    // Sign In screen
+                    composable("signInScreen") {
+                        SignInScreen(navController)
+                    }
+
+                    // Sign Up screen
+                    composable("signUpScreen") {
+                        SignUpScreen(navController)
+                    }
+
+                    // Product Details screen
+                    composable("productDetailsScreen") {
+                        ProductDetailsScreen() // Pass no extra parameters here
+                    }
+
+                    // Home screen after login/signup
+                    composable("homeScreen") {
+                        SignInScreen(navController)
+                    }
+                }
             }
         }
     }
