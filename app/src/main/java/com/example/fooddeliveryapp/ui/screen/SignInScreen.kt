@@ -111,7 +111,7 @@ fun SignInScreen(navController: NavController) {
                     Button(
                         onClick = {
                             if (email == validEmail && password == validPassword) {
-                                navController.navigate("productDetailsScreen") // Navigate to ProductDetailsScreen
+                                navController.navigate("homeScreen") // Navigate to ProductDetailsScreen
                             } else {
                                 // Handle invalid login (e.g., Snackbar)
                                 println("Invalid login credentials")

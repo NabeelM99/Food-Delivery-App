@@ -1,11 +1,10 @@
 package com.example.fooddeliveryapp
-
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.*
 import androidx.navigation.compose.*
 import com.example.fooddeliveryapp.ui.screen.* // Import all your screens here
+import com.example.fooddeliveryapp.ui.screen.HomeScreen
 import com.example.fooddeliveryapp.ui.theme.AppTheme
 
 class MainActivity : ComponentActivity() {
@@ -44,7 +43,7 @@ class MainActivity : ComponentActivity() {
 
                     // Home screen after login/signup
                     composable("homeScreen") {
-                        SignInScreen(navController)
+                        HomeScreen(navController) // Change this to your actual Home screen
                     }
                 }
             }
