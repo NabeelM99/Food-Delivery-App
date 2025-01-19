@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fooddeliveryapp.R
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,32 +35,54 @@ fun TodaysMenuSection() {
             R.drawable.img_donut,
             Color(0xFF79be95)
         ),
-        CardData("Cool Drinks!",
-            "Refreshing all day",
+        CardData("Free Drinks!",
+            "With every Burger of $10",
             R.drawable.img_drinks,
-            Color(0xFF77AADD)
+            Color(0xFF704747)
         ),
-        CardData("Amazing Cakes!",
-            "Enhance your flavor",
+        CardData("Free Cakes!",
+            "For orders over $10",
             R.drawable.img_cake,
-            Color(0xFF8BC34A)
+            Color(0xFFC4A44E)
+        ),
+        CardData(
+            "Free Shawarma",
+            "For 4 Shawarma purchase",
+            R.drawable.img_shawarma,
+            Color(0xFFFF9500)
         )
+
     )
-    var currentCardIndex by remember { mutableStateOf(0) }
-    val offsetAnimation1 = remember { Animatable(0f) }
-    val offsetAnimation2 = remember { Animatable(400f) }
+    var currentCardIndex by remember {
+        mutableStateOf(0)
+    }
+    val offsetAnimation1 = remember {
+        Animatable(0f)
+    }
+    val offsetAnimation2 = remember {
+        Animatable(400f)
+    }
 
     LaunchedEffect(currentCardIndex) {
         while (true) {
             delay(3000)
-            offsetAnimation1.animateTo(
-                targetValue = -400f, // Slide left
-                animationSpec = tween(durationMillis = 1000)
-            )
-            offsetAnimation2.animateTo(
-                targetValue = 0f,
-                animationSpec = tween(durationMillis = 1000),
-            )
+            coroutineScope {
+                // Launch both animations simultaneously using coroutineScope
+                launch {
+                    offsetAnimation1.animateTo(
+                        targetValue = -400f,
+                        animationSpec = tween(durationMillis = 1000)
+                    )
+                }
+                launch {
+                    offsetAnimation2.animateTo(
+                        targetValue = 0f,
+                        animationSpec = tween(durationMillis = 1000)
+                    )
+                }
+            }
+
+            //delay(1000)
 
             currentCardIndex = (currentCardIndex + 1) % cards.size
             offsetAnimation1.snapTo(0f)
@@ -87,19 +111,13 @@ fun TodaysMenuSection() {
                 .height(150.dp), // Adjust the height as needed
             contentAlignment = Alignment.Center
         ) {
-            /*// Display the current card and the next card to create the loop effect
-            val currentCard = cards[currentCardIndex]
-            val nextCard = cards[(currentCardIndex + 1) % cards.size]
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp) // Adding space between the cards
-            ) {*/
-            FeaturedCard( title = cards[currentCardIndex].title,
+            FeaturedCard(
+                title = cards[currentCardIndex].title,
                 subtitle = cards[currentCardIndex].subtitle,
                 imageResId = cards[currentCardIndex].imageResId,
                 backgroundColor = cards[currentCardIndex].backgroundColor,
-                offset = offsetAnimation1.value )
+                offset = offsetAnimation1.value
+            )
 
                 Spacer(modifier = Modifier.width(16.dp)) // Adding space between cards
 
@@ -138,7 +156,8 @@ fun FeaturedCard(
                 .fillMaxWidth()
                 .width(300.dp)
                 .height(120.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            elevation = CardDefaults
+                .cardElevation(defaultElevation = 4.dp),
             shape = RoundedCornerShape(30.dp),
             colors = CardDefaults.cardColors(
                 containerColor = backgroundColor
@@ -175,7 +194,7 @@ fun FeaturedCard(
             modifier = Modifier
                 .size(100.dp)
                 .align(Alignment.CenterEnd)
-                .offset(x = (-5).dp)
+                .offset(x = (0).dp)
                 .offset(y = (-30).dp)
                 .clip(RoundedCornerShape(8.dp)),
             contentScale = ContentScale.Fit
