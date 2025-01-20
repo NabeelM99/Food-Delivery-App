@@ -49,7 +49,7 @@ fun TodaysMenuSection() {
             "Free Shawarma",
             "For 4 Shawarma purchase",
             R.drawable.img_shawarma,
-            Color(0xFFFF9500)
+            Color(0xFF886532)
         )
 
     )

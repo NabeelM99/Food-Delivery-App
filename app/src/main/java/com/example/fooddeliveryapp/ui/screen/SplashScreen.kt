@@ -18,7 +18,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.fooddeliveryapp.MainActivity
 import com.example.fooddeliveryapp.R
 import com.example.fooddeliveryapp.ui.theme.YummyFoodiesFontFamily
 import com.example.fooddeliveryapp.ui.theme.extendedTypography

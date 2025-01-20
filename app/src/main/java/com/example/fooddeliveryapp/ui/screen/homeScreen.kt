@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.fooddeliveryapp.ui.screen.home_components.MenuSection
 import com.example.fooddeliveryapp.ui.screen.home_components.TodaysMenuSection
 import com.example.fooddeliveryapp.ui.screen.home_components.TopSection
 
@@ -26,6 +27,8 @@ fun HomeScreen(navController: NavController) {
                 TopSection()
                 //Spacer(modifier = Modifier.height(5.dp))
                 TodaysMenuSection()
+                MenuSection()
+
                 Spacer(modifier = Modifier.height(20.dp))
                 Text("Welcome to the Home Screen!")
                 Spacer(modifier = Modifier.height(20.dp))
