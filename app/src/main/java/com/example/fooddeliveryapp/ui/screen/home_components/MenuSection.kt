@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fooddeliveryapp.R
@@ -21,11 +22,26 @@ import com.example.fooddeliveryapp.R
 @Composable
 fun MenuSection(onCategoryClick: (MenuCategory) -> Unit = {}) {
     val menuCategories = listOf(
-        MenuCategory("Burgers", R.drawable.img_burger, Color(0xFFFFD700)),
-        MenuCategory("Fries", R.drawable.img_fries, Color(0xFFFFA500)),
-        MenuCategory("Drinks", R.drawable.img_drinks, Color(0xFF77AADD)),
-        MenuCategory("Pasta", R.drawable.img_pasta, Color(0xFF8BC34A)),
-        MenuCategory("Juice", R.drawable.img_juice, Color(0xFFFF6347))
+        MenuCategory("Burgers",
+            R.drawable.img_burger1,
+            Color(0xFFFFD700)
+        ),
+        MenuCategory("Fries",
+            R.drawable.img_fries,
+            Color(0xFFFFA500)
+        ),
+        MenuCategory("Drinks",
+            R.drawable.img_drinks,
+            Color(0xFF77AADD)
+        ),
+        MenuCategory("Pasta",
+            R.drawable.img_pasta,
+            Color(0xFF8BC34A)
+        ),
+        MenuCategory("Juice",
+            R.drawable.img_juice,
+            Color(0xFFFF6347)
+        )
     )
 
     Column(
@@ -71,26 +87,30 @@ fun MenuCard(
         colors = CardDefaults.cardColors(containerColor = category.backgroundColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
+            // Title at the top
+            Text(
+                text = category.label,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp)
+            )
+
+            // Large image at bottom-left
             Image(
                 painter = painterResource(id = category.imageResId),
                 contentDescription = category.label,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(60.dp)
-            )
-
-            Text(
-                text = category.label,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
+                    .size(100.dp)
+                    .wrapContentSize(align = Alignment.BottomStart)
+                    .offset(x = (-20).dp, y = 40.dp)
             )
         }
     }
