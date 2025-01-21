@@ -47,11 +47,11 @@ fun MenuSection(onCategoryClick: (MenuCategory) -> Unit = {}) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(start = 16.dp, end = 16.dp)
     ) {
         Text(
             text = "Menu Categories",
-            fontSize = 28.sp,
+            fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
         )

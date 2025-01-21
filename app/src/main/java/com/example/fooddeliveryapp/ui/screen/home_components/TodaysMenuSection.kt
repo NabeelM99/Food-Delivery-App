@@ -94,21 +94,20 @@ fun TodaysMenuSection() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(start  = 16.dp, end = 16.dp),
     ) {
         Text(
-            text = "Today's Menu",
-            fontSize = 40.sp,
+            text = "Today's Offer",
+            fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(150.dp), // Adjust the height as needed
+                .height(150.dp)
+                .padding(bottom = 25.dp),
             contentAlignment = Alignment.Center
         ) {
             FeaturedCard(
@@ -147,7 +146,7 @@ fun FeaturedCard(
 ) {
     Box(
         modifier = Modifier
-            .width(360.dp)
+            .width(380.dp)
             .height(130.dp)
             .offset(x = offset.dp)
     ) {

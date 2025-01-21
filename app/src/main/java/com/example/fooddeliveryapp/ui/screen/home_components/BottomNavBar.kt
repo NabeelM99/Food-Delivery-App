@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -63,7 +64,9 @@ fun BottomNavBar(
                 },
                 selected = currentRoute == item.route,
                 onClick = {
-                    if (item.route == "home" && currentRoute != "home") {
+                    if (item.route == "search") {
+                        onNavigate("SearchBarSection") // Explicitly navigate to the search screen
+                    } else if (item.route == "home" && currentRoute != "home") {
                         onNavigate(item.route)
                     } else if (item.route != "home") {
                         onNavigate(item.route)
@@ -93,6 +96,11 @@ private val bottomNavItems = listOf(
         icon = Icons.Default.LocationOn,
         label = "Location",
         route = "location"
+    ),
+    NavItem(
+        icon = Icons.Default.Search,
+        label = "Search",
+        route = "search"
     ),
     NavItem(
         icon = Icons.Default.Home,

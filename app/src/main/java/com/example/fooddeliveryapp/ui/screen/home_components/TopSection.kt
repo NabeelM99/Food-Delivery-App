@@ -1,4 +1,5 @@
 package com.example.fooddeliveryapp.ui.screen.home_components
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,6 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.example.fooddeliveryapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -23,110 +25,60 @@ fun TopSection() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
+            .zIndex(1f) // Ensure header stays above other content
     ) {
-        // User Profile Card
-        ElevatedCard(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color(0xFFFFCC80))
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Profile Picture
-                Image(
-                    painter = painterResource(id = R.drawable.user_profile),
-                    contentDescription = "User Profile",
-                    modifier = Modifier
-                        .size(45.dp)
-                        .clip(CircleShape)
-                        .background(Color.White),
-                    contentScale = ContentScale.Crop
-                )
+        // User Profile Header
+        UserProfileHeader(userName = "Pin") // Pass the user name dynamically
 
-                Spacer(modifier = Modifier.width(16.dp))
+        // Search Bar Section
+        //SearchBarSection() // Now coming from a separate file
+    }
+}
 
-                // Welcome Message and Question
-                Column {
-                    Text(
-                        text = "Welcome back, Pin!",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = "How hungry are you?",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    )
-                }
-            }
-        }
-
-        // Search Bar
+@Composable
+fun UserProfileHeader(userName: String) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
+        color = Color(0xFFFFCC80),
+        shape = RoundedCornerShape(12.dp),
+        shadowElevation = 4.dp
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp),
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TextField(
-                value = "",
-                onValueChange = {},
-                placeholder = {
-                    Text(text = "Search...",
-                        color = MaterialTheme.colorScheme
-                            .onSurface.copy(alpha = 0.5f))
-                },
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_search),
-                        contentDescription = "Search Icon",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                },
+            Image(
+                painter = painterResource(id = R.drawable.user_profile),
+                contentDescription = "User Profile",
                 modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color.LightGray.copy(alpha = 0.2f)),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-                    errorContainerColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                )
+                    .size(45.dp)
+                    .clip(CircleShape)
+                    .background(Color.White),
+                contentScale = ContentScale.Crop
             )
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
-            // Filter Icon
-            ElevatedCard(
-                shape = CircleShape,
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme
-                    .colorScheme.primary),
-                onClick = { /* TODO: Add filter logic */ }
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_sliders),
-                    contentDescription = "Filter Icon",
-                    tint = Color.White,
-                    modifier = Modifier
-                        .size(36.dp)
-                        .padding(8.dp)
+            Column {
+                Text(
+                    text = "Welcome back, $userName!",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "How hungry are you?",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
             }
         }
     }
 }
-

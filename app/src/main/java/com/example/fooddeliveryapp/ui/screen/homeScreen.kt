@@ -34,7 +34,11 @@ fun HomeScreen(navController: NavController) {
                         currentRoute = currentRoute,
                         onNavigate = { route ->
                             currentRoute = route
-                            navController.navigate(route)
+                            if (route == "SearchBarSection") {
+                                navController.navigate("SearchBarSection") // Navigate to SearchScreen
+                            } else {
+                                navController.navigate(route)
+                            }
                         }
                     )
                 }
@@ -48,16 +52,12 @@ fun HomeScreen(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 TopSection()
+                Spacer(modifier = Modifier.height(2.dp))
                 TodaysMenuSection()
+                Spacer(modifier = Modifier.height(2.dp))
                 MenuSection()
 
-                Spacer(modifier = Modifier.height(20.dp))
-                Text("Welcome to the Home Screen!")
-                Spacer(modifier = Modifier.height(20.dp))
-                Button(onClick = { /* Handle navigation or actions here */ }) {
-                    Text("Explore More")
                 }
             }
         }
     }
-}
