@@ -97,7 +97,7 @@ fun TodaysMenuSection() {
             .padding(start  = 16.dp, end = 16.dp),
     ) {
         Text(
-            text = "Today's Offer",
+            text = "Today's Menu",
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
@@ -154,7 +154,7 @@ fun FeaturedCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .width(300.dp)
-                .height(120.dp),
+                .height(150.dp),
             elevation = CardDefaults
                 .cardElevation(defaultElevation = 4.dp),
             shape = RoundedCornerShape(30.dp),
@@ -191,7 +191,7 @@ fun FeaturedCard(
             painter = painterResource(id = imageResId),
             contentDescription = null,
             modifier = Modifier
-                .size(100.dp)
+                .size(120.dp)
                 .align(Alignment.CenterEnd)
                 .offset(x = (0).dp)
                 .offset(y = (-30).dp)
@@ -200,3 +200,4 @@ fun FeaturedCard(
         )
     }
 }
+

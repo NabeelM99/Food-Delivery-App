@@ -49,12 +49,6 @@ fun MenuSection(onCategoryClick: (MenuCategory) -> Unit = {}) {
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp)
     ) {
-        Text(
-            text = "Menu Categories",
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
 
         Row(
             modifier = Modifier
@@ -81,8 +75,8 @@ fun MenuCard(
     Card(
         onClick = onClick,
         modifier = Modifier
-            .width(120.dp)
-            .height(120.dp),
+            .width(100.dp)
+            .height(130.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = category.backgroundColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
