@@ -1,4 +1,4 @@
-package com.example.fooddeliveryapp.data
+/*package com.example.fooddeliveryapp.data
 
 data class OrderState(
     val amount: Int,
@@ -8,4 +8,4 @@ data class OrderState(
 val OrderData = OrderState(
     amount = 5,
     totalPrice = "$27.45"
-)
+)*/

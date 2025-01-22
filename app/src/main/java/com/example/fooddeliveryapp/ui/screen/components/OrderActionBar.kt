@@ -1,18 +1,9 @@
 package com.example.fooddeliveryapp.ui.screen.components
 
-
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -26,13 +17,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.fooddeliveryapp.R
-import com.example.fooddeliveryapp.data.OrderState
 import com.example.fooddeliveryapp.ui.theme.AppTheme
+
+// OrderState class and default values defined inside OrderActionBar.kt
+data class OrderState(
+    val amount: Int,
+    val totalPrice: String
+)
 
 @Composable
 fun OrderActionBar(
     modifier: Modifier = Modifier,
-    state: OrderState,
+    state: OrderState = OrderState(amount = 5, totalPrice = "$27.45"), // Default OrderState
     onAddItemClicked: () -> Unit,
     onRemoveItemClicked: () -> Unit,
     onCheckOutClicked: () -> Unit
@@ -97,7 +93,6 @@ private fun Selector(
                 color = AppTheme.colors.onSurface,
                 style = AppTheme.typography.titleLarge
             )
-
 
             SelectorButton(
                 iconRes = R.drawable.ic_plus,

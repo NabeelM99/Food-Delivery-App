@@ -13,6 +13,7 @@ import com.example.fooddeliveryapp.ui.screen.home_components.MenuSection
 import com.example.fooddeliveryapp.ui.screen.home_components.TodaysMenuSection
 import com.example.fooddeliveryapp.ui.screen.home_components.TopSection
 import com.example.fooddeliveryapp.components.BottomNavBar
+import com.example.fooddeliveryapp.ui.screen.home_components.BestOfferSection
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -56,6 +57,8 @@ fun HomeScreen(navController: NavController) {
                 TodaysMenuSection()
                 Spacer(modifier = Modifier.height(2.dp))
                 MenuSection()
+                Spacer(modifier = Modifier.height(20.dp))
+                BestOfferSection(navController)
 
                 }
             }

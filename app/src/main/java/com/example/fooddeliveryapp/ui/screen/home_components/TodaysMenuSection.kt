@@ -98,7 +98,7 @@ fun TodaysMenuSection() {
     ) {
         Text(
             text = "Today's Menu",
-            fontSize = 30.sp,
+            fontSize = 40.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
         )
