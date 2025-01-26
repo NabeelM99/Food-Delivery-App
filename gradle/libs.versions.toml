@@ -42,6 +42,8 @@ osmdroid = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroid" 
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines" }
 mediation-test-suite = { group = "com.google.android.ads", name = "mediation-test-suite", version.ref = "mediationTestSuite" }
+play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version = "21.5.0" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
