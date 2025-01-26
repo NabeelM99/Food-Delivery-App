@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         // Location Selection Screen
-                        composable("LocationScreen") {
+                        composable("location") {
                             LocationSelectionScreen(navController)
                         }
 
