@@ -40,7 +40,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -51,6 +50,13 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.compose.constraint.layout)
     implementation(libs.navigation.compose)
+    implementation(libs.play.services.maps) // Google Maps
+    implementation(libs.play.services.location) // Location services
+    implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.osmdroid)
+    implementation(libs.play.services.location)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.mediation.test.suite)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -58,5 +64,4 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
 }

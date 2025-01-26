@@ -1,4 +1,5 @@
 package com.example.fooddeliveryapp
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -7,10 +8,12 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
-import androidx.navigation.compose.*
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.fooddeliveryapp.ui.screen.* // Import all your screens here
-import com.example.fooddeliveryapp.ui.screen.HomeScreen
 import com.example.fooddeliveryapp.ui.theme.AppTheme
+
 
 class MainActivity : ComponentActivity() {
 
@@ -39,29 +42,40 @@ class MainActivity : ComponentActivity() {
                             }
                         }
 
-                        // Sign In screen
+                        // Location Selection Screen
+                        composable("locationScreen") {
+                            LocationSelectionScreen(navController)
+                        }
+
+                        // Location Map Screen
+                        composable("locationMapScreen") {
+                            LocationMapScreen(navController)
+                        }
+
+                        // Sign In Screen
                         composable("signInScreen") {
                             SignInScreen(navController)
                         }
 
-                        // Sign Up screen
+                        // Sign Up Screen
                         composable("signUpScreen") {
                             SignUpScreen(navController)
                         }
 
-                        // Product Details screen
+                        // Product Details Screen
                         composable("productDetailsScreen") {
-                            ProductDetailsScreen() // Pass no extra parameters here
+                            ProductDetailsScreen() // Adjust if parameters are needed
                         }
 
-                        // Home screen after login/signup
+                        // Home Screen
                         composable("homeScreen") {
-                            HomeScreen(navController) // Change this to your actual Home screen
-                        }
-                        composable("SearchBarSection") {
-                            SearchScreen() // Change this to your actual Home screen
+                            HomeScreen(navController)
                         }
 
+                        // Search Bar Section
+                        composable("SearchBarSection") {
+                            SearchScreen()
+                        }
                     }
                 }
             }

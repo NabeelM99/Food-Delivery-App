@@ -11,6 +11,12 @@ composeBom = "2024.04.01"
 compose-constrant-layout = "1.0.1"
 navigation-compose = "2.5.3"
 compose = "androidx.navigation:navigation-compose:2.5.3"
+playServicesMaps = "19.0.0"
+kotlinx-coroutines = "1.7.3"
+appcompat = "1.7.0"
+osmdroid = "6.1.11"
+playServicesLocation = "21.3.0"
+mediationTestSuite = "3.0.0"
 
 
 [libraries]
@@ -30,6 +36,12 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 compose-constraint-layout = {group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "compose-constrant-layout"}
+play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+osmdroid = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroid" }
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines" }
+mediation-test-suite = { group = "com.google.android.ads", name = "mediation-test-suite", version.ref = "mediationTestSuite" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
