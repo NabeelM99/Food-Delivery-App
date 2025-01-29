@@ -30,6 +30,7 @@ import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.util.BoundingBox
 import java.util.Locale
+import androidx.compose.ui.graphics.Color
 
 data class LocationDetails(
     val geoPoint: GeoPoint,
@@ -41,7 +42,7 @@ data class LocationDetails(
 fun LocationMapScreen(navController: NavController) {
     val context = LocalContext.current
     var mapView by remember { mutableStateOf<MapView?>(null) }
-    var selectedLocation by remember { mutableStateOf<GeoPoint?>(null) }
+    var selectedLocation by remember { mutableStateOf<LocationDetails?>(null) }
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var showSheet by remember { mutableStateOf(false) }
@@ -88,34 +89,8 @@ fun LocationMapScreen(navController: NavController) {
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        // Search Bar
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            placeholder = { Text("Search for a location...") },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(
-                onSearch = {
-                    scope.launch {
-                        searchLocation(
-                            mapView,
-                            context,
-                            searchQuery,
-                            geocoder
-                        ){ geoPoint ->
-                            selectedLocation = geoPoint
-                        }
-                    }
-                }
-            )
-        )
-
     Box(modifier = Modifier.fillMaxSize()) {
+        // Map at the bottom layer
         mapView?.let { map ->
             AndroidView(
                 factory = { map },
@@ -125,19 +100,57 @@ fun LocationMapScreen(navController: NavController) {
                         map,
                         context,
                         geocoder
-                    ) {
-                        locationDetails ->
-                        selectedLocation = locationDetails.geoPoint
+                    ) { locationDetails ->
+                        selectedLocation = locationDetails
                         showSheet = true
-                        scope.launch { sheetState.show()
-                        }
+                        scope.launch { sheetState.show() }
                     }
                 }
             )
         }
-    }
+
+        // Search Bar at the top of the map (overlayed)
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .align(Alignment.TopCenter) // Align the search bar at the top
+        ) {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                modifier = Modifier
+                    .fillMaxWidth(),
+                placeholder = { Text("Search for a location...") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions(
+                    onSearch = {
+                        scope.launch {
+                            searchLocation(
+                                mapView,
+                                context,
+                                searchQuery,
+                                geocoder
+                            ) { locationDetails ->
+                                selectedLocation = locationDetails
+                                showSheet = true
+                                scope.launch { sheetState.show() }
+                            }
+                        }
+                    }
+                ),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color(0xFFFFA500), // Orange border color
+                    unfocusedBorderColor = Color(0xFFFFA500), // Orange border color
+                    containerColor = Color(0xFFF8F8F8) // Light white background
+                ),
+                shape = MaterialTheme.shapes.medium
+            )
+        }
     }
 }
+
+
 
 @SuppressLint("DefaultLocale")
 @Composable
@@ -196,17 +209,20 @@ private fun setupOpenStreetMap(
 
     val mapEventsOverlay = MapEventsOverlay(
         object : MapEventsReceiver {
-        override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
-            mapView.overlays.removeAll { it is Marker }
+        override fun singleTapConfirmedHelper(
+            p: GeoPoint): Boolean {
+            mapView.overlays.removeAll {
+                it is Marker
+            }
 
             // Create and configure the marker with a larger size
             val marker = Marker(mapView).apply {
                 position = p
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                icon = ContextCompat.getDrawable(context, R.drawable.ic_location_pin)?.apply {
-                }
+                icon = ContextCompat.getDrawable(context, R.drawable.ic_location_pin)
                 title = "Selected Location"
             }
+
             mapView.overlays.add(marker)
             mapView.controller.animateTo(p)
 
@@ -216,10 +232,10 @@ private fun setupOpenStreetMap(
                 val address = addresses?.firstOrNull()?.let { addr ->
                     buildString {
                         append(addr.getAddressLine(0) ?: "")
-                        if (addr.locality != null) {
+                        if (addr.locality != null && !addr.getAddressLine(0)?.contains(addr.locality)!!) {
                             append(", ${addr.locality}")
                         }
-                        if (addr.countryName != null) {
+                        if (addr.countryName != null && !addr.getAddressLine(0)?.contains(addr.countryName)!!) {
                             append(", ${addr.countryName}")
                         }
                     }
@@ -244,7 +260,7 @@ private suspend fun searchLocation(
     context: Context,
     locationName: String,
     geocoder: Geocoder,
-    onLocationFound: (GeoPoint) -> Unit
+    onLocationFound: (LocationDetails) -> Unit
 ) {
     withContext(Dispatchers.IO) {
         try {
@@ -269,7 +285,9 @@ private suspend fun searchLocation(
                     mapView?.overlays?.add(marker)
                     mapView?.invalidate()
 
-                    onLocationFound(geoPoint)
+                    // Pass LocationDetails (GeoPoint + Address)
+                    val locationDetails = LocationDetails(geoPoint, address.getAddressLine(0) ?: "Unknown location")
+                    onLocationFound(locationDetails)
                 }
             }
         } catch (e: Exception) {
