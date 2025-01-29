@@ -50,13 +50,11 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.compose.constraint.layout)
     implementation(libs.navigation.compose)
-    implementation(libs.play.services.maps) // Google Maps
-    implementation(libs.play.services.location) // Location services
     implementation(libs.play.services.ads) // Google Mobile Ads SDK
-
+    implementation(libs.osmdroid.android)
+    implementation(libs.osmdroid.wms)
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.osmdroid)
-    implementation(libs.play.services.location)
     implementation(libs.androidx.appcompat)
     implementation(libs.mediation.test.suite)
     testImplementation(libs.junit)
