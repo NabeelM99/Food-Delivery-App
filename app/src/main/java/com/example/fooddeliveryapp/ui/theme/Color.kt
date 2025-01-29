@@ -3,7 +3,6 @@ package com.example.fooddeliveryapp.ui.theme
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import androidx.core.content.pm.ShortcutInfoCompat.Surface
 
 val Orange = Color (0xFFFFA500)
 val Green = Color (0xFF84A59D)

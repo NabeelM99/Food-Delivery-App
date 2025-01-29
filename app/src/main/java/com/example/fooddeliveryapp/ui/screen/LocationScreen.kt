@@ -2,8 +2,12 @@ package com.example.fooddeliveryapp.ui.screen
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.location.Address
+import android.location.Geocoder
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -11,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
 import kotlinx.coroutines.Dispatchers
@@ -23,10 +28,13 @@ import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
-/*import org.osmdroid.bonuspack.location.GeocoderNominatim
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay*/
 import org.osmdroid.util.BoundingBox
+import java.util.Locale
+
+data class LocationDetails(
+    val geoPoint: GeoPoint,
+    val address: String
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,19 +42,19 @@ fun LocationMapScreen(navController: NavController) {
     val context = LocalContext.current
     var mapView by remember { mutableStateOf<MapView?>(null) }
     var selectedLocation by remember { mutableStateOf<GeoPoint?>(null) }
-    var locationAddress by remember { mutableStateOf<String?>(null) }
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var showSheet by remember { mutableStateOf(false) }
+    val geocoder = remember { Geocoder(context, Locale.getDefault()) }
+    var searchQuery by remember { mutableStateOf("") }
 
     // Initialize map
     LaunchedEffect(Unit) {
-        Configuration.getInstance()
-            .load(context,
-                context.getSharedPreferences
-                    ("osm_prefs", Context.MODE_PRIVATE))
+        Configuration.getInstance().load(context,
+            context.getSharedPreferences("osm_prefs",
+                Context.MODE_PRIVATE))
         mapView = MapView(context).apply {
-            setTileSource(TileSourceFactory.MAPNIK) // Ensure area names are visible
+            setTileSource(TileSourceFactory.MAPNIK)
             setMultiTouchControls(true)
 
             val bahrain = BoundingBox(
@@ -55,59 +63,88 @@ fun LocationMapScreen(navController: NavController) {
                 25.567, // South
                 50.267  // West
             )
-
             setScrollableAreaLimitDouble(bahrain)
-            setMinZoomLevel(11.0) // Adjust this value to control minimum zoom
-            setMaxZoomLevel(19.0) // Maximum zoom level
+            setMinZoomLevel(11.0)
+            setMaxZoomLevel(19.0)
+
+            isTilesScaledToDpi = true
+            setZoomRounding(true)
+            isHorizontalMapRepetitionEnabled = false
+            isVerticalMapRepetitionEnabled = false
         }
     }
 
+    if (showSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showSheet = false },
+            sheetState = sheetState
+        ) {
+            selectedLocation?.let { location ->
+                LocationConfirmationCard(
+                    navController = navController,
+                    locationDetails = location
+                )
+            }
+        }
+    }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        // Search Bar
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            placeholder = { Text("Search for a location...") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            keyboardActions = KeyboardActions(
+                onSearch = {
+                    scope.launch {
+                        searchLocation(
+                            mapView,
+                            context,
+                            searchQuery,
+                            geocoder
+                        ){ geoPoint ->
+                            selectedLocation = geoPoint
+                        }
+                    }
+                }
+            )
+        )
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Fullscreen MapView
         mapView?.let { map ->
             AndroidView(
                 factory = { map },
                 modifier = Modifier.fillMaxSize(),
                 update = {
                     setupOpenStreetMap(
-                        map, context
-                    ) { geoPoint ->
-                        selectedLocation = geoPoint
-                        scope.launch {
-                            showSheet = true
-                            sheetState.show()
+                        map,
+                        context,
+                        geocoder
+                    ) {
+                        locationDetails ->
+                        selectedLocation = locationDetails.geoPoint
+                        showSheet = true
+                        scope.launch { sheetState.show()
                         }
                     }
                 }
             )
         }
     }
-
-    // Modal Bottom Sheet
-    if (showSheet) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                showSheet = false },
-            sheetState = sheetState
-        ) {
-            selectedLocation?.let { location ->
-                LocationConfirmationCard(
-                    navController = navController,
-                    location = location,
-                    address = locationAddress ?: "Location name not found"
-                )
-            }
-        }
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun LocationConfirmationCard(
     navController: NavController,
-    location: GeoPoint,
-    address: String
-){
+    locationDetails: LocationDetails
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -117,11 +154,16 @@ fun LocationConfirmationCard(
             modifier = Modifier.padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Selected Location: $address")
+
+            Text(
+                locationDetails.address,
+                style = MaterialTheme.typography.bodyMedium
+            )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Coordinates: ${location.latitude}, ${location.longitude}",
-                style = MaterialTheme.typography.bodySmall
+                "Latitude: ${String.format("%.6f", locationDetails.geoPoint.latitude)}\n" +
+                        "Longitude: ${String.format("%.6f", locationDetails.geoPoint.longitude)}",
+                style = MaterialTheme.typography.bodyMedium
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -143,28 +185,50 @@ fun LocationConfirmationCard(
 private fun setupOpenStreetMap(
     mapView: MapView,
     context: Context,
-    onLocationSelected: (GeoPoint) -> Unit
+    geocoder: Geocoder,
+    onLocationSelected: (LocationDetails) -> Unit
 ) {
-    val startPoint = GeoPoint(26.0667, 50.5577) // Default to Bahrain
-    mapView.controller.setZoom(15.0)
+    val startPoint = GeoPoint(26.221514, 50.580924) // Bahrain center
+    mapView.controller.setZoom(13.0)
     mapView.controller.setCenter(startPoint)
     mapView.setBuiltInZoomControls(true)
     mapView.overlays.clear()
 
-    val mapEventsOverlay = MapEventsOverlay(object : MapEventsReceiver {
-        @SuppressLint("UseCompatLoadingForDrawables")
+    val mapEventsOverlay = MapEventsOverlay(
+        object : MapEventsReceiver {
         override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
             mapView.overlays.removeAll { it is Marker }
 
+            // Create and configure the marker with a larger size
             val marker = Marker(mapView).apply {
                 position = p
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                icon = context.getDrawable(R.drawable.ic_location_pin) // Add custom location icon
+                icon = ContextCompat.getDrawable(context, R.drawable.ic_location_pin)?.apply {
+                }
                 title = "Selected Location"
             }
             mapView.overlays.add(marker)
             mapView.controller.animateTo(p)
-            onLocationSelected(p)
+
+            // Get address using Geocoder
+            try {
+                val addresses = geocoder.getFromLocation(p.latitude, p.longitude, 1)
+                val address = addresses?.firstOrNull()?.let { addr ->
+                    buildString {
+                        append(addr.getAddressLine(0) ?: "")
+                        if (addr.locality != null) {
+                            append(", ${addr.locality}")
+                        }
+                        if (addr.countryName != null) {
+                            append(", ${addr.countryName}")
+                        }
+                    }
+                } ?: "Unknown location"
+
+                onLocationSelected(LocationDetails(p, address))
+            } catch (e: Exception) {
+                onLocationSelected(LocationDetails(p, "Location details not available"))
+            }
             return true
         }
 
@@ -175,17 +239,41 @@ private fun setupOpenStreetMap(
     mapView.invalidate()
 }
 
-// Function to get address from coordinates
-/*private suspend fun getAddressFromLocation(geoPoint: GeoPoint): String? {
-    return withContext(Dispatchers.IO) {
+private suspend fun searchLocation(
+    mapView: MapView?,
+    context: Context,
+    locationName: String,
+    geocoder: Geocoder,
+    onLocationFound: (GeoPoint) -> Unit
+) {
+    withContext(Dispatchers.IO) {
         try {
-            val geocoder = GeocoderNominatim("FoodDeliveryApp")
-            val addresses = geocoder.getFromLocation(geoPoint.latitude, geoPoint.longitude, 1)
-            if (addresses.isNotEmpty()) {
-                addresses[0].getAddressLine(0)
-            } else null
+            val addresses = geocoder.getFromLocationName(locationName, 1)
+            val address = addresses?.firstOrNull()
+            if (address != null) {
+                val geoPoint = GeoPoint(address.latitude, address.longitude)
+                withContext(Dispatchers.Main) {
+                    mapView?.controller?.setZoom(15.0)
+                    mapView?.controller?.animateTo(geoPoint)
+
+                    // Clear existing markers
+                    mapView?.overlays?.removeAll { it is Marker }
+
+                    // Add new marker
+                    val marker = Marker(mapView).apply {
+                        position = geoPoint
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        icon = ContextCompat.getDrawable(context, R.drawable.ic_location_pin)
+                        title = locationName
+                    }
+                    mapView?.overlays?.add(marker)
+                    mapView?.invalidate()
+
+                    onLocationFound(geoPoint)
+                }
+            }
         } catch (e: Exception) {
-            null
+            e.printStackTrace()
         }
     }
-}*/
+}
