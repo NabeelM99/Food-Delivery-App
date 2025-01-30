@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.osmdroid)
     implementation(libs.androidx.appcompat)
     implementation(libs.mediation.test.suite)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

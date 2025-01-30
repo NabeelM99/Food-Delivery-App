@@ -17,6 +17,7 @@ appcompat = "1.7.0"
 osmdroid = "6.1.16"
 playServicesLocation = "21.3.0"
 mediationTestSuite = "3.0.0"
+playServicesLocationVersion = "21.3.0"
 
 
 [libraries]
@@ -43,6 +44,7 @@ osmdroid = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroid" 
 kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines" }
 mediation-test-suite = { group = "com.google.android.ads", name = "mediation-test-suite", version.ref = "mediationTestSuite" }
 play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version = "23.6.0" }
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocationVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

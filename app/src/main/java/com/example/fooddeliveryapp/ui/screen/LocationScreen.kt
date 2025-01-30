@@ -1,36 +1,47 @@
 package com.example.fooddeliveryapp.ui.screen
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Geocoder
+import android.location.LocationManager
+import android.os.Looper
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
+import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import org.osmdroid.views.MapView
-import org.osmdroid.util.GeoPoint
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.BoundingBox
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
-import org.osmdroid.util.BoundingBox
 import java.util.Locale
-import androidx.compose.ui.graphics.Color
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationResult
 
 data class LocationDetails(
     val geoPoint: GeoPoint,
@@ -49,11 +60,38 @@ fun LocationMapScreen(navController: NavController) {
     val geocoder = remember { Geocoder(context, Locale.getDefault()) }
     var searchQuery by remember { mutableStateOf("") }
 
+    // Location permission states
+    var showLocationPermissionDialog by remember { mutableStateOf(false) }
+    var showLocationSettingsDialog by remember { mutableStateOf(false) }
+
+    // Permission launcher
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            checkLocationSettingsAndGetLocation(context) { isEnabled ->
+                if (!isEnabled) {
+                    showLocationSettingsDialog = true
+                } else {
+                    scope.launch {
+                        getCurrentLocation(context, mapView) { location ->
+                            location?.let { locationDetails ->
+                                selectedLocation = locationDetails
+                                showSheet = true
+                                scope.launch { sheetState.show() }
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            showLocationPermissionDialog = true
+        }
+    }
+
     // Initialize map
     LaunchedEffect(Unit) {
-        Configuration.getInstance().load(context,
-            context.getSharedPreferences("osm_prefs",
-                Context.MODE_PRIVATE))
+        Configuration.getInstance().load(context, context.getSharedPreferences("osm_prefs", Context.MODE_PRIVATE))
         mapView = MapView(context).apply {
             setTileSource(TileSourceFactory.MAPNIK)
             setMultiTouchControls(true)
@@ -73,8 +111,77 @@ fun LocationMapScreen(navController: NavController) {
             isHorizontalMapRepetitionEnabled = false
             isVerticalMapRepetitionEnabled = false
         }
+
+        // Check location permission
+        when {
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                checkLocationSettingsAndGetLocation(context) { isEnabled ->
+                    if (!isEnabled) {
+                        showLocationSettingsDialog = true
+                    }
+                }
+            }
+            else -> {
+                locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+        }
     }
 
+    // Location Permission Dialog
+    if (showLocationPermissionDialog) {
+        AlertDialog(
+            onDismissRequest = { showLocationPermissionDialog = false },
+            title = { Text("Location Permission Required") },
+            text = { Text("This app needs location permission to show your current location. Please grant the permission in Settings.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showLocationPermissionDialog = false
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = android.net.Uri.fromParts("package", context.packageName, null)
+                        }
+                        context.startActivity(intent)
+                    }
+                ) {
+                    Text("Open Settings")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLocationPermissionDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    // Location Settings Dialog
+    if (showLocationSettingsDialog) {
+        AlertDialog(
+            onDismissRequest = { showLocationSettingsDialog = false },
+            title = { Text("Location Services Required") },
+            text = { Text("Please enable location services to use your current location.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showLocationSettingsDialog = false
+                        context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                    }
+                ) {
+                    Text("Turn On")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLocationSettingsDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    // Bottom Sheet
     if (showSheet) {
         ModalBottomSheet(
             onDismissRequest = { showSheet = false },
@@ -88,7 +195,6 @@ fun LocationMapScreen(navController: NavController) {
             }
         }
     }
-
     Box(modifier = Modifier.fillMaxSize()) {
         // Map at the bottom layer
         mapView?.let { map ->
@@ -96,11 +202,7 @@ fun LocationMapScreen(navController: NavController) {
                 factory = { map },
                 modifier = Modifier.fillMaxSize(),
                 update = {
-                    setupOpenStreetMap(
-                        map,
-                        context,
-                        geocoder
-                    ) { locationDetails ->
+                    setupOpenStreetMap(map, context, geocoder) { locationDetails ->
                         selectedLocation = locationDetails
                         showSheet = true
                         scope.launch { sheetState.show() }
@@ -109,29 +211,24 @@ fun LocationMapScreen(navController: NavController) {
             )
         }
 
-        // Search Bar at the top of the map (overlayed)
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .align(Alignment.TopCenter) // Align the search bar at the top
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .align(Alignment.TopCenter)
         ) {
+            // Search bar
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("Search for a location...") },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(
                     onSearch = {
                         scope.launch {
-                            searchLocation(
-                                mapView,
-                                context,
-                                searchQuery,
-                                geocoder
-                            ) { locationDetails ->
+                            searchLocation(mapView, context, searchQuery, geocoder) { locationDetails ->
                                 selectedLocation = locationDetails
                                 showSheet = true
                                 scope.launch { sheetState.show() }
@@ -139,18 +236,41 @@ fun LocationMapScreen(navController: NavController) {
                         }
                     }
                 ),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color(0xFFFFA500), // Orange border color
-                    unfocusedBorderColor = Color(0xFFFFA500), // Orange border color
-                    containerColor = Color(0xFFF8F8F8) // Light white background
+                colors = TextFieldDefaults.colors(
+                    focusedIndicatorColor = Color(0xFFFFA500),
+                    unfocusedIndicatorColor = Color(0xFFFFA500),
+                    focusedContainerColor = Color(0xFFF8F8F8),
+                    unfocusedContainerColor = Color(0xFFF8F8F8),
+                    cursorColor = Color(0xFFFFA500),
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black
                 ),
                 shape = MaterialTheme.shapes.medium
             )
+
+            // Current Location Button
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = {
+                    scope.launch {
+                        getCurrentLocation(context, mapView) { locationDetails ->
+                            locationDetails?.let {
+                                selectedLocation = it
+                                showSheet = true
+                                scope.launch { sheetState.show() }
+                            }
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500))
+            ) {
+                Text("Use Current Location")
+            }
         }
     }
+
 }
-
-
 
 @SuppressLint("DefaultLocale")
 @Composable
@@ -167,17 +287,16 @@ fun LocationConfirmationCard(
             modifier = Modifier.padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             Text(
                 locationDetails.address,
                 style = MaterialTheme.typography.bodyMedium
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(
+            /*Text(
                 "Latitude: ${String.format("%.6f", locationDetails.geoPoint.latitude)}\n" +
                         "Longitude: ${String.format("%.6f", locationDetails.geoPoint.longitude)}",
                 style = MaterialTheme.typography.bodyMedium
-            )
+            )*/
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -187,7 +306,9 @@ fun LocationConfirmationCard(
                         popUpTo("homeScreen") { inclusive = true }
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500))
+
             ) {
                 Text("Confirm Location")
             }
@@ -207,15 +328,10 @@ private fun setupOpenStreetMap(
     mapView.setBuiltInZoomControls(true)
     mapView.overlays.clear()
 
-    val mapEventsOverlay = MapEventsOverlay(
-        object : MapEventsReceiver {
-        override fun singleTapConfirmedHelper(
-            p: GeoPoint): Boolean {
-            mapView.overlays.removeAll {
-                it is Marker
-            }
+    val mapEventsOverlay = MapEventsOverlay(object : MapEventsReceiver {
+        override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
+            mapView.overlays.removeAll { it is Marker }
 
-            // Create and configure the marker with a larger size
             val marker = Marker(mapView).apply {
                 position = p
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
@@ -226,7 +342,6 @@ private fun setupOpenStreetMap(
             mapView.overlays.add(marker)
             mapView.controller.animateTo(p)
 
-            // Get address using Geocoder
             try {
                 val addresses = geocoder.getFromLocation(p.latitude, p.longitude, 1)
                 val address = addresses?.firstOrNull()?.let { addr ->
@@ -255,6 +370,78 @@ private fun setupOpenStreetMap(
     mapView.invalidate()
 }
 
+private fun checkLocationSettingsAndGetLocation(context: Context, callback: (Boolean) -> Unit) {
+    val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    val isLocationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+            locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    callback(isLocationEnabled)
+}
+
+@SuppressLint("MissingPermission")
+private suspend fun getCurrentLocation(
+    context: Context,
+    mapView: MapView?,
+    onLocationFound: (LocationDetails?) -> Unit
+) {
+    if (ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        onLocationFound(null)
+        return
+    }
+
+    try {
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+
+        // Request fresh location
+        val locationRequest = com.google.android.gms.location.LocationRequest.create().apply {
+            priority = com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
+            interval = 0
+            fastestInterval = 0
+            numUpdates = 1
+        }
+
+        withContext(Dispatchers.Main) {
+            fusedLocationClient.requestLocationUpdates(locationRequest, object : com.google.android.gms.location.LocationCallback() {
+                override fun onLocationResult(locationResult: com.google.android.gms.location.LocationResult) {
+                    val location = locationResult.lastLocation
+                    if (location != null) {
+                        val geoPoint = GeoPoint(location.latitude, location.longitude)
+
+                        mapView?.controller?.setZoom(15.0)
+                        mapView?.controller?.animateTo(geoPoint)
+
+                        mapView?.overlays?.removeAll { it is Marker }
+                        val marker = Marker(mapView).apply {
+                            position = geoPoint
+                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                            icon = ContextCompat.getDrawable(context, R.drawable.ic_location_pin)?.apply {
+                                setBounds(0, 0, 80, 80)
+                            }
+                            title = "Current Location"
+                        }
+                        mapView?.overlays?.add(marker)
+                        mapView?.invalidate()
+
+                        val geocoder = Geocoder(context, Locale.getDefault())
+                        val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                        val address = addresses?.firstOrNull()?.getAddressLine(0) ?: "Current Location"
+
+                        onLocationFound(LocationDetails(geoPoint, address))
+                        fusedLocationClient.removeLocationUpdates(this)
+                    }
+                }
+            }, Looper.getMainLooper())
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        onLocationFound(null)
+    }
+}
+
+
 private suspend fun searchLocation(
     mapView: MapView?,
     context: Context,
@@ -272,10 +459,8 @@ private suspend fun searchLocation(
                     mapView?.controller?.setZoom(15.0)
                     mapView?.controller?.animateTo(geoPoint)
 
-                    // Clear existing markers
                     mapView?.overlays?.removeAll { it is Marker }
 
-                    // Add new marker
                     val marker = Marker(mapView).apply {
                         position = geoPoint
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
@@ -285,8 +470,8 @@ private suspend fun searchLocation(
                     mapView?.overlays?.add(marker)
                     mapView?.invalidate()
 
-                    // Pass LocationDetails (GeoPoint + Address)
-                    val locationDetails = LocationDetails(geoPoint, address.getAddressLine(0) ?: "Unknown location")
+                    val locationDetails = LocationDetails(geoPoint, address.getAddressLine(0) ?:"Unknown location"
+                    )
                     onLocationFound(locationDetails)
                 }
             }
