@@ -40,8 +40,11 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import java.util.Locale
+import com.google.android.gms.location.Priority
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 data class LocationDetails(
     val geoPoint: GeoPoint,
@@ -316,6 +319,21 @@ fun LocationConfirmationCard(
     }
 }
 
+
+
+/*private object BahrainBounds {
+    const val NORTH = 26.417
+    const val SOUTH = 25.567
+    const val EAST = 50.933
+    const val WEST = 50.267
+}
+
+private fun isLocationInBahrain(latitude: Double, longitude: Double): Boolean {
+    return latitude in BahrainBounds.SOUTH..BahrainBounds.NORTH &&
+            longitude in BahrainBounds.WEST..BahrainBounds.EAST
+}*/
+
+
 private fun setupOpenStreetMap(
     mapView: MapView,
     context: Context,
@@ -325,7 +343,7 @@ private fun setupOpenStreetMap(
     val startPoint = GeoPoint(26.221514, 50.580924) // Bahrain center
     mapView.controller.setZoom(13.0)
     mapView.controller.setCenter(startPoint)
-    mapView.setBuiltInZoomControls(true)
+    mapView.zoomController.setVisibility(org.osmdroid.views.CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
     mapView.overlays.clear()
 
     val mapEventsOverlay = MapEventsOverlay(object : MapEventsReceiver {
@@ -377,6 +395,18 @@ private fun checkLocationSettingsAndGetLocation(context: Context, callback: (Boo
     callback(isLocationEnabled)
 }
 
+private object BahrainBounds {
+    const val NORTH = 26.417
+    const val SOUTH = 25.567
+    const val EAST = 50.933
+    const val WEST = 50.267
+}
+
+private fun isLocationInBahrain(latitude: Double, longitude: Double): Boolean {
+    return latitude in BahrainBounds.SOUTH..BahrainBounds.NORTH &&
+            longitude in BahrainBounds.WEST..BahrainBounds.EAST
+}
+
 @SuppressLint("MissingPermission")
 private suspend fun getCurrentLocation(
     context: Context,
@@ -396,48 +426,69 @@ private suspend fun getCurrentLocation(
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
         // Request fresh location
-        val locationRequest = com.google.android.gms.location.LocationRequest.create().apply {
-            priority = com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
-            interval = 0
-            fastestInterval = 0
-            numUpdates = 1
-        }
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 0)
+            .setWaitForAccurateLocation(true)
+            .setMinUpdateIntervalMillis(0)
+            .setMaxUpdates(1)
+            .build()
 
         withContext(Dispatchers.Main) {
-            fusedLocationClient.requestLocationUpdates(locationRequest, object : com.google.android.gms.location.LocationCallback() {
-                override fun onLocationResult(locationResult: com.google.android.gms.location.LocationResult) {
+            fusedLocationClient.requestLocationUpdates(locationRequest, object : LocationCallback() {
+                override fun onLocationResult(locationResult: LocationResult) {
                     val location = locationResult.lastLocation
                     if (location != null) {
-                        val geoPoint = GeoPoint(location.latitude, location.longitude)
+                        //val geoPoint = GeoPoint(location.latitude, location.longitude)
+                        // Check if location is within Bahrain
+                        if (isLocationInBahrain(location.latitude, location.longitude)) {
+                            val geoPoint = GeoPoint(location.latitude, location.longitude)
 
-                        mapView?.controller?.setZoom(15.0)
-                        mapView?.controller?.animateTo(geoPoint)
+                            mapView?.controller?.setZoom(15.0)
+                            mapView?.controller?.animateTo(geoPoint)
 
-                        mapView?.overlays?.removeAll { it is Marker }
-                        val marker = Marker(mapView).apply {
-                            position = geoPoint
-                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                            icon = ContextCompat.getDrawable(context, R.drawable.ic_location_pin)?.apply {
-                                setBounds(0, 0, 80, 80)
+                            mapView?.overlays?.removeAll { it is Marker }
+                            val marker = Marker(mapView).apply {
+                                position = geoPoint
+                                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                                icon =
+                                    ContextCompat.getDrawable(context, R.drawable.ic_location_pin)
+                                        ?.apply {
+                                            setBounds(0, 0, 80, 80)
+                                        }
+                                title = "Current Location"
                             }
-                            title = "Current Location"
+                            mapView?.overlays?.add(marker)
+                            mapView?.invalidate()
+
+                            val geocoder = Geocoder(context, Locale.getDefault())
+                            val addresses =
+                                geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                            val address =
+                                addresses?.firstOrNull()?.getAddressLine(0) ?: "Current Location"
+
+                            onLocationFound(LocationDetails(geoPoint, address))
+                        } else {
+                            // If location is outside Bahrain, center on Bahrain
+                            val defaultBahrainLocation =
+                                GeoPoint(26.0667, 50.5577) // Manama coordinates
+                            val locationDetails = LocationDetails(
+                                defaultBahrainLocation,
+                                "Default Location in Bahrain"
+                            )
+                            mapView?.controller?.setZoom(11.0)
+                            mapView?.controller?.animateTo(defaultBahrainLocation)
+                            onLocationFound(locationDetails)
                         }
-                        mapView?.overlays?.add(marker)
-                        mapView?.invalidate()
-
-                        val geocoder = Geocoder(context, Locale.getDefault())
-                        val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
-                        val address = addresses?.firstOrNull()?.getAddressLine(0) ?: "Current Location"
-
-                        onLocationFound(LocationDetails(geoPoint, address))
-                        fusedLocationClient.removeLocationUpdates(this)
                     }
+                    fusedLocationClient.removeLocationUpdates(this)
+
                 }
             }, Looper.getMainLooper())
         }
     } catch (e: Exception) {
         e.printStackTrace()
-        onLocationFound(null)
+        // If there's an error, center on Bahrain
+        val defaultBahrainLocation = GeoPoint(26.0667, 50.5577)
+        onLocationFound(LocationDetails(defaultBahrainLocation, "Default Location in Bahrain"))
     }
 }
 
@@ -451,9 +502,20 @@ private suspend fun searchLocation(
 ) {
     withContext(Dispatchers.IO) {
         try {
-            val addresses = geocoder.getFromLocationName(locationName, 1)
+            // Handle different API levels for Geocoder
+            val addresses = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                suspendCancellableCoroutine { continuation ->
+                    geocoder.getFromLocationName("$locationName, Bahrain", 1) { addresses ->
+                        continuation.resume(addresses) { }
+                    }
+                }
+            } else {
+                @Suppress("DEPRECATION")
+                geocoder.getFromLocationName("$locationName, Bahrain", 1)
+            }
+
             val address = addresses?.firstOrNull()
-            if (address != null) {
+            if (address != null && isLocationInBahrain(address.latitude, address.longitude)) {
                 val geoPoint = GeoPoint(address.latitude, address.longitude)
                 withContext(Dispatchers.Main) {
                     mapView?.controller?.setZoom(15.0)
@@ -470,13 +532,27 @@ private suspend fun searchLocation(
                     mapView?.overlays?.add(marker)
                     mapView?.invalidate()
 
-                    val locationDetails = LocationDetails(geoPoint, address.getAddressLine(0) ?:"Unknown location"
+                    val locationDetails = LocationDetails(
+                        geoPoint,
+                        address.getAddressLine(0) ?:"Unknown location"
                     )
                     onLocationFound(locationDetails)
                 }
+
+            }else {
+                // If location is outside Bahrain or not found
+                withContext(Dispatchers.Main) {
+                    val defaultBahrainLocation = GeoPoint(26.0667, 50.5577)
+                    onLocationFound(LocationDetails(defaultBahrainLocation, "Location not found in Bahrain"))
+                }
             }
+
         } catch (e: Exception) {
             e.printStackTrace()
+            withContext(Dispatchers.Main) {
+                val defaultBahrainLocation = GeoPoint(26.0667, 50.5577)
+                onLocationFound(LocationDetails(defaultBahrainLocation, "Error finding location"))
+            }
         }
     }
 }

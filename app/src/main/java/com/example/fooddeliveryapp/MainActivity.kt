@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        //FirebaseApp.initializeApp(this)
         // Make status bar transparent and ensure content doesn't go behind it
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
