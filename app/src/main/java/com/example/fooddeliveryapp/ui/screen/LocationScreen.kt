@@ -29,7 +29,6 @@ import com.example.fooddeliveryapp.R
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
@@ -44,6 +43,7 @@ import com.google.android.gms.location.Priority
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 data class LocationDetails(
@@ -346,37 +346,46 @@ private fun setupOpenStreetMap(
     mapView.zoomController.setVisibility(org.osmdroid.views.CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
     mapView.overlays.clear()
 
+    // Create a draggable marker
+    val marker = Marker(mapView).apply {
+        position = startPoint
+        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        icon = ContextCompat.getDrawable(context, R.drawable.ic_location_pin)?.apply {
+            setBounds(0, 0, 80, 80)
+        }
+        isDraggable = true
+        title = "Drag to select location"
+    }
+
+    // Handle marker drag events
+    marker.setOnMarkerDragListener(object : Marker.OnMarkerDragListener {
+        override fun onMarkerDrag(marker: Marker) {
+            mapView.invalidate()
+        }
+
+        override fun onMarkerDragEnd(marker: Marker) {
+            val newPosition = marker.position
+            getAddressFromLocation(geocoder, newPosition.latitude, newPosition.longitude) { address ->
+                onLocationSelected(LocationDetails(newPosition, address))
+            }
+        }
+
+        override fun onMarkerDragStart(marker: Marker) {
+            // Optional: Handle drag start
+        }
+    })
+
+    // Add the marker to the map
+    mapView.overlays.add(marker)
+
+    // Update marker position on map tap
     val mapEventsOverlay = MapEventsOverlay(object : MapEventsReceiver {
         override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
-            mapView.overlays.removeAll { it is Marker }
-
-            val marker = Marker(mapView).apply {
-                position = p
-                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                icon = ContextCompat.getDrawable(context, R.drawable.ic_location_pin)
-                title = "Selected Location"
-            }
-
-            mapView.overlays.add(marker)
+            marker.position = p
             mapView.controller.animateTo(p)
 
-            try {
-                val addresses = geocoder.getFromLocation(p.latitude, p.longitude, 1)
-                val address = addresses?.firstOrNull()?.let { addr ->
-                    buildString {
-                        append(addr.getAddressLine(0) ?: "")
-                        if (addr.locality != null && !addr.getAddressLine(0)?.contains(addr.locality)!!) {
-                            append(", ${addr.locality}")
-                        }
-                        if (addr.countryName != null && !addr.getAddressLine(0)?.contains(addr.countryName)!!) {
-                            append(", ${addr.countryName}")
-                        }
-                    }
-                } ?: "Unknown location"
-
+            getAddressFromLocation(geocoder, p.latitude, p.longitude) { address ->
                 onLocationSelected(LocationDetails(p, address))
-            } catch (e: Exception) {
-                onLocationSelected(LocationDetails(p, "Location details not available"))
             }
             return true
         }
@@ -386,6 +395,44 @@ private fun setupOpenStreetMap(
 
     mapView.overlays.add(mapEventsOverlay)
     mapView.invalidate()
+}
+
+private fun getAddressFromLocation(
+    geocoder: Geocoder,
+    latitude: Double,
+    longitude: Double,
+    callback: (String) -> Unit
+) {
+    try {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            geocoder.getFromLocation(latitude, longitude, 1) { addresses ->
+                val address = formatAddress(addresses.firstOrNull())
+                callback(address)
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            val addresses = geocoder.getFromLocation(latitude, longitude, 1)
+            val address = formatAddress(addresses?.firstOrNull())
+            callback(address)
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        callback("Location details not available")
+    }
+}
+
+private fun formatAddress(address: android.location.Address?): String {
+    return address?.let { addr ->
+        buildString {
+            append(addr.getAddressLine(0) ?: "")
+            if (addr.locality != null && !addr.getAddressLine(0)?.contains(addr.locality)!!) {
+                append(", ${addr.locality}")
+            }
+            if (addr.countryName != null && !addr.getAddressLine(0)?.contains(addr.countryName)!!) {
+                append(", ${addr.countryName}")
+            }
+        }
+    } ?: "Unknown location"
 }
 
 private fun checkLocationSettingsAndGetLocation(context: Context, callback: (Boolean) -> Unit) {
@@ -493,6 +540,7 @@ private suspend fun getCurrentLocation(
 }
 
 
+@OptIn(ExperimentalCoroutinesApi::class)
 private suspend fun searchLocation(
     mapView: MapView?,
     context: Context,

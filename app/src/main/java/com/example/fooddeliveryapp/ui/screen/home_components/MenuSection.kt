@@ -16,29 +16,35 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MenuSection(onCategoryClick: (MenuCategory) -> Unit = {}) {
+fun MenuSection(navController: NavController) {
     val menuCategories = listOf(
-        MenuCategory("Burgers",
+        MenuCategory(
+            "Burgers",
             R.drawable.img_burger1,
             Color(0xFFFFD700)
         ),
-        MenuCategory("Fries",
+        MenuCategory(
+            "Fries",
             R.drawable.img_fries,
             Color(0xFFFFA500)
         ),
-        MenuCategory("Drinks",
+        MenuCategory(
+            "Drinks",
             R.drawable.img_drinks,
             Color(0xFF77AADD)
         ),
-        MenuCategory("Pasta",
+        MenuCategory(
+            "Pasta",
             R.drawable.img_pasta,
             Color(0xFF8BC34A)
         ),
-        MenuCategory("Juice",
+        MenuCategory(
+            "Juice",
             R.drawable.img_juice,
             Color(0xFFFF6347)
         )
@@ -49,7 +55,6 @@ fun MenuSection(onCategoryClick: (MenuCategory) -> Unit = {}) {
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp)
     ) {
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -59,7 +64,12 @@ fun MenuSection(onCategoryClick: (MenuCategory) -> Unit = {}) {
             menuCategories.forEach { category ->
                 MenuCard(
                     category = category,
-                    onClick = { onCategoryClick(category) }
+                    onClick = {
+                        when (category.label) {
+                            "Burgers" -> navController.navigate("burger_screen")
+                            // Add other category navigations when needed
+                        }
+                    }
                 )
             }
         }

@@ -56,7 +56,7 @@ fun HomeScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(2.dp))
                 TodaysMenuSection()
                 Spacer(modifier = Modifier.height(2.dp))
-                MenuSection()
+                MenuSection(navController)
                 Spacer(modifier = Modifier.height(20.dp))
                 BestOfferSection(navController)
 
