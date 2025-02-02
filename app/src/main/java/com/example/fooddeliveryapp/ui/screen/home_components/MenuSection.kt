@@ -66,7 +66,7 @@ fun MenuSection(navController: NavController) {
                     category = category,
                     onClick = {
                         when (category.label) {
-                            "Burgers" -> navController.navigate("burger_screen")
+                            "Burgers" -> navController.navigate("BurgerScreen")
                             // Add other category navigations when needed
                         }
                     }

@@ -16,6 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
 
 data class Burger(
@@ -28,7 +29,7 @@ data class Burger(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BurgerScreen(onBackClick: () -> Unit = {}) {
+fun BurgerScreen(navController: NavController) {
     val burgers = remember {
         listOf(
             Burger(
@@ -42,7 +43,7 @@ fun BurgerScreen(onBackClick: () -> Unit = {}) {
                 2,
                 "Double Beef Burger",
                 7.99,
-                R.drawable.img_burger1,
+                R.drawable.img_doubleburger,
                 "Double the beef, double the flavor"
             ),
             Burger(
@@ -68,7 +69,7 @@ fun BurgerScreen(onBackClick: () -> Unit = {}) {
             TopAppBar(
                 title = { Text("Burgers") },
                 navigationIcon = {
-                    IconButton(onClick = onBackClick) {
+                    IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_close),
                             contentDescription = "Back"
