@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.fooddeliveryapp.ui.screen.* // Import all your screens here
 import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.BurgerScreen
+import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.FriesScreen
 import com.example.fooddeliveryapp.ui.theme.AppTheme
 
 
@@ -45,6 +46,11 @@ class MainActivity : ComponentActivity() {
 
                         composable("BurgerScreen") {
                             BurgerScreen(navController) }
+
+                        composable("FriesScreen") {
+                            FriesScreen(navController)
+                        }
+
 
                         // Location Selection Screen
                         composable("location") {
