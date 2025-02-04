@@ -7,20 +7,21 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.0"
-composeBom = "2025.01.00"
+composeBom = "2025.01.01"
 compose-constrant-layout = "1.1.0"
-navigation-compose = "2.8.5"
-compose = "androidx.navigation:navigation-compose:2.5.3"
-playServicesMaps = "19.0.0"
+navigation-compose = "2.8.6"
 kotlinx-coroutines = "1.7.3"
 appcompat = "1.7.0"
 osmdroid = "6.1.16"
-playServicesLocation = "21.3.0"
 mediationTestSuite = "3.0.0"
 playServicesLocationVersion = "21.3.0"
+firebaseFirestoreKtx = "25.1.1"
+firebase-bom = "33.8.0"
+firebaseAuthKtx = "22.3.1"
 
 
 [libraries]
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -38,13 +39,19 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 compose-constraint-layout = {group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "compose-constrant-layout"}
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+#noinspection SimilarGradleDependency
 osmdroid-android = { group = "org.osmdroid", name = "osmdroid-android", version.ref = "osmdroid" }
 osmdroid-wms = { group = "org.osmdroid", name = "osmdroid-wms", version.ref = "osmdroid" }
+#noinspection SimilarGradleDependency
 osmdroid = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroid" }
 kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines" }
 mediation-test-suite = { group = "com.google.android.ads", name = "mediation-test-suite", version.ref = "mediationTestSuite" }
 play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version = "23.6.0" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocationVersion" }
+firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

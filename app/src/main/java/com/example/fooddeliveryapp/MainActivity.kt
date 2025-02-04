@@ -16,13 +16,14 @@ import com.example.fooddeliveryapp.ui.screen.home_components.menusection_compone
 import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.DrinksScreen
 import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.FriesScreen
 import com.example.fooddeliveryapp.ui.theme.AppTheme
+import com.google.firebase.FirebaseApp
 
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //FirebaseApp.initializeApp(this)
+        FirebaseApp.initializeApp(this)
         // Make status bar transparent and ensure content doesn't go behind it
         WindowCompat.setDecorFitsSystemWindows(window, false)
 

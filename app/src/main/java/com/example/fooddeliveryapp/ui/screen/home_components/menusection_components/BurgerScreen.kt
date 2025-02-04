@@ -1,6 +1,7 @@
 package com.example.fooddeliveryapp.ui.screen.home_components.menusection_components
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,57 +20,52 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 
 data class Burger(
-    val id: Int,
-    val name: String,
-    val price: Double,
-    val imageResId: Int,
-    val description: String
+    val id: Int = 0,
+    val name: String = "",
+    val price: Double = 0.0,
+    val imageUrl: String = "",
+    val description: String = ""
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BurgerScreen(navController: NavController) {
-    val burgers = remember {
-        listOf(
-            Burger(
-                1,
-                "Classic Cheeseburger",
-                5.99,
-                R.drawable.img_classiccheeseburger,
-                "Juicy beef patty with melted cheese"
-            ),
-            Burger(
-                2,
-                "Double Beef Burger",
-                7.99,
-                R.drawable.img_doubleburger,
-                "Double the beef, double the flavor"
-            ),
-            Burger(
-                3,
-                "Chicken Burger",
-                6.49,
-                R.drawable.img_chickenburger,
-                "Crispy chicken with fresh lettuce"
-            ),
-            Burger(
-                4,
-                "Veggie Burger",
-                5.49,
-                R.drawable.img_veggieburger,
-                "Plant-based patty with fresh veggies"
-            ),
-            Burger(
-                5,
-                "Beef Burger",
-                5.94,
-                R.drawable.img_beefburger,
-                "Grass fed cow with extra tenderness"
-            )
+    val burgers = remember { mutableStateListOf<Burger>() }
 
-        )
+
+    LaunchedEffect(Unit) {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("burgers")
+            .get()
+            .addOnSuccessListener { result ->
+                val fetchedBurgers = result.documents.mapNotNull { doc ->
+                    try {
+                        Burger(
+                            id = when (val idValue = doc.get("id")) {
+                                is Number -> idValue.toInt()  // If it's a number, convert to Int
+                                is String -> idValue.toIntOrNull() ?: 0  // If it's a string, parse safely
+                                else -> 0  // Default to 0 if invalid
+                            },
+                            name = doc.getString("name") ?: "",
+                            price = doc.getDouble("price") ?: 0.0, // Ensure correct type
+                            imageUrl = doc.getString("imageUrl") ?: "",
+                            description = doc.getString("description") ?: ""
+                        )
+                    } catch (e: Exception) {
+                        Log.e("Firestore", "Error parsing document: ${doc.id}", e)
+                        null
+                    }
+                }
+                burgers.clear()
+                burgers.addAll(fetchedBurgers)
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Error fetching burgers", e)
+            }
     }
 
     Scaffold(
@@ -109,6 +105,8 @@ fun BurgerScreen(navController: NavController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BurgerCard(burger: Burger) {
+    val imageResId = getImageResourceId(burger.imageUrl)
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -128,9 +126,8 @@ fun BurgerCard(burger: Burger) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Burger Image
             Image(
-                painter = painterResource(id = burger.imageResId),
+                painter = painterResource(id = getImageResourceId(burger.imageUrl)),
                 contentDescription = burger.name,
                 modifier = Modifier
                     .size(100.dp)
@@ -138,7 +135,6 @@ fun BurgerCard(burger: Burger) {
                 contentScale = ContentScale.Crop
             )
 
-            // Burger Details
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -158,7 +154,6 @@ fun BurgerCard(burger: Burger) {
                 )
             }
 
-            // Price and Add to Cart Button
             Button(
                 onClick = { /* Handle add to cart */ },
                 modifier = Modifier
@@ -184,5 +179,16 @@ fun BurgerCard(burger: Burger) {
                 }
             }
         }
+    }
+}
+
+fun getImageResourceId(imageName: String): Int {
+    return when (imageName) {
+        "img_classiccheeseburger" -> R.drawable.img_classiccheeseburger
+        "img_doubleburger" -> R.drawable.img_doubleburger
+        "img_chickenburger" -> R.drawable.img_chickenburger
+        "img_veggieburger" -> R.drawable.img_veggieburger
+        "img_beefburger" -> R.drawable.img_beefburger
+        else -> R.drawable.img_placeholder
     }
 }
