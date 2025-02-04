@@ -1,5 +1,6 @@
 package com.example.fooddeliveryapp.ui.screen.home_components.menusection_components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -104,6 +105,7 @@ fun BurgerScreen(navController: NavController) {
     }
 }
 
+@SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BurgerCard(burger: Burger) {
