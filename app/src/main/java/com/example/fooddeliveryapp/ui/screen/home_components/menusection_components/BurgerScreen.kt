@@ -36,7 +36,7 @@ fun BurgerScreen(navController: NavController) {
                 1,
                 "Classic Cheeseburger",
                 5.99,
-                R.drawable.img_burger1,
+                R.drawable.img_classiccheeseburger,
                 "Juicy beef patty with melted cheese"
             ),
             Burger(
@@ -50,17 +50,24 @@ fun BurgerScreen(navController: NavController) {
                 3,
                 "Chicken Burger",
                 6.49,
-                R.drawable.img_burger1,
+                R.drawable.img_chickenburger,
                 "Crispy chicken with fresh lettuce"
             ),
             Burger(
                 4,
                 "Veggie Burger",
                 5.49,
-                R.drawable.img_burger1,
+                R.drawable.img_veggieburger,
                 "Plant-based patty with fresh veggies"
             ),
-            // Add more burgers as needed
+            Burger(
+                5,
+                "Beef Burger",
+                5.94,
+                R.drawable.img_beefburger,
+                "Grass fed cow with extra tenderness"
+            )
+
         )
     }
 
