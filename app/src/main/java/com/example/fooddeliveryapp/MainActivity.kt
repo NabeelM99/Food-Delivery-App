@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -17,7 +18,7 @@ import com.example.fooddeliveryapp.ui.screen.home_components.menusection_compone
 import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.FriesScreen
 import com.example.fooddeliveryapp.ui.theme.AppTheme
 import com.google.firebase.FirebaseApp
-
+import androidx.navigation.navArgument
 
 class MainActivity : ComponentActivity() {
 
@@ -46,17 +47,20 @@ class MainActivity : ComponentActivity() {
                             }
                         }
 
+                        // Burger Screen
                         composable("BurgerScreen") {
-                            BurgerScreen(navController) }
+                            BurgerScreen(navController)
+                        }
 
+                        // Fries Screen
                         composable("FriesScreen") {
                             FriesScreen(navController)
                         }
 
+                        // Drinks Screen
                         composable("DrinksScreen") {
                             DrinksScreen(navController)
                         }
-
 
                         // Location Selection Screen
                         composable("location") {
@@ -78,9 +82,13 @@ class MainActivity : ComponentActivity() {
                             SignUpScreen(navController)
                         }
 
-                        // Product Details Screen
-                        composable("productDetailsScreen") {
-                            ProductDetailsScreen() // Adjust if parameters are needed
+                        // Product Details Screen with burgerId argument
+                        composable(
+                            "productDetailsScreen/{burgerId}",
+                            arguments = listOf(navArgument("burgerId") { type = NavType.IntType })
+                        ) { backStackEntry ->
+                            val burgerId = backStackEntry.arguments?.getInt("burgerId") ?: 0
+                            ProductDetailsScreen(burgerId)
                         }
 
                         // Home Screen

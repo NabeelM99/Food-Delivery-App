@@ -14,7 +14,8 @@ import com.example.fooddeliveryapp.ui.theme.AppTheme
 
 @Composable
 fun ProductDetailsScreen(
-    modifier: Modifier = Modifier,
+    burgerId: Int,
+    modifier: Modifier.Companion = Modifier,
     productPreviewState: ProductPreviewState = ProductPreviewState(),
     productFlavors: List<ProductFlavorState> = ProductFlavorData,
     productNutritionState: ProductNutritionState = ProductNutritionData,
@@ -26,8 +27,9 @@ fun ProductDetailsScreen(
     }
 
     Box(
-        modifier = modifier.fillMaxSize().
-        background(AppTheme.colors.background)
+        modifier = modifier
+            .fillMaxSize()
+            .background(AppTheme.colors.background)
             .padding(0.dp),
         contentAlignment = Alignment.BottomCenter
     ) {

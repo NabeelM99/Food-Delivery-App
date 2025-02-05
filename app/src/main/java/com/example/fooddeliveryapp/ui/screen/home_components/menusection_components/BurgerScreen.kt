@@ -3,6 +3,7 @@ package com.example.fooddeliveryapp.ui.screen.home_components.menusection_compon
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -35,7 +36,7 @@ data class Burger(
 @Composable
 fun BurgerScreen(navController: NavController) {
     val burgers = remember { mutableStateListOf<Burger>() }
-
+    var loading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         val db = FirebaseFirestore.getInstance()
@@ -62,9 +63,11 @@ fun BurgerScreen(navController: NavController) {
                 }
                 burgers.clear()
                 burgers.addAll(fetchedBurgers)
+                loading = false
             }
             .addOnFailureListener { e ->
                 Log.e("Firestore", "Error fetching burgers", e)
+                loading = false
             }
     }
 
@@ -95,7 +98,7 @@ fun BurgerScreen(navController: NavController) {
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
             items(burgers) { burger ->
-                BurgerCard(burger = burger)
+                BurgerCard(burger = burger, navController = navController)
             }
         }
     }
@@ -104,13 +107,16 @@ fun BurgerScreen(navController: NavController) {
 @SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BurgerCard(burger: Burger) {
+fun BurgerCard(burger: Burger, navController: NavController) {
     val imageResId = getImageResourceId(burger.imageUrl)
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp),
+            .height(120.dp)
+            .clickable {
+                navController.navigate("productDetailsScreen/${burger.id}")
+            },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
@@ -154,7 +160,7 @@ fun BurgerCard(burger: Burger) {
                 )
             }
 
-            Button(
+            /*Button(
                 onClick = { /* Handle add to cart */ },
                 modifier = Modifier
                     .width(100.dp)
@@ -177,7 +183,7 @@ fun BurgerCard(burger: Burger) {
                         fontSize = 12.sp
                     )
                 }
-            }
+            } */
         }
     }
 }
