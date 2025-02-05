@@ -1,7 +1,9 @@
 package com.example.fooddeliveryapp.ui.screen.home_components.menusection_components
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,66 +21,54 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 
 data class Drink(
-    val id: Int,
-    val name: String,
-    val price: Double,
-    val imageResId: Int,
-    val description: String
+    val id: Int = 0,
+    val name: String = "",
+    val price: Double = 0.0,
+    val imageUrl: String = "",
+    val description: String = ""
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DrinksScreen(navController: NavController) {
-    val drinks = remember {
-        listOf(
-            Drink(
-                1,
-                "Kinza Cola",
-                5.99,
-                R.drawable.img_kinzacola,
-                "250ml Kinza Cola Carbonated Soft Drink"
-            ),
-            Drink(
-                2,
-                "Kinza Lemon",
-                7.99,
-                R.drawable.img_kinzalemon,
-                "250ml Kinza Lemon Carbonated Soft Drink"
-            ),
-            Drink(
-                3,
-                "Kinza Orange",
-                6.49,
-                R.drawable.img_kinzaorange,
-                "250ml Kinza Orange Carbonated Soft Drink"
-            ),
-            Drink(
-                4,
-                "Kinza Black Currant",
-                5.49,
-                R.drawable.img_kinzablackcurrant,
-                "330ml Kinza Blackcurrant Carbonated Soft Drink"
-            ),
-            Drink(
-                5,
-                "Shafa Pomegranate",
-                5.94,
-                R.drawable.img_pamircola1,
-                "330ml Shafa Pomegranate Carbonated Soft Drink"
-            ),
-            Drink(
-                6,
-                "Pamir Lemon Lime",
-                6.94,
-                R.drawable.img_pamirlemonlime,
-                "330ml Pamir Cola Lemon Lime Carbonated Soft Drink"
-            )
+    val drinks = remember { mutableStateListOf<Drink>() }
+    var loading by remember { mutableStateOf(true) }
 
-
-
-        )
+    LaunchedEffect(Unit) {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("drinks")
+            .get()
+            .addOnSuccessListener { result ->
+                val fetchedDrinks = result.documents.mapNotNull { doc ->
+                    try {
+                        Drink(
+                            id = when (val idValue = doc.get("id")) {
+                                is Number -> idValue.toInt()
+                                is String -> idValue.toIntOrNull() ?: 0
+                                else -> 0
+                            },
+                            name = doc.getString("name") ?: "",
+                            price = doc.getDouble("price") ?: 0.0,
+                            imageUrl = doc.getString("imageUrl") ?: "",
+                            description = doc.getString("description") ?: ""
+                        )
+                    } catch (e: Exception) {
+                        Log.e("Firestore", "Error parsing document: ${doc.id}", e)
+                        null
+                    }
+                }
+                drinks.clear()
+                drinks.addAll(fetchedDrinks)
+                loading = false
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Error fetching drinks", e)
+                loading = false
+            }
     }
 
     Scaffold(
@@ -118,10 +108,13 @@ fun DrinksScreen(navController: NavController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DrinkCard(drink: Drink) {
+    val imageResId = getDrinkImageResourceId(drink.imageUrl)
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp),
+            .height(120.dp)
+            .clickable { /* Handle click */ },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
@@ -137,16 +130,14 @@ fun DrinkCard(drink: Drink) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Image(
-                painter = painterResource(id = drink.imageResId),
+                painter = painterResource(id = imageResId),
                 contentDescription = drink.name,
                 modifier = Modifier
                     .size(100.dp)
                     .clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Crop
             )
-
 
             Column(
                 modifier = Modifier
@@ -167,7 +158,6 @@ fun DrinkCard(drink: Drink) {
                 )
             }
 
-            // Price and Add to Cart Button
             Button(
                 onClick = { /* Handle add to cart */ },
                 modifier = Modifier
@@ -193,5 +183,17 @@ fun DrinkCard(drink: Drink) {
                 }
             }
         }
+    }
+}
+
+fun getDrinkImageResourceId(imageName: String): Int {
+    return when (imageName) {
+        "img_kinzacola" -> R.drawable.img_kinzacola
+        "img_kinzalemon" -> R.drawable.img_kinzalemon
+        "img_kinzaorange" -> R.drawable.img_kinzaorange
+        "img_kinzablackcurrant" -> R.drawable.img_kinzablackcurrant
+        "img_pamircola1" -> R.drawable.img_pamircola1
+        "img_pamirlemonlime" -> R.drawable.img_pamirlemonlime
+        else -> R.drawable.img_placeholder
     }
 }
