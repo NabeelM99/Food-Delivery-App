@@ -2,21 +2,8 @@ package com.example.fooddeliveryapp.ui.screen.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -27,18 +14,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.core.provider.FontsContractCompat.Columns
 import com.example.fooddeliveryapp.R
-import com.example.fooddeliveryapp.data.ProductPreviewState
 import com.example.fooddeliveryapp.ui.theme.AppTheme
 
 @Composable
 fun ProductPreviewSection(
     modifier: Modifier = Modifier,
-    state: ProductPreviewState
+    state: ProductPreviewState = defaultProductPreviewState // Default state included here
 ) {
-    Box(modifier=modifier.height(IntrinsicSize.Max)
-    ){
+    Box(modifier = modifier.height(IntrinsicSize.Max)) {
         ProductBackground(
             modifier = Modifier.padding(bottom = 24.dp)
         )
@@ -66,54 +50,46 @@ private fun ProductBackground(
                 )
             )
     )
-
 }
-
-
-
 
 @Composable
 private fun Content(
     modifier: Modifier = Modifier,
     state: ProductPreviewState
-){
+) {
     ConstraintLayout(
         modifier = modifier.fillMaxWidth()
     ) {
         val (actionBar, highlights, productImg) = createRefs()
         ActionBar(
-            headline = "Mr.Burger",
+            headline = state.headline,
             modifier = Modifier
                 .padding(horizontal = 18.dp)
                 .constrainAs(actionBar) {
                     top.linkTo(parent.top)
                 }
-
         )
         Image(
-            painter = painterResource(id = R.drawable.img_burger),
-                contentDescription = null,
-                contentScale = ContentScale.FillHeight,
+            painter = painterResource(id = state.productImg),
+            contentDescription = null,
+            contentScale = ContentScale.FillHeight,
             modifier = Modifier
                 .height(256.dp)
-                .constrainAs(productImg){
+                .constrainAs(productImg) {
                     end.linkTo(parent.end)
-                    top.linkTo(anchor = actionBar.bottom,
-                        margin = 20.dp
-                    )
+                    top.linkTo(anchor = actionBar.bottom, margin = 20.dp)
                 }
-            )
+        )
         ProductHighLights(
             highlights = state.highlights,
-            modifier = Modifier.constrainAs(highlights){
-                start.linkTo(anchor = parent.start,
-                    margin = 19.dp
-                )
+            modifier = Modifier.constrainAs(highlights) {
+                start.linkTo(anchor = parent.start, margin = 19.dp)
                 top.linkTo(productImg.top)
             }
         )
     }
 }
+
 @Composable
 private fun ActionBar(
     modifier: Modifier = Modifier,
@@ -136,23 +112,50 @@ private fun ActionBar(
 @Composable
 private fun CloseButton(
     modifier: Modifier = Modifier
-){
-    Surface (
-        modifier= modifier.size(44.dp),
+) {
+    Surface(
+        modifier = modifier.size(44.dp),
         shape = RoundedCornerShape(16.dp),
         color = AppTheme.colors.secondarySurface,
         contentColor = AppTheme.colors.secondarySurface
-    ){
+    ) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
-        ){
-            Icon(painter = painterResource(id = R.drawable.ic_close),
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_close),
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
-                        tint = AppTheme.colors.onSecondarySurface
+                tint = AppTheme.colors.onSecondarySurface
             )
         }
     }
 }
 
+// Data and state classes moved here from ProductPreviewData.kt
+data class ProductHighLightState(
+    val text: String,
+    val type: ProductHighLightType
+)
+
+enum class ProductHighLightType {
+    PRIMARY, SECONDARY
+}
+
+data class ProductPreviewState(
+    val headline: String = "Mr. Burger",
+    val productImg: Int = R.drawable.img_burger,
+    val highlights: List<ProductHighLightState> = listOf(
+        ProductHighLightState(
+            text = "Classic Taste",
+            type = ProductHighLightType.SECONDARY
+        ),
+        ProductHighLightState(
+            text = "Bestseller",
+            type = ProductHighLightType.PRIMARY
+        )
+    )
+)
+
+val defaultProductPreviewState = ProductPreviewState() // Default state for convenience

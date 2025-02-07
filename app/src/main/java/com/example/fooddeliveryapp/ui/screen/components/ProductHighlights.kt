@@ -17,8 +17,8 @@ import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.fooddeliveryapp.data.ProductHighLightState
-import com.example.fooddeliveryapp.data.ProductHighLightType
+//import com.example.fooddeliveryapp.data.ProductHighLightState
+//import com.example.fooddeliveryapp.data.ProductHighLightType
 import com.example.fooddeliveryapp.ui.theme.AppTheme
 
 @Composable
