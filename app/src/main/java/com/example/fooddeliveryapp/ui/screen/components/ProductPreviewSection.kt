@@ -20,7 +20,7 @@ import com.example.fooddeliveryapp.ui.theme.AppTheme
 @Composable
 fun ProductPreviewSection(
     modifier: Modifier = Modifier,
-    state: ProductPreviewState = defaultProductPreviewState // Default state included here
+    state: ProductPreviewState
 ) {
     Box(modifier = modifier.height(IntrinsicSize.Max)) {
         ProductBackground(
@@ -80,13 +80,13 @@ private fun Content(
                     top.linkTo(anchor = actionBar.bottom, margin = 20.dp)
                 }
         )
-        ProductHighLights(
+        /*ProductHighLights(
             highlights = state.highlights,
             modifier = Modifier.constrainAs(highlights) {
                 start.linkTo(anchor = parent.start, margin = 19.dp)
                 top.linkTo(productImg.top)
             }
-        )
+        )*/
     }
 }
 

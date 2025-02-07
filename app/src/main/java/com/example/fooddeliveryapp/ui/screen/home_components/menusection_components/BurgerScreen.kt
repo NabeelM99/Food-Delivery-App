@@ -29,7 +29,8 @@ data class Burger(
     val name: String = "",
     val price: Double = 0.0,
     val imageUrl: String = "",
-    val description: String = ""
+    val description: String = "",
+    val productDescription: String = ""
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -159,31 +160,6 @@ fun BurgerCard(burger: Burger, navController: NavController) {
                     color = Color.Gray
                 )
             }
-
-            /*Button(
-                onClick = { /* Handle add to cart */ },
-                modifier = Modifier
-                    .width(100.dp)
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFFFA500)
-                ),
-                shape = RoundedCornerShape(25.dp)
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "$${String.format("%.2f", burger.price)}",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "Add",
-                        fontSize = 12.sp
-                    )
-                }
-            } */
         }
     }
 }

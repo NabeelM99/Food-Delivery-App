@@ -14,7 +14,7 @@ import com.example.fooddeliveryapp.ui.theme.AppTheme
 @Composable
 fun ProductDescriptionSection(
     modifier: Modifier = Modifier,
-    productDescription: String = ProductDescriptionData // Default data included here
+    productDescription: String
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),

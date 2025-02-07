@@ -1,4 +1,4 @@
-package com.example.fooddeliveryapp.ui.screen.components
+/*package com.example.fooddeliveryapp.ui.screen.components
 
 import android.text.Highlights
 import androidx.compose.foundation.layout.Arrangement
@@ -92,4 +92,4 @@ private object HighlightDefaults{
 private data class HighlightColors(
     val containerColor: Color,
     val contentColor: Color
-)
+)*/
