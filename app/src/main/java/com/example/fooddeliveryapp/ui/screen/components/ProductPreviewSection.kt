@@ -24,7 +24,7 @@ import kotlinx.coroutines.tasks.await
 @Composable
 fun ProductPreviewSection(
     modifier: Modifier = Modifier,
-    burgerId: Int
+    burgerId: Int,
 ) {
     // State to hold the fetched product preview data
     var productPreviewState by remember { mutableStateOf<ProductPreviewState?>(null) }

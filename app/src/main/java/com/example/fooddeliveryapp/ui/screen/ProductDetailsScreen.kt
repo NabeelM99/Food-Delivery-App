@@ -20,7 +20,6 @@ fun ProductDetailsScreen(burgerId: String) {
 
     Log.d("ProductDetailsScreen", "Received burgerId: $burgerId")
 
-    // Fetching the data asynchronously from Firebase
     LaunchedEffect(Unit) {
         try {
             val docRef = db.collection("productdetails").document("burger$burgerId")
