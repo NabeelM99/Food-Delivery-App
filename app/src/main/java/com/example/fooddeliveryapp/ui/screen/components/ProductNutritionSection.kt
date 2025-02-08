@@ -1,9 +1,6 @@
 package com.example.fooddeliveryapp.ui.screen.components
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,7 +12,7 @@ import com.example.fooddeliveryapp.ui.theme.AppTheme
 @Composable
 fun ProductNutritionSection(
     modifier: Modifier = Modifier,
-    state: ProductNutritionState = ProductNutritionData // Default data included here
+    state: ProductNutritionState // Accept dynamic state here
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -29,7 +26,7 @@ fun ProductNutritionSection(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            state.nutrition.onEach { item ->
+            state.nutrition.forEach { item ->
                 NutritionItem(state = item)
             }
         }
@@ -105,7 +102,7 @@ private fun NutritionItem(
     }
 }
 
-// Data classes and default data moved here from ProductNutritionData.kt
+// Data classes to hold dynamic data
 data class ProductNutritionState(
     val calories: Calories,
     val nutrition: List<NutritionState>
@@ -122,26 +119,28 @@ data class NutritionState(
     val title: String
 )
 
-val ProductNutritionData = ProductNutritionState(
-    calories = Calories(
-        value = "650",
-        unit = "Cal"
-    ),
-    nutrition = listOf(
-        NutritionState(
-            amount = "35",
-            unit = "g",
-            title = "Total Fat (45% DV)"
-        ),
-        NutritionState(
-            amount = "43",
-            unit = "g",
-            title = "Total Fat (16% DV)"
-        ),
-        NutritionState(
-            amount = "36",
-            unit = "g",
-            title = "Protein"
-        )
+
+// Extension function to convert Firebase data into ProductNutritionState
+fun Map<String, Any>.toProductNutritionState(): ProductNutritionState {
+    val nutritionData = this["nutrition"] as? List<Map<String, Any>> ?: emptyList()
+    val caloriesData = this["calories"] as? Map<String, Any> ?: emptyMap()
+
+    val calories = Calories(
+        value = (caloriesData["value"] as? String) ?: "",
+        unit = (caloriesData["unit"] as? String) ?: ""
     )
-)
+
+
+    val nutrition = nutritionData.map {
+        NutritionState(
+            amount = it["amount"] as? String ?: "",
+            unit = it["unit"] as? String ?: "",
+            title = it["title"] as? String ?: ""
+        )
+    }
+
+    return ProductNutritionState(
+        calories = calories,
+        nutrition = nutrition
+    )
+}

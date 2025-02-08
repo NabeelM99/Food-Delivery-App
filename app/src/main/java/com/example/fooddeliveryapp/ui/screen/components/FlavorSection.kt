@@ -19,7 +19,7 @@ import com.example.fooddeliveryapp.ui.theme.AppTheme
 @Composable
 fun FlavorSection(
     modifier: Modifier = Modifier,
-    data: List<ProductFlavorState> = ProductFlavorData // Default data included here
+    data: List<ProductFlavorState>
 ) {
     Column(
         modifier = modifier
@@ -34,7 +34,7 @@ fun FlavorSection(
                 .padding(vertical = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            data.onEach { item ->
+            data.forEach { item ->
                 ProductFlavorItem(
                     state = item,
                     modifier = Modifier.weight(weight = 1f)
@@ -71,6 +71,9 @@ private fun ProductFlavorItem(
     modifier: Modifier = Modifier,
     state: ProductFlavorState
 ) {
+
+    val drawableId = getDrawableId(state.imgRes)
+
     Box(
         modifier = modifier
             .shadow(
@@ -92,7 +95,7 @@ private fun ProductFlavorItem(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = state.imgRes),
+                painter = painterResource(id = drawableId),
                 contentDescription = null,
                 contentScale = ContentScale.FillWidth,
                 modifier = Modifier.fillMaxWidth()
@@ -119,23 +122,5 @@ private fun ProductFlavorItem(
 data class ProductFlavorState(
     val name: String,
     val price: String,
-    val imgRes: Int
-)
-
-val ProductFlavorData = listOf(
-    ProductFlavorState(
-        imgRes = R.drawable.img_cheese,
-        name = "Cheddar",
-        price = "$0.79"
-    ),
-    ProductFlavorState(
-        imgRes = R.drawable.img_bacon,
-        name = "Halal Bacon",
-        price = "$0.52"
-    ),
-    ProductFlavorState(
-        imgRes = R.drawable.img_onion,
-        name = "Onion",
-        price = "$0.28"
-    )
+    val imgRes: String
 )

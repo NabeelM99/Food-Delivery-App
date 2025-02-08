@@ -25,6 +25,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
+
         // Make status bar transparent and ensure content doesn't go behind it
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
@@ -85,10 +86,10 @@ class MainActivity : ComponentActivity() {
                         // Product Details Screen with burgerId argument
                         composable(
                             "productDetailsScreen/{burgerId}",
-                            arguments = listOf(navArgument("burgerId") { type = NavType.IntType })
+                            arguments = listOf(navArgument("burgerId") { type = NavType.StringType })
                         ) { backStackEntry ->
-                            val burgerId = backStackEntry.arguments?.getInt("burgerId") ?: 0
-                            ProductDetailsScreen(burgerId)
+                            val burgerId = backStackEntry.arguments?.getString("burgerId") ?: ""
+                            ProductDetailsScreen(burgerId = burgerId)
                         }
 
                         // Home Screen
