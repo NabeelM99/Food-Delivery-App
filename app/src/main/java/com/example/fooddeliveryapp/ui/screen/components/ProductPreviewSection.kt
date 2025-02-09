@@ -34,6 +34,7 @@ fun ProductPreviewSection(
     LaunchedEffect(burgerId) {
         try {
             val db = FirebaseFirestore.getInstance()
+            Log.d("Firestore", "Attempting to fetch document: burger$burgerId")
             val document = db.collection("productdetails")
                 .document("burger$burgerId")
                 .get()
@@ -42,17 +43,26 @@ fun ProductPreviewSection(
             if (document.exists()) {
                 val data = document.data
                 if (data != null) {
+                    // Add null safety checks for all fields
                     productPreviewState = ProductPreviewState(
-                        name = data["name"] as String,
-                        imageUrl = data["imageUrl"] as String,
-                        price = data["price"] as Double
+                        name = data["name"] as? String ?: "",
+                        imageUrl = data["imageUrl"] as? String ?: "",
+                        // Add safe casting for price
+                        price = when (val priceValue = data["price"]) {
+                            is Double -> priceValue
+                            is Long -> priceValue.toDouble()
+                            is String -> priceValue.toDoubleOrNull() ?: 0.0
+                            else -> 0.0
+                        }
                     )
+                    Log.d("Firestore", "Successfully mapped data: $productPreviewState")
                 }
             } else {
                 Log.e("Firestore", "Document does not exist for burgerId: $burgerId")
             }
         } catch (e: Exception) {
             Log.e("Firestore", "Error fetching product preview data", e)
+            Log.e("Firestore", "Stack trace: ${e.stackTrace.joinToString("\n")}")
         } finally {
             loading = false
         }

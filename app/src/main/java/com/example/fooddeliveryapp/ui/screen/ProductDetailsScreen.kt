@@ -23,8 +23,9 @@ fun ProductDetailsScreen(burgerId: String) {
     LaunchedEffect(Unit) {
         try {
             val docRef = db.collection("productdetails").document("burger$burgerId")
-            Log.d("Firestore", "Fetching document: burger$burgerId")
+            Log.d("Firestore", "Attempting to Fetching document: burger$burgerId")
             val document = docRef.get().await()
+            Log.d("Firestore", "Document exists: ${document.exists()}")
             if (document.exists()) {
                 val data = document.data
                 if (data != null) {

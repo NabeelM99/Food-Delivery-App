@@ -116,6 +116,9 @@ fun BurgerCard(burger: Burger, navController: NavController) {
             .fillMaxWidth()
             .height(120.dp)
             .clickable {
+                Log.d("Navigation", "Navigating to burger with ID: ${burger.id}")
+                val documentPath = "burger${burger.id}"
+                Log.d("Navigation", "Will look for document: $documentPath")
                 navController.navigate("productDetailsScreen/${burger.id}")
             },
         shape = RoundedCornerShape(16.dp),
