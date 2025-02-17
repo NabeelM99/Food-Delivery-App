@@ -97,8 +97,8 @@ fun ProductDetailsScreen(burgerId: String) {
 }
 
 // 🔹 Function to get drawable resource ID from a string name
-fun getDrawableId(imageName: String): Int {
-    return when (imageName) {
+fun getDrawableId(imgRes: String): Int {
+    return when (imgRes) {
         "img_cheese" -> R.drawable.img_cheese
         "img_bacon" -> R.drawable.img_bacon
         "img_onion" -> R.drawable.img_onion
