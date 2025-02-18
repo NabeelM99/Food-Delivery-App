@@ -1,5 +1,6 @@
 package com.example.fooddeliveryapp.ui.screen.components
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -21,6 +22,11 @@ fun FlavorSection(
     modifier: Modifier = Modifier,
     data: List<ProductFlavorState>
 ) {
+    Log.d("FlavorSection", "Rendering FlavorSection with ${data.size} flavors")
+    data.forEach { flavor ->
+        Log.d("FlavorSection", "Flavor: ${flavor.name}, Image: ${flavor.imgRes}, Price: ${flavor.price}")
+    }
+
     Column(
         modifier = modifier
     ) {
@@ -71,8 +77,8 @@ private fun ProductFlavorItem(
     modifier: Modifier = Modifier,
     state: ProductFlavorState
 ) {
-
-    val drawableId = getDrawableId(state.imgRes)
+    val drawableId = getFlavorDrawableId(state.imgRes)
+    Log.d("FlavorSection", "Loading flavor image for ${state.name}: ${state.imgRes}, resolved to resource ID: $drawableId")
 
     Box(
         modifier = modifier
@@ -96,7 +102,7 @@ private fun ProductFlavorItem(
         ) {
             Image(
                 painter = painterResource(id = drawableId),
-                contentDescription = null,
+                contentDescription = state.name,
                 contentScale = ContentScale.FillWidth,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -118,7 +124,30 @@ private fun ProductFlavorItem(
     }
 }
 
-// Data class and default data moved here from ProductFlavorData.kt
+// Dedicated function for flavor images to avoid conflicts with other getDrawableId functions
+private fun getFlavorDrawableId(imgName: String): Int {
+    Log.d("FlavorSection", "Attempting to get drawable ID for: $imgName")
+    return when (imgName) {
+        "img_cheese" -> {
+            Log.d("FlavorSection", "Found match for img_cheese")
+            R.drawable.img_cheese
+        }
+        "img_bacon" -> {
+            Log.d("FlavorSection", "Found match for img_bacon")
+            R.drawable.img_bacon
+        }
+        "img_onion" -> {
+            Log.d("FlavorSection", "Found match for img_onion")
+            R.drawable.img_onion
+        }
+        else -> {
+            Log.d("FlavorSection", "No match found for $imgName, using fallback image")
+            R.drawable.img_placeholder
+        }
+    }
+}
+
+// Data class for flavor state
 data class ProductFlavorState(
     val name: String,
     val price: String,
