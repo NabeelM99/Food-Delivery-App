@@ -7,13 +7,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
 import com.example.fooddeliveryapp.ui.screen.components.*
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
 @Composable
-fun ProductDetailsScreen(burgerId: String) {
+fun ProductDetailsScreen(
+    burgerId: String,
+    navController: NavController
+) {
     val db = FirebaseFirestore.getInstance()
     var productDetails by remember { mutableStateOf<ProductDetails?>(null) }
     var isLoading by remember { mutableStateOf(true) }
@@ -74,10 +78,16 @@ fun ProductDetailsScreen(burgerId: String) {
     // UI layout
     Column(modifier = Modifier.padding(16.dp)) {
         if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center))
+            CircularProgressIndicator(modifier = Modifier
+                .fillMaxSize()
+                .wrapContentSize(Alignment.Center)
+            )
         } else {
             productDetails?.let { details ->
-                ProductPreviewSection(burgerId = details.id.toInt())
+                ProductPreviewSection(
+                    burgerId = details.id.toInt(),
+                    navController = navController
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -91,7 +101,11 @@ fun ProductDetailsScreen(burgerId: String) {
 
                 // Passing dynamic description
                 ProductDescriptionSection(productDescription = details.productDescription)
-            } ?: Text("Product not found", modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center))
+            } ?: Text("Product not found",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(Alignment.Center)
+            )
         }
     }
 }

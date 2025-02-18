@@ -3,6 +3,7 @@ package com.example.fooddeliveryapp.ui.screen.components
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -15,7 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
 import com.example.fooddeliveryapp.ui.theme.AppTheme
 import com.google.firebase.firestore.FirebaseFirestore
@@ -25,6 +28,7 @@ import kotlinx.coroutines.tasks.await
 fun ProductPreviewSection(
     modifier: Modifier = Modifier,
     burgerId: Int,
+    navController: NavController
 ) {
     // State to hold the fetched product preview data
     var productPreviewState by remember { mutableStateOf<ProductPreviewState?>(null) }
@@ -106,7 +110,8 @@ fun ProductPreviewSection(
                 price = preview.price,
                 modifier = Modifier
                     .statusBarsPadding()
-                    .padding(top = 24.dp)
+                    .padding(top = 24.dp),
+                navController = navController
             )
         }
     }
@@ -129,15 +134,17 @@ private fun Content(
     modifier: Modifier = Modifier,
     name: String,
     imageUrl: String,
-    price: Double
+    price: Double,
+    navController: NavController
 ) {
     ConstraintLayout(modifier = modifier.fillMaxWidth()) {
-        val (actionBar, productImg, highlightsSection) = createRefs()
+        val (actionBar, productImg) = createRefs()
         ActionBar(
             headline = name,
             modifier = Modifier
                 .padding(horizontal = 18.dp)
-                .constrainAs(actionBar) { top.linkTo(parent.top) }
+                .constrainAs(actionBar) { top.linkTo(parent.top) },
+            navController = navController
         )
         Image(
             painter = painterResource(id = getDrawableId(imageUrl)),
@@ -154,7 +161,10 @@ private fun Content(
 }
 
 @Composable
-private fun ActionBar(modifier: Modifier = Modifier, headline: String) {
+private fun ActionBar(modifier: Modifier = Modifier, 
+                      headline: String,
+                      navController: NavController
+) {
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -163,21 +173,30 @@ private fun ActionBar(modifier: Modifier = Modifier, headline: String) {
         Text(
             text = headline,
             style = AppTheme.typography.headline,
-            color = AppTheme.colors.onSecondarySurface
+            color = AppTheme.colors.onSecondarySurface,
+            fontSize = 24.sp
         )
-        CloseButton()
+        CloseButton(navController = navController)
     }
 }
 
 @Composable
-private fun CloseButton(modifier: Modifier = Modifier) {
+private fun CloseButton(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    //onClick: () -> Unit
+) {
     Surface(
-        modifier = modifier.size(44.dp),
+        modifier = modifier.size(44.dp)
+            .clickable { navController.navigateUp() },
         shape = RoundedCornerShape(16.dp),
         color = AppTheme.colors.secondarySurface,
-        contentColor = AppTheme.colors.secondarySurface
+        contentColor = AppTheme.colors.secondarySurface,
+        //onClick = onClick
     ) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Box(modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_close),
                 contentDescription = null,

@@ -124,7 +124,7 @@ private fun ProductFlavorItem(
     }
 }
 
-// Dedicated function for flavor images to avoid conflicts with other getDrawableId functions
+// Dedicated function for flavor images
 private fun getFlavorDrawableId(imgName: String): Int {
     Log.d("FlavorSection", "Attempting to get drawable ID for: $imgName")
     return when (imgName) {
