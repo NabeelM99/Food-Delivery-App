@@ -13,8 +13,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -47,18 +49,16 @@ fun ProductPreviewSection(
             if (document.exists()) {
                 val data = document.data
                 if (data != null) {
-                    // Add null safety checks for all fields
+                    Log.d("Firestore", "Fetched data: $data")
+                    val price = data["price"] as? Double ?: 0.0
+                    Log.d("Firestore", "Price value from Firebase: $price")
+
                     productPreviewState = ProductPreviewState(
                         name = data["name"] as? String ?: "",
                         imageUrl = data["imageUrl"] as? String ?: "",
-                        // Add safe casting for price
-                        price = when (val priceValue = data["price"]) {
-                            is Double -> priceValue
-                            is Long -> priceValue.toDouble()
-                            is String -> priceValue.toDoubleOrNull() ?: 0.0
-                            else -> 0.0
-                        }
+                        price = price
                     )
+
                     Log.d("Firestore", "Successfully mapped data: $productPreviewState")
                 }
             } else {
@@ -100,9 +100,22 @@ fun ProductPreviewSection(
 
     // Display the product preview section
     Box(modifier = modifier.height(IntrinsicSize.Max)) {
-        ProductBackground(
-            modifier = Modifier.padding(bottom = 24.dp)
-        )
+        Column {
+            ProductBackground(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(350.dp)  // Reduced height
+            )
+
+            // New light orange box for price
+            productPreviewState?.let { preview ->
+                Log.d("ProductPreview", "Price to display: ${preview.price}")
+                PriceBox(
+                    price = preview.price,
+                    modifier = Modifier.height(50.dp)
+                )
+            }
+        }
         productPreviewState?.let { preview ->
             Content(
                 name = preview.name,
@@ -121,13 +134,37 @@ fun ProductPreviewSection(
 private fun ProductBackground(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .background(
                 color = AppTheme.colors.secondarySurface,
-                shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
+                //shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
             )
     )
 }
+
+
+@Composable
+private fun PriceBox(
+    modifier: Modifier = Modifier,
+    price: Double
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Color(0xFFFCD9B6))  // Light orange color
+            .padding(horizontal = 18.dp, vertical = 8.dp),
+        contentAlignment = Alignment.CenterEnd
+    ) {
+        Text(
+            text = "$${String.format("%.2f", price)}",
+            style = AppTheme.typography.titleLarge,
+            color = AppTheme.colors.onSecondarySurface,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+
 
 @Composable
 private fun Content(
@@ -143,7 +180,10 @@ private fun Content(
             headline = name,
             modifier = Modifier
                 .padding(horizontal = 18.dp)
-                .constrainAs(actionBar) { top.linkTo(parent.top) },
+                .constrainAs(actionBar) {
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end) },
             navController = navController
         )
         Image(
@@ -161,7 +201,7 @@ private fun Content(
 }
 
 @Composable
-private fun ActionBar(modifier: Modifier = Modifier, 
+private fun ActionBar(modifier: Modifier = Modifier,
                       headline: String,
                       navController: NavController
 ) {
@@ -184,7 +224,6 @@ private fun ActionBar(modifier: Modifier = Modifier,
 private fun CloseButton(
     modifier: Modifier = Modifier,
     navController: NavController,
-    //onClick: () -> Unit
 ) {
     Surface(
         modifier = modifier.size(44.dp)
@@ -192,7 +231,6 @@ private fun CloseButton(
         shape = RoundedCornerShape(16.dp),
         color = AppTheme.colors.secondarySurface,
         contentColor = AppTheme.colors.secondarySurface,
-        //onClick = onClick
     ) {
         Box(modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
