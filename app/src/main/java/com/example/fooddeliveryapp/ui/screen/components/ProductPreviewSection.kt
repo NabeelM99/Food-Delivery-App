@@ -158,7 +158,7 @@ private fun PriceBox(
         Text(
             text = "$${String.format("%.2f", price)}",
             style = AppTheme.typography.titleLarge,
-            color = AppTheme.colors.onSecondarySurface,
+            color = Color.Black,
             fontWeight = FontWeight.Bold
         )
     }
