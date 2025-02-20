@@ -28,7 +28,7 @@ data class OrderState(
 @Composable
 fun OrderActionBar(
     modifier: Modifier = Modifier,
-    state: OrderState = OrderState(amount = 5, totalPrice = "$27.45"), // Default OrderState
+    state: OrderState, // Default OrderState
     onAddItemClicked: () -> Unit,
     onRemoveItemClicked: () -> Unit,
     onCheckOutClicked: () -> Unit

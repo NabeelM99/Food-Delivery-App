@@ -2,6 +2,7 @@ package com.example.fooddeliveryapp.ui.screen
 
 import android.util.Log
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -11,7 +12,9 @@ import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
 import com.example.fooddeliveryapp.ui.screen.components.*
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import androidx.compose.runtime.rememberCoroutineScope
 
 @Composable
 fun ProductDetailsScreen(
@@ -21,10 +24,13 @@ fun ProductDetailsScreen(
     val db = FirebaseFirestore.getInstance()
     var productDetails by remember { mutableStateOf<ProductDetails?>(null) }
     var isLoading by remember { mutableStateOf(true) }
+    var amount by remember { mutableStateOf(1) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     Log.d("ProductDetailsScreen", "Received burgerId: $burgerId")
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(burgerId) {
         try {
             val docRef = db.collection("productdetails").document("burger$burgerId")
             Log.d("Firestore", "Attempting to Fetching document: burger$burgerId")
@@ -75,40 +81,73 @@ fun ProductDetailsScreen(
         }
     }
 
-    // UI layout
-    Column(modifier = Modifier.padding(16.dp)) {
-        if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier
-                .fillMaxSize()
-                .wrapContentSize(Alignment.Center)
-            )
-        } else {
-            productDetails?.let { details ->
-                ProductPreviewSection(
-                    burgerId = details.id.toInt(),
-                    navController = navController
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        bottomBar = {
+            if (!isLoading && productDetails != null) {
+                OrderActionBar(
+                    state = OrderState(
+                        amount = amount,
+                        totalPrice = "$${productDetails?.price?.times(amount)?.format(2) ?: "0.00"}"
+                    ),
+                    onAddItemClicked = { amount++ },
+                    onRemoveItemClicked = { if (amount > 1) amount-- },
+                    onCheckOutClicked = {
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Item is added to the cart")
+                        }
+                    }
                 )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Passing dynamic data to the flavor section
-                FlavorSection(data = details.flavors)
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Passing dynamic data to the nutrition section
-                ProductNutritionSection(state = details.nutrition)
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Passing dynamic description
-                ProductDescriptionSection(productDescription = details.productDescription)
-            } ?: Text("Product not found",
+            }
+        }
+    ) { paddingValues ->
+        if (isLoading) {
+            CircularProgressIndicator(
                 modifier = Modifier
                     .fillMaxSize()
                     .wrapContentSize(Alignment.Center)
             )
+        } else {
+            productDetails?.let { details ->
+                // Make content scrollable with LazyColumn
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues) // Apply scaffold padding
+                        .padding(horizontal = 16.dp), // Horizontal padding
+                    contentPadding = PaddingValues(bottom = 16.dp) // Add padding at the bottom
+                ) {
+                    item {
+                        ProductPreviewSection(
+                            burgerId = details.id.toInt(),
+                            navController = navController
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        FlavorSection(data = details.flavors)
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        ProductNutritionSection(state = details.nutrition)
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        ProductDescriptionSection(productDescription = details.productDescription)
+                    }
+                }
+            } ?: Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Product not found")
+            }
         }
     }
 }
+
+// Helper function to format double values
+fun Double.format(digits: Int) = "%.${digits}f".format(this)
 
 // 🔹 Function to get drawable resource ID from a string name
 fun getDrawableId(imageName: String): Int {
