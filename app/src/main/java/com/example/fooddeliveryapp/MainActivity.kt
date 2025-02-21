@@ -102,6 +102,10 @@ class MainActivity : ComponentActivity() {
                             SearchScreen()
                         }
 
+                        composable("cart") {
+                            AddToCartScreen(navController)
+                        }
+
                     }
                 }
             }
