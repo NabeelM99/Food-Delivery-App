@@ -15,11 +15,13 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun ProductDetailsScreen(
     burgerId: String,
-    navController: NavController
+    navController: NavController,
+    cardViewModel: CartViewModel = viewModel()
 ) {
     val db = FirebaseFirestore.getInstance()
     var productDetails by remember { mutableStateOf<ProductDetails?>(null) }
@@ -108,6 +110,14 @@ fun ProductDetailsScreen(
                     onCheckOutClicked = {
                         scope.launch {
                             snackbarHostState.showSnackbar("Item is added to the cart")
+                            val item = CartItem(
+                                id = productDetails?.id ?: 0,
+                                name = productDetails?.name ?: "",
+                                price = productDetails?.price ?: 0.0,
+                                imageUrl = productDetails?.imageUrl ?: "",
+                                quantity = amount
+                            )
+                            cardViewModel.addToCart(item)
                         }
                     }
                 )

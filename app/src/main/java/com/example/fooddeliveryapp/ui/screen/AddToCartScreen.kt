@@ -8,23 +8,27 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope // For viewModelScope
+import com.example.fooddeliveryapp.R
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 // Data class for cart items
 data class CartItem(
@@ -35,20 +39,58 @@ data class CartItem(
     var quantity: Int = 1
 )
 
+// ViewModel to manage cart state
+class CartViewModel : ViewModel() {
+    // State to hold the list of cart items
+    private val _cartItems = MutableStateFlow<List<CartItem>>(emptyList())
+    val cartItems: StateFlow<List<CartItem>> get() = _cartItems
+
+    // Add an item to the cart
+    fun addToCart(item: CartItem) {
+        viewModelScope.launch {
+            val existingItem = _cartItems.value.find { it.id == item.id }
+            if (existingItem != null) {
+                // Update quantity if the item already exists
+                _cartItems.value = _cartItems.value.map {
+                    if (it.id == item.id) it.copy(quantity = it.quantity + item.quantity) else it
+                }
+            } else {
+                // Add new item to the cart
+                _cartItems.value = _cartItems.value + item
+            }
+        }
+    }
+
+    // Remove an item from the cart
+    fun removeFromCart(itemId: Long) {
+        viewModelScope.launch {
+            _cartItems.value = _cartItems.value.filter { it.id != itemId }
+        }
+    }
+
+    // Update the quantity of an item in the cart
+    fun updateQuantity(itemId: Long, quantity: Int) {
+        viewModelScope.launch {
+            _cartItems.value = _cartItems.value.map {
+                if (it.id == itemId) it.copy(quantity = quantity) else it
+            }
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddToCartScreen(
     navController: NavController,
-    cartItems: List<CartItem> = emptyList() // Default empty list if no items
+    cartViewModel: CartViewModel = viewModel() // Inject the CartViewModel
 ) {
-    // State for cart items, initialized with passed items or empty list
-    var items by remember { mutableStateOf(cartItems) }
+    // Observe the cart items from the ViewModel
+    val cartItems by cartViewModel.cartItems.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-
-    // Calculate total price
-    val totalPrice = items.sumOf { it.price * it.quantity }
+    // Calculate the total price
+    val totalPrice = cartItems.sumOf { it.price * it.quantity }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -73,7 +115,7 @@ fun AddToCartScreen(
                 totalPrice = totalPrice,
                 onCheckoutClicked = {
                     scope.launch {
-                        if (items.isEmpty()) {
+                        if (cartItems.isEmpty()) {
                             snackbarHostState.showSnackbar("Your cart is empty")
                         } else {
                             snackbarHostState.showSnackbar("Proceeding to checkout")
@@ -85,7 +127,7 @@ fun AddToCartScreen(
             )
         }
     ) { paddingValues ->
-        if (items.isEmpty()) {
+        if (cartItems.isEmpty()) {
             EmptyCartView(modifier = Modifier.padding(paddingValues))
         } else {
             LazyColumn(
@@ -96,21 +138,21 @@ fun AddToCartScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(vertical = 16.dp)
             ) {
-                items(items) { cartItem ->
+                items(cartItems) { cartItem ->
                     CartItemCard(
                         cartItem = cartItem,
                         onIncreaseQuantity = { id ->
-                            items = items.map {
-                                if (it.id == id) it.copy(quantity = it.quantity + 1) else it
-                            }
+                            cartViewModel.updateQuantity(id, cartItem.quantity + 1)
                         },
                         onDecreaseQuantity = { id ->
-                            items = items.map {
-                                if (it.id == id && it.quantity > 1) it.copy(quantity = it.quantity - 1) else it
+                            if (cartItem.quantity > 1) {
+                                cartViewModel.updateQuantity(id, cartItem.quantity - 1)
+                            } else {
+                                cartViewModel.removeFromCart(id)
                             }
                         },
                         onRemoveItem = { id ->
-                            items = items.filter { it.id != id }
+                            cartViewModel.removeFromCart(id)
                             scope.launch {
                                 snackbarHostState.showSnackbar("Item removed from cart")
                             }
@@ -132,64 +174,51 @@ fun CartItemCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp),
+            .height(100.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        ),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp),
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Item Image (Left)
-            Box(
+            // Left: Item Image
+            Image(
+                painter = rememberAsyncImagePainter(cartItem.imageUrl),
+                contentDescription = cartItem.name,
                 modifier = Modifier
-                    .size(100.dp)
-                    .clip(RoundedCornerShape(8.dp))
-            ) {
-                Image(
-                    painter = rememberAsyncImagePainter(cartItem.imageUrl),
-                    contentDescription = cartItem.name,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
+                    .size(70.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop
+            )
 
-            // Item Info (Middle)
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 12.dp),
-                verticalArrangement = Arrangement.Center
-            ) {
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // Middle: Item Name and Price
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = cartItem.name,
                     fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1
+                    fontWeight = FontWeight.Bold
                 )
-                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "$${cartItem.price.format(2)}",
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.primary
                 )
-
-                // Show total item price
-                Text(
-                    text = "Total: $${(cartItem.price * cartItem.quantity).format(2)}",
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
 
-            // Quantity Controls (Right)
+            // Right: Quantity Selector
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Decrease button
+                // Minus Button
                 IconButton(
                     onClick = {
                         if (cartItem.quantity > 1) {
@@ -204,23 +233,23 @@ fun CartItemCard(
                         .background(MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Create,
+                        painter = painterResource(id = R.drawable.ic_minus),
                         contentDescription = "Decrease quantity",
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
 
-                // Quantity display
+                // Quantity Display
                 Text(
                     text = "${cartItem.quantity}",
-                    fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier.width(24.dp),
                     textAlign = TextAlign.Center
                 )
 
-                // Increase button
+                // Plus Button
                 IconButton(
                     onClick = { onIncreaseQuantity(cartItem.id) },
                     modifier = Modifier
@@ -229,10 +258,10 @@ fun CartItemCard(
                         .background(MaterialTheme.colorScheme.primary)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Add,
+                        painter = painterResource(id = R.drawable.ic_plus),
                         contentDescription = "Increase quantity",
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }

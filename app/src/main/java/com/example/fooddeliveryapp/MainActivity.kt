@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -37,8 +38,10 @@ class MainActivity : ComponentActivity() {
                         .statusBarsPadding()
                 ) {
                     val navController = rememberNavController()
+                    val cartViewModel: CartViewModel = viewModel()
 
-                    NavHost(navController = navController, startDestination = "splashScreen") {
+                    NavHost(navController = navController,
+                        startDestination = "splashScreen") {
                         // Splash Screen
                         composable("splashScreen") {
                             SplashScreen {
@@ -89,7 +92,10 @@ class MainActivity : ComponentActivity() {
                             arguments = listOf(navArgument("burgerId") { type = NavType.StringType })
                         ) { backStackEntry ->
                             val burgerId = backStackEntry.arguments?.getString("burgerId") ?: ""
-                            ProductDetailsScreen(burgerId = burgerId, navController = navController)
+                            ProductDetailsScreen(burgerId = burgerId,
+                                navController = navController,
+                                cardViewModel = cartViewModel
+                            )
                         }
 
                         // Home Screen
@@ -103,7 +109,11 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("cart") {
-                            AddToCartScreen(navController)
+                            AddToCartScreen(
+                                navController = navController,
+                                cartViewModel = cartViewModel
+                            )
+
                         }
 
                     }
