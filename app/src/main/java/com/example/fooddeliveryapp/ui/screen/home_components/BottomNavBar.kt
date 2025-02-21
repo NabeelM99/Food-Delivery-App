@@ -17,11 +17,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-
 @Composable
 fun BottomNavBar(
     currentRoute: String,
-    onNavigate: (String) -> Unit
+    onNavigate: (String) -> Unit,
+    cartItemCount: Int = 0,
+    selectedBurgerId: Int = 0, // Add selected burger ID
+    selectedAmount: Int = 1 // Add selected amount
 ) {
     NavigationBar(
         modifier = Modifier
@@ -49,11 +51,31 @@ fun BottomNavBar(
                             ),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            imageVector = item.icon,
-                            contentDescription = item.label,
-                            modifier = Modifier.size(28.dp)
-                        )
+                        // Show badge for cart if there are items
+                        if (item.route == "cart" && cartItemCount > 0) {
+                            BadgedBox(
+                                badge = {
+                                    Badge(
+                                        containerColor = MaterialTheme.colorScheme.error,
+                                        contentColor = MaterialTheme.colorScheme.onError
+                                    ) {
+                                        Text(cartItemCount.toString())
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = item.icon,
+                                    contentDescription = item.label,
+                                    modifier = Modifier.size(28.dp)
+                                )
+                            }
+                        } else {
+                            Icon(
+                                imageVector = item.icon,
+                                contentDescription = item.label,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
                     }
                 },
                 label = {
@@ -64,7 +86,9 @@ fun BottomNavBar(
                 },
                 selected = currentRoute == item.route,
                 onClick = {
-                    if (item.route == "search") {
+                    if (item.route == "cart") {
+                        onNavigate("cart")
+                    } else if (item.route == "search") {
                         onNavigate("SearchBarSection") // Explicitly navigate to the search screen
                     } else if (item.route == "home" && currentRoute != "home") {
                         onNavigate(item.route)
@@ -83,7 +107,6 @@ fun BottomNavBar(
         }
     }
 }
-
 
 private data class NavItem(
     val icon: ImageVector,
@@ -110,7 +133,7 @@ private val bottomNavItems = listOf(
     NavItem(
         icon = Icons.Default.ShoppingCart,
         label = "My Cart",
-        route = "cart"
+        route = "cart" // This route will navigate to AddToCartScreen
     ),
     NavItem(
         icon = Icons.Default.Person,

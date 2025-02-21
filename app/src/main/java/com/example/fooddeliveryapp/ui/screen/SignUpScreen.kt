@@ -13,7 +13,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -23,8 +22,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
 import com.example.fooddeliveryapp.ui.theme.AppTheme
-import com.example.fooddeliveryapp.ui.theme.customTypography
-import com.example.fooddeliveryapp.ui.theme.extendedTypography
+import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHostState
+import kotlinx.coroutines.launch
 
 private val YummyFoodiesFontFamily = FontFamily(
     Font(R.font.yummy_foodies_regular, FontWeight.Normal)
@@ -36,22 +37,12 @@ fun SignUpScreen(navController: NavController) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val auth = FirebaseAuth.getInstance()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     Scaffold(
-        /*topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Create your Account",
-                        color = Color(0xFFFFA500),
-                        fontFamily = YummyFoodiesFontFamily,
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-        },*/
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         content = { paddingValues ->
             Box(
                 modifier = Modifier
@@ -142,8 +133,21 @@ fun SignUpScreen(navController: NavController) {
                     // Create Account Button
                     Button(
                         onClick = {
-                            // Handle account creation logic here (e.g., save user to database)
-                            navController.navigate("loginScreen") // After sign-up, navigate to login screen
+                            if (email.isNotEmpty() && password.isNotEmpty()) {
+                                auth.createUserWithEmailAndPassword(email, password)
+                                    .addOnCompleteListener { task ->
+                                        if (task.isSuccessful) {
+                                            // Navigate to login screen or home
+                                            navController.navigate("signInScreen")
+                                        } else {
+                                            val message = task.exception?.message ?: "Sign-up failed"
+
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar(message) // Show error message in Snackbar
+                                            }
+                                        }
+                                    }
+                            }
                         },
                         colors = ButtonDefaults
                             .buttonColors(containerColor = Color(0xFFFFA500)), // Orange color

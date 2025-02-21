@@ -81,6 +81,19 @@ fun ProductDetailsScreen(
         }
     }
 
+    //added
+    if (isLoading) {
+        CircularProgressIndicator(modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center))
+        return
+    }
+    // Show error state if product details are not found
+    if (productDetails == null) {
+        Text("Product not found", modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center))
+        return
+    }
+
+
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {

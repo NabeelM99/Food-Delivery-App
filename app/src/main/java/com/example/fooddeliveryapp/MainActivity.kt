@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
                         // Splash Screen
                         composable("splashScreen") {
                             SplashScreen {
-                                navController.navigate("homeScreen") {
+                                navController.navigate("signInScreen") {
                                     popUpTo("splashScreen") { inclusive = true }
                                 }
                             }
@@ -101,6 +101,7 @@ class MainActivity : ComponentActivity() {
                         composable("SearchBarSection") {
                             SearchScreen()
                         }
+
                     }
                 }
             }

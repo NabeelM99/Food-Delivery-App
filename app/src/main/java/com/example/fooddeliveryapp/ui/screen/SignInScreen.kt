@@ -25,16 +25,22 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
 import com.example.fooddeliveryapp.ui.theme.AppTheme
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val validEmail = "test"
-    val validPassword = "123"
+    val auth = FirebaseAuth.getInstance()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    //val validEmail = "test"
+    //val validPassword = "123"
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         content = { paddingValues ->
             Box(
                 modifier = Modifier
@@ -110,11 +116,21 @@ fun SignInScreen(navController: NavController) {
                     // Login Button
                     Button(
                         onClick = {
-                            if (email == validEmail && password == validPassword) {
-                                navController.navigate("homeScreen") // Navigate to ProductDetailsScreen
-                            } else {
-                                // Handle invalid login (e.g., Snackbar)
-                                println("Invalid login credentials")
+                            if (email.isNotEmpty() && password.isNotEmpty()) {
+                                auth.signInWithEmailAndPassword(email, password)
+                                    .addOnCompleteListener { task ->
+                                        if (task.isSuccessful) {
+                                            // Successfully signed in, navigate to the home screen or another screen
+                                            navController.navigate("homeScreen") // Or any screen after sign-in
+                                        } else {
+                                            // Launch coroutine to show Snackbar on failure
+                                            val message = task.exception?.message ?: "Sign-in failed"
+
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar(message) // Show error message in Snackbar
+                                            }
+                                        }
+                                    }
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500)),
