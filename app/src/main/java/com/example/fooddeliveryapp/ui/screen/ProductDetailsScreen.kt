@@ -120,6 +120,7 @@ fun ProductDetailsScreen(
                             cardViewModel.addToCart(item)
                         }
                     }
+
                 )
             }
         }

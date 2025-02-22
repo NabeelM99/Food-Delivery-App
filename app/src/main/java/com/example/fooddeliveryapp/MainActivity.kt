@@ -116,6 +116,16 @@ class MainActivity : ComponentActivity() {
 
                         }
 
+                        composable("AddToCartScreen") {
+                            AddToCartScreen(
+                                navController = navController,
+                                cartViewModel = cartViewModel
+                            )
+
+                        }
+
+
+
                     }
                 }
             }

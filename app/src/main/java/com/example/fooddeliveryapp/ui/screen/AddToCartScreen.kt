@@ -1,5 +1,6 @@
 package com.example.fooddeliveryapp.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -45,19 +46,29 @@ class CartViewModel : ViewModel() {
     private val _cartItems = MutableStateFlow<List<CartItem>>(emptyList())
     val cartItems: StateFlow<List<CartItem>> get() = _cartItems
 
+    /*init {
+        _cartItems.value = listOf(
+            CartItem(1, "Burger", 5.99, "image_url", 2),
+            CartItem(2, "Fries", 2.99, "image_url", 1)
+        )
+        Log.d("CartViewModel", "Initialized with hardcoded data")
+    }*/
+
     // Add an item to the cart
     fun addToCart(item: CartItem) {
         viewModelScope.launch {
+            Log.d("CartViewModel", "Adding item to cart: ${item.name} (ID: ${item.id})")
             val existingItem = _cartItems.value.find { it.id == item.id }
             if (existingItem != null) {
-                // Update quantity if the item already exists
+                Log.d("CartViewModel", "Updating quantity for item: ${item.name}")
                 _cartItems.value = _cartItems.value.map {
                     if (it.id == item.id) it.copy(quantity = it.quantity + item.quantity) else it
                 }
             } else {
-                // Add new item to the cart
+                Log.d("CartViewModel", "Adding new item: ${item.name}")
                 _cartItems.value = _cartItems.value + item
             }
+            Log.d("CartViewModel", "Cart items: ${_cartItems.value}")
         }
     }
 
@@ -354,6 +365,7 @@ fun EmptyCartView(modifier: Modifier = Modifier) {
             ) {
                 Text("Browse Menu")
             }
+
         }
     }
 }
