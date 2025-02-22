@@ -114,7 +114,7 @@ fun ProductDetailsScreen(
                                 id = productDetails?.id ?: 0,
                                 name = productDetails?.name ?: "",
                                 price = productDetails?.price ?: 0.0,
-                                imageUrl = productDetails?.imageUrl ?: "",
+                                imageName = productDetails?.imageUrl ?: "",
                                 quantity = amount
                             )
                             cardViewModel.addToCart(item)

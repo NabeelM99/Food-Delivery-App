@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -28,6 +29,8 @@ import kotlinx.coroutines.launch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope // For viewModelScope
 import com.example.fooddeliveryapp.R
+import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.getImageResourceId
+import com.example.fooddeliveryapp.ui.theme.Orange
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -36,7 +39,7 @@ data class CartItem(
     val id: Long,
     val name: String,
     val price: Double,
-    val imageUrl: String,
+    val imageName: String,
     var quantity: Int = 1
 )
 
@@ -45,14 +48,6 @@ class CartViewModel : ViewModel() {
     // State to hold the list of cart items
     private val _cartItems = MutableStateFlow<List<CartItem>>(emptyList())
     val cartItems: StateFlow<List<CartItem>> get() = _cartItems
-
-    /*init {
-        _cartItems.value = listOf(
-            CartItem(1, "Burger", 5.99, "image_url", 2),
-            CartItem(2, "Fries", 2.99, "image_url", 1)
-        )
-        Log.d("CartViewModel", "Initialized with hardcoded data")
-    }*/
 
     // Add an item to the cart
     fun addToCart(item: CartItem) {
@@ -200,7 +195,7 @@ fun CartItemCard(
         ) {
             // Left: Item Image
             Image(
-                painter = rememberAsyncImagePainter(cartItem.imageUrl),
+                painter = painterResource(id = getImageResourceId(cartItem.imageName)),
                 contentDescription = cartItem.name,
                 modifier = Modifier
                     .size(70.dp)
@@ -227,7 +222,7 @@ fun CartItemCard(
             // Right: Quantity Selector
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 // Minus Button
                 IconButton(
@@ -239,22 +234,23 @@ fun CartItemCard(
                         }
                     },
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(26.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .padding(4.dp)
+                        .background(Color.White),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_minus),
                         contentDescription = "Decrease quantity",
-                        modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        modifier = Modifier.size(14.dp),
+                        tint = Color.Red
                     )
                 }
 
                 // Quantity Display
                 Text(
                     text = "${cartItem.quantity}",
-                    fontSize = 16.sp,
+                    fontSize = 25.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.width(24.dp),
                     textAlign = TextAlign.Center
@@ -264,15 +260,16 @@ fun CartItemCard(
                 IconButton(
                     onClick = { onIncreaseQuantity(cartItem.id) },
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(26.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary)
+                        .padding(4.dp)
+                        .background(Orange)
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_plus),
                         contentDescription = "Increase quantity",
-                        modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.onPrimary
+                        modifier = Modifier.size(14.dp),
+                        tint = Color.White
                     )
                 }
             }
