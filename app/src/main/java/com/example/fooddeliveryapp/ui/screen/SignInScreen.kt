@@ -36,8 +36,8 @@ fun SignInScreen(navController: NavController) {
     val auth = FirebaseAuth.getInstance()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    //val validEmail = "test"
-    //val validPassword = "123"
+    val ADMIN_EMAIL = "admin@culinario.com"
+    val ADMIN_PASSWORD = "admin1234"
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -120,17 +120,29 @@ fun SignInScreen(navController: NavController) {
                                 auth.signInWithEmailAndPassword(email, password)
                                     .addOnCompleteListener { task ->
                                         if (task.isSuccessful) {
-                                            // Successfully signed in, navigate to the home screen or another screen
-                                            navController.navigate("homeScreen") // Or any screen after sign-in
+                                            // Check if logged in user is admin
+                                            val user = auth.currentUser
+                                            if (user?.email == ADMIN_EMAIL) {
+                                                navController.navigate("adminHomeScreen") {
+                                                    popUpTo("signInScreen") { inclusive = true }
+                                                }
+                                            } else {
+                                                navController.navigate("homeScreen") {
+                                                    popUpTo("signInScreen") { inclusive = true }
+                                                }
+                                            }
                                         } else {
-                                            // Launch coroutine to show Snackbar on failure
-                                            val message = task.exception?.message ?: "Sign-in failed"
-
                                             scope.launch {
-                                                snackbarHostState.showSnackbar(message) // Show error message in Snackbar
+                                                snackbarHostState.showSnackbar(
+                                                    task.exception?.message ?: "Authentication failed"
+                                                )
                                             }
                                         }
                                     }
+                            } else {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("Please fill all fields")
+                                }
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500)),
