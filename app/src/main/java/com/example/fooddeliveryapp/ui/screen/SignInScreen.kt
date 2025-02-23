@@ -58,7 +58,7 @@ fun SignInScreen(navController: NavController) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.White.copy(alpha = 0.8f)) // Adjust alpha for opacity
+                        .background(Color.White.copy(alpha = 0.8f))
                 )
 
                 Column(
@@ -107,10 +107,8 @@ fun SignInScreen(navController: NavController) {
                         value = password,
                         onValueChange = { password = it },
                         placeholder = "Password",
-
                         keyboardType = KeyboardType.Password
                     )
-
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Login Button
@@ -122,7 +120,7 @@ fun SignInScreen(navController: NavController) {
                                         if (task.isSuccessful) {
                                             // Check if logged in user is admin
                                             val user = auth.currentUser
-                                            if (user?.email == ADMIN_EMAIL) {
+                                            if (user?.email == ADMIN_EMAIL && password == ADMIN_PASSWORD) {
                                                 navController.navigate("adminHomeScreen") {
                                                     popUpTo("signInScreen") { inclusive = true }
                                                 }

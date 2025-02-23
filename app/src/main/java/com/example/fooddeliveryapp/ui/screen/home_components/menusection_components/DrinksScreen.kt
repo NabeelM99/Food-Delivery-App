@@ -29,7 +29,8 @@ data class Drink(
     val name: String = "",
     val price: Double = 0.0,
     val imageUrl: String = "",
-    val description: String = ""
+    val description: String = "",
+    val productDescription: String = ""  // Added to match Burger structure
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,7 +55,8 @@ fun DrinksScreen(navController: NavController) {
                             name = doc.getString("name") ?: "",
                             price = doc.getDouble("price") ?: 0.0,
                             imageUrl = doc.getString("imageUrl") ?: "",
-                            description = doc.getString("description") ?: ""
+                            description = doc.getString("description") ?: "",
+                            productDescription = doc.getString("productDescription") ?: ""
                         )
                     } catch (e: Exception) {
                         Log.e("Firestore", "Error parsing document: ${doc.id}", e)
@@ -98,7 +100,7 @@ fun DrinksScreen(navController: NavController) {
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
             items(drinks) { drink ->
-                DrinkCard(drink = drink)
+                DrinkCard(drink = drink, navController = navController)
             }
         }
     }
@@ -107,14 +109,17 @@ fun DrinksScreen(navController: NavController) {
 @SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DrinkCard(drink: Drink) {
+fun DrinkCard(drink: Drink, navController: NavController) {
     val imageResId = getDrinkImageResourceId(drink.imageUrl)
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(120.dp)
-            .clickable { /* Handle click */ },
+            .clickable {
+                Log.d("Navigation", "Navigating to drink with ID: ${drink.id}")
+                navController.navigate("productDetailsScreen/${drink.id}")
+            },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
@@ -156,31 +161,6 @@ fun DrinkCard(drink: Drink) {
                     fontSize = 14.sp,
                     color = Color.Gray
                 )
-            }
-
-            Button(
-                onClick = { /* Handle add to cart */ },
-                modifier = Modifier
-                    .width(100.dp)
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFFFA500)
-                ),
-                shape = RoundedCornerShape(25.dp)
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "$${String.format("%.2f", drink.price)}",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "Add",
-                        fontSize = 12.sp
-                    )
-                }
             }
         }
     }

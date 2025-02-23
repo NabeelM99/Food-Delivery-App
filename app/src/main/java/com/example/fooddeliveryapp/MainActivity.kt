@@ -103,6 +103,10 @@ class MainActivity : ComponentActivity() {
                             HomeScreen(navController)
                         }
 
+                        composable("adminHomeScreen") {
+                            AdminHomeScreen(navController)
+                        }
+
                         // Search Bar Section
                         composable("SearchBarSection") {
                             SearchScreen()
@@ -113,7 +117,6 @@ class MainActivity : ComponentActivity() {
                                 navController = navController,
                                 cartViewModel = cartViewModel
                             )
-
                         }
 
                         composable("AddToCartScreen") {
@@ -121,7 +124,6 @@ class MainActivity : ComponentActivity() {
                                 navController = navController,
                                 cartViewModel = cartViewModel
                             )
-
                         }
 
 
