@@ -48,9 +48,9 @@ fun BurgerScreen(navController: NavController) {
                     try {
                         Burger(
                             id = when (val idValue = doc.get("id")) {
-                                is Number -> idValue.toInt()  // If it's a number, convert to Int
-                                is String -> idValue.toIntOrNull() ?: 0  // If it's a string, parse safely
-                                else -> 0  // Default to 0 if invalid
+                                is Number -> idValue.toInt()
+                                is String -> idValue.toIntOrNull() ?: 0
+                                else -> 0
                             },
                             name = doc.getString("name") ?: "",
                             price = doc.getDouble("price") ?: 0.0, // Ensure correct type

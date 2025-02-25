@@ -44,7 +44,7 @@ fun MenuSection(navController: NavController) {
             Color(0xFF8BC34A)
         ),
         MenuCategory(
-            "Juice",
+            "Juices",
             R.drawable.img_juice,
             Color(0xFFFF6347)
         )
@@ -69,6 +69,8 @@ fun MenuSection(navController: NavController) {
                             "Burgers" -> navController.navigate("BurgerScreen")
                             "Fries" -> navController.navigate("FriesScreen")
                             "Drinks" -> navController.navigate("DrinksScreen")
+                            "Juices" -> navController.navigate("JuiceScreen")
+
                         }
                     }
                 )

@@ -20,6 +20,7 @@ import com.example.fooddeliveryapp.ui.screen.home_components.menusection_compone
 import com.example.fooddeliveryapp.ui.theme.AppTheme
 import com.google.firebase.FirebaseApp
 import androidx.navigation.navArgument
+import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.JuiceScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -64,6 +65,11 @@ class MainActivity : ComponentActivity() {
                         // Drinks Screen
                         composable("DrinksScreen") {
                             DrinksScreen(navController)
+                        }
+
+                        // Juices Screen
+                        composable("JuiceScreen") {
+                            JuiceScreen(navController)
                         }
 
                         // Location Selection Screen
