@@ -119,13 +119,13 @@ fun AddProductForm(
     onBack: () -> Unit
 ) {
     var selectedCategory by remember { mutableStateOf("burger") }
-    //var selectedCategory by remember { mutableStateOf("burger") }
     var productId by remember { mutableStateOf("") }
     var productName by remember { mutableStateOf("") }
     var imageUrl by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
+    var price by remember { mutableStateOf("") }
 
-    val categories = listOf("Burger", "Drink", "Fries", "Pasta", "Juice")
+    val categories = listOf("Burger", "Juice", "Fries", "Pasta", "Drink")
     var categoryExpanded by remember { mutableStateOf(false) }
 
     Column(
@@ -173,17 +173,24 @@ fun AddProductForm(
             OutlinedTextField(
                 value = productId,
                 onValueChange = { productId = it },
-                label = { Text("Product ID") },
+                label = { Text("Burger ID") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
         }
 
-
         OutlinedTextField(
             value = productName,
             onValueChange = { productName = it },
             label = { Text("Product Name") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = price,
+            onValueChange = { price = it },
+            label = { Text("Price") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -206,13 +213,13 @@ fun AddProductForm(
                 if (selectedCategory.isNotEmpty() && productName.isNotEmpty()) {
                     val productData = hashMapOf(
                         "name" to productName,
-                        "price" to 0.0, // Default price
+                        "price" to price.toDouble(),
                         "imageUrl" to imageUrl,
                         "description" to description
                     )
 
                     if (selectedCategory == "Burger" && productId.isNotEmpty()) {
-                        // For burgers, use the numeric ID
+                        // For burgers, use explicit ID
                         db.collection("burgers")
                             .document("burger$productId")
                             .set(productData)
@@ -221,6 +228,7 @@ fun AddProductForm(
                                     snackbarHostState.showSnackbar("Burger added successfully!")
                                     productId = ""
                                     productName = ""
+                                    price = ""
                                     imageUrl = ""
                                     description = ""
                                 }
@@ -231,16 +239,33 @@ fun AddProductForm(
                                 }
                             }
                     } else {
-                        // For other products, use auto-generated IDs
-                        db.collection(selectedCategory.lowercase() + "s")
-                            .add(productData)
+                        // For other products, use auto-generated ID
+                        val collection = db.collection("${selectedCategory.lowercase()}s")
+                        collection.add(productData)
                             .addOnSuccessListener { docRef ->
-                                scope.launch {
-                                    snackbarHostState.showSnackbar("${selectedCategory} added successfully!")
-                                    productName = ""
-                                    imageUrl = ""
-                                    description = ""
-                                }
+                                // Create matching productdetails entry
+                                val detailsData = hashMapOf(
+                                    //"productId" to docRef.id,
+                                    "name" to productName,
+                                    "price" to (price.toDoubleOrNull() ?: 0.0),
+                                    "imageUrl" to imageUrl,
+                                    "description" to description,
+                                    "nutrition" to hashMapOf<String, Any>(),
+                                    "flavors" to emptyList<Map<String, String>>()
+                                )
+
+                                db.collection("productdetails")
+                                    .document(docRef.id)
+                                    .set(detailsData)
+                                    .addOnSuccessListener {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar("${selectedCategory} added with ID: ${docRef.id}")
+                                            productName = ""
+                                            price = ""
+                                            imageUrl = ""
+                                            description = ""
+                                        }
+                                    }
                             }
                             .addOnFailureListener { e ->
                                 scope.launch {
@@ -250,7 +275,7 @@ fun AddProductForm(
                     }
                 } else {
                     scope.launch {
-                        snackbarHostState.showSnackbar("Please fill all fields and select category")
+                        snackbarHostState.showSnackbar("Please fill all required fields")
                     }
                 }
             },
@@ -271,8 +296,8 @@ fun AddProductDetailsForm(
     padding: PaddingValues,
     onBack: () -> Unit
 ) {
+    var productId by remember { mutableStateOf("") }
     var productName by remember { mutableStateOf("") }
-    //var burgerName by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
     var imageUrl by remember { mutableStateOf("") }
     var productDescription by remember { mutableStateOf("") }
@@ -288,6 +313,13 @@ fun AddProductDetailsForm(
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
+        OutlinedTextField(
+            value = productId,
+            onValueChange = { productId = it },
+            label = { Text("Product ID") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
         OutlinedTextField(
             value = productName,
             onValueChange = { productName = it },
@@ -367,7 +399,8 @@ fun AddProductDetailsForm(
 
         Button(
             onClick = {
-                val burgerData = hashMapOf(
+                val detailsData = hashMapOf(
+                    "productId" to productId,
                     "name" to productName,
                     "price" to price.toDouble(),
                     "imageUrl" to imageUrl,
@@ -382,10 +415,12 @@ fun AddProductDetailsForm(
                 )
 
                 db.collection("productdetails")
-                    .add(burgerData)
+                    .document(productId)
+                    .set(detailsData)
                     .addOnSuccessListener {
                         scope.launch {
-                            snackbarHostState.showSnackbar("Product details added successfully!")
+                            snackbarHostState.showSnackbar("Details added for product $productId")
+                            productId = ""
                             productName = ""
                             price = ""
                             imageUrl = ""

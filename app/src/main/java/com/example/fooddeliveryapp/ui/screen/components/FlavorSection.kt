@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -32,7 +33,8 @@ fun FlavorSection(
     ) {
         SectionHeader(
             title = "Add More Flavor",
-            emotion = "\uD83E\uDD29"
+            emotion = ""
+
         )
         Row(
             modifier = Modifier
@@ -82,6 +84,7 @@ private fun ProductFlavorItem(
 
     Box(
         modifier = modifier
+            .size(150.dp)
             .shadow(
                 elevation = 10.dp,
                 spotColor = Color.LightGray,
@@ -103,8 +106,10 @@ private fun ProductFlavorItem(
             Image(
                 painter = painterResource(id = drawableId),
                 contentDescription = state.name,
-                contentScale = ContentScale.FillWidth,
-                modifier = Modifier.fillMaxWidth()
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(RoundedCornerShape(16.dp))
             )
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -140,6 +145,19 @@ private fun getFlavorDrawableId(imgName: String): Int {
             Log.d("FlavorSection", "Found match for img_onion")
             R.drawable.img_onion
         }
+        "img_orangepulp" -> {
+            Log.d("FlavorSection", "Found match for img_onion")
+            R.drawable.img_orangepulp
+        }
+        "img_limepulp" -> {
+            Log.d("FlavorSection", "Found match for img_onion")
+            R.drawable.img_limepulp
+        }
+        "img_pineapplepulp" -> {
+            Log.d("FlavorSection", "Found match for img_onion")
+            R.drawable.img_pineapplepulp
+        }
+
         else -> {
             Log.d("FlavorSection", "No match found for $imgName, using fallback image")
             R.drawable.img_placeholder

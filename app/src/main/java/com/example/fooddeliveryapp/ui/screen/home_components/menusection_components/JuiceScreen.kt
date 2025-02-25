@@ -24,7 +24,7 @@ import com.example.fooddeliveryapp.R
 import com.google.firebase.firestore.FirebaseFirestore
 
 data class Juice(
-    val id: Int = 0,
+    val id: String = "",
     val name: String = "",
     val price: Double = 0.0,
     val imageUrl: String = "",
@@ -46,7 +46,7 @@ fun JuiceScreen(navController: NavController) {
                 val fetchedJuices = result.documents.mapNotNull { doc ->
                     try {
                         Juice(
-                            id = doc.getLong("id")?.toInt() ?: 0,
+                            id = doc.id,
                             name = doc.getString("name") ?: "",
                             price = doc.getDouble("price") ?: 0.0,
                             imageUrl = doc.getString("imageUrl") ?: "",
@@ -111,7 +111,7 @@ fun JuiceCard(juice: Juice, navController: NavController) {
             .height(120.dp)
             .clickable {
                 Log.d("Navigation", "Navigating to juice with ID: ${juice.id}")
-                navController.navigate("productDetailsScreen/juice/${juice.id}")
+                navController.navigate("productDetailsScreen/juices/${juice.id}")
             },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),

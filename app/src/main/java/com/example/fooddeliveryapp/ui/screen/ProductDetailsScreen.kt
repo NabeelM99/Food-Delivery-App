@@ -35,6 +35,7 @@ fun ProductDetailsScreen(
 
     LaunchedEffect(productType, productId) {
         try {
+
             val docRef = if (productType == "burger") {
                 db.collection("productdetails").document("burger$productId")
             } else {
@@ -149,18 +150,16 @@ fun ProductDetailsScreen(
                 ) {
                     item {
                         ProductPreviewSection(
-                            burgerId = details.id.toInt(),
+                            productType = productType,
+                            productId = productId,
                             navController = navController
                         )
-
                         Spacer(modifier = Modifier.height(16.dp))
 
                         FlavorSection(data = details.flavors)
-
                         Spacer(modifier = Modifier.height(16.dp))
 
                         ProductNutritionSection(state = details.nutrition)
-
                         Spacer(modifier = Modifier.height(16.dp))
 
                         ProductDescriptionSection(productDescription = details.productDescription)

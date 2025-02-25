@@ -29,7 +29,8 @@ import kotlinx.coroutines.tasks.await
 @Composable
 fun ProductPreviewSection(
     modifier: Modifier = Modifier,
-    burgerId: Int,
+    productType: String,
+    productId: String,
     navController: NavController
 ) {
     // State to hold the fetched product preview data
@@ -37,12 +38,13 @@ fun ProductPreviewSection(
     var loading by remember { mutableStateOf(true) }
 
     // Fetch product preview data from Firebase
-    LaunchedEffect(burgerId) {
+    LaunchedEffect(productId) {
         try {
             val db = FirebaseFirestore.getInstance()
-            Log.d("Firestore", "Attempting to fetch document: burger$burgerId")
+            val documentId = if (productType == "burger") "burger$productId" else productId
+            Log.d("Firestore", "Attempting to fetch document: $documentId")
             val document = db.collection("productdetails")
-                .document("burger$burgerId")
+                .document(documentId)
                 .get()
                 .await()
 
@@ -62,7 +64,7 @@ fun ProductPreviewSection(
                     Log.d("Firestore", "Successfully mapped data: $productPreviewState")
                 }
             } else {
-                Log.e("Firestore", "Document does not exist for burgerId: $burgerId")
+                //Log.e("Firestore", "Document does not exist for burgerId: $burgerId")
             }
         } catch (e: Exception) {
             Log.e("Firestore", "Error fetching product preview data", e)
@@ -248,11 +250,27 @@ private fun CloseButton(
 // Helper function to get drawable resource ID from a string
 fun getDrawableId(imageName: String): Int {
     return when (imageName) {
+        //burger
         "img_classiccheeseburger" -> R.drawable.img_classiccheeseburger
         "img_doubleburger" -> R.drawable.img_doubleburger
         "img_chickenburger" -> R.drawable.img_chickenburger
         "img_veggieburger" -> R.drawable.img_veggieburger
         "img_beefburger" -> R.drawable.img_beefburger
+        //juice
+        "img_orangejuice" -> R.drawable.img_orangejuice
+        "img_papayajuice" -> R.drawable.img_papayajuice
+        "img_watermelonjuice" -> R.drawable.img_watermelonjuice
+        "img_pineapplejuice" -> R.drawable.img_pineapplejuice
+        "img_avocadojuice" -> R.drawable.img_avocadojuice
+        "img_mangojuice" -> R.drawable.img_mangojuice
+        //drinks
+        "img_kinzablackcurrant" -> R.drawable.img_kinzablackcurrant
+        "img_kinzacitrus" -> R.drawable.img_kinzacitrus
+        "img_kinzalemon" -> R.drawable.img_kinzalemon
+        "img_kinzaorange" -> R.drawable.img_kinzaorange
+        "img_pamircola1" -> R.drawable.img_pamircola1
+        "img_pamirlemonlime" -> R.drawable.img_pamirlemonlime
+
         else -> R.drawable.img_placeholder
     }
 }
