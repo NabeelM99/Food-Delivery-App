@@ -256,7 +256,7 @@ fun getDrawableId(imageName: String): Int {
         "img_chickenburger" -> R.drawable.img_chickenburger
         "img_veggieburger" -> R.drawable.img_veggieburger
         "img_beefburger" -> R.drawable.img_beefburger
-        //juice
+        //juices
         "img_orangejuice" -> R.drawable.img_orangejuice
         "img_papayajuice" -> R.drawable.img_papayajuice
         "img_watermelonjuice" -> R.drawable.img_watermelonjuice
@@ -270,6 +270,22 @@ fun getDrawableId(imageName: String): Int {
         "img_kinzaorange" -> R.drawable.img_kinzaorange
         "img_pamircola1" -> R.drawable.img_pamircola1
         "img_pamirlemonlime" -> R.drawable.img_pamirlemonlime
+        "img_kinzacola" -> R.drawable.img_kinzacola
+        "kinzasoftdrinks" -> R.drawable.img_kinzasoftdrinks
+        //Fries
+        "img_pimiento" -> R.drawable.img_pimiento
+        "img_potatotornado" -> R.drawable.img_potatotornado
+        "img_sweetpotatofries" -> R.drawable.img_sweetpotatofries
+        "img_thricefires" -> R.drawable.img_thricefries
+        "img_wedgecutfries" -> R.drawable.img_wedgecutfries
+        //pasta
+        "img_bbqchickenpasta" -> R.drawable.img_bbqchickenpasta
+        "img_chickpeapasta" -> R.drawable.img_chickpeapasta
+        "img_fettuccinealfredopasta" -> R.drawable.img_fettuccinealfredopasta
+        "img_greepasta" -> R.drawable.img_greenpasta
+        "img_lemonpasta" -> R.drawable.img_lemonpasta
+        "img_pastaalavodka" -> R.drawable.img_pastaalavodka
+        "img_tomatoandgarlicpasta" -> R.drawable.img_tomatoandgarlicpasta
 
         else -> R.drawable.img_placeholder
     }
