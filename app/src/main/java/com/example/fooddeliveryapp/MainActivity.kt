@@ -94,11 +94,17 @@ class MainActivity : ComponentActivity() {
 
                         // Product Details Screen with burgerId argument
                         composable(
-                            "productDetailsScreen/{burgerId}",
-                            arguments = listOf(navArgument("burgerId") { type = NavType.StringType })
+                            "productDetailsScreen/{productType}/{productId}",
+                            arguments = listOf(
+                                navArgument("productType") { type = NavType.StringType },
+                                navArgument("productId") { type = NavType.StringType }
+                            )
                         ) { backStackEntry ->
-                            val burgerId = backStackEntry.arguments?.getString("burgerId") ?: ""
-                            ProductDetailsScreen(burgerId = burgerId,
+                            val productType = backStackEntry.arguments?.getString("productType") ?: ""
+                            val productId = backStackEntry.arguments?.getString("productId") ?: ""
+                            ProductDetailsScreen(
+                                productType = productType,
+                                productId = productId,
                                 navController = navController,
                                 cardViewModel = cartViewModel
                             )

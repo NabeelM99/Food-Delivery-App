@@ -111,7 +111,7 @@ fun JuiceCard(juice: Juice, navController: NavController) {
             .height(120.dp)
             .clickable {
                 Log.d("Navigation", "Navigating to juice with ID: ${juice.id}")
-                navController.navigate("productDetailsScreen/${juice.id}")
+                navController.navigate("productDetailsScreen/juice/${juice.id}")
             },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),

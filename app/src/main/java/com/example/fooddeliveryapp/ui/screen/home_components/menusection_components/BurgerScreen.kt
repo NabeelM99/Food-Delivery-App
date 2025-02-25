@@ -119,7 +119,7 @@ fun BurgerCard(burger: Burger, navController: NavController) {
                 Log.d("Navigation", "Navigating to burger with ID: ${burger.id}")
                 val documentPath = "burger${burger.id}"
                 Log.d("Navigation", "Will look for document: $documentPath")
-                navController.navigate("productDetailsScreen/${burger.id}")
+                navController.navigate("productDetailsScreen/burger/${burger.id}")
             },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(

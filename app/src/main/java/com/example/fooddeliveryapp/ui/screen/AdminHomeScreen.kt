@@ -118,7 +118,8 @@ fun AddProductForm(
     padding: PaddingValues,
     onBack: () -> Unit
 ) {
-    var selectedCategory by remember { mutableStateOf("") }
+    var selectedCategory by remember { mutableStateOf("burger") }
+    //var selectedCategory by remember { mutableStateOf("burger") }
     var productId by remember { mutableStateOf("") }
     var productName by remember { mutableStateOf("") }
     var imageUrl by remember { mutableStateOf("") }
@@ -167,13 +168,17 @@ fun AddProductForm(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedTextField(
-            value = productId,
-            onValueChange = { productId = it },
-            label = { Text("Product ID") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth()
-        )
+        // Show ID field only for burgers
+        if (selectedCategory == "Burger") {
+            OutlinedTextField(
+                value = productId,
+                onValueChange = { productId = it },
+                label = { Text("Product ID") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
 
         OutlinedTextField(
             value = productName,
@@ -198,30 +203,51 @@ fun AddProductForm(
 
         Button(
             onClick = {
-                if (selectedCategory.isNotEmpty() && productId.isNotEmpty()) {
+                if (selectedCategory.isNotEmpty() && productName.isNotEmpty()) {
                     val productData = hashMapOf(
-                        "id" to productId.toInt(),
                         "name" to productName,
+                        "price" to 0.0, // Default price
                         "imageUrl" to imageUrl,
                         "description" to description
                     )
 
-                    db.collection(selectedCategory.lowercase() + "s")
-                        .add(productData)
-                        .addOnSuccessListener {
-                            scope.launch {
-                                snackbarHostState.showSnackbar("Product added to $selectedCategory collection!")
-                                productId = ""
-                                productName = ""
-                                imageUrl = ""
-                                description = ""
+                    if (selectedCategory == "Burger" && productId.isNotEmpty()) {
+                        // For burgers, use the numeric ID
+                        db.collection("burgers")
+                            .document("burger$productId")
+                            .set(productData)
+                            .addOnSuccessListener {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("Burger added successfully!")
+                                    productId = ""
+                                    productName = ""
+                                    imageUrl = ""
+                                    description = ""
+                                }
                             }
-                        }
-                        .addOnFailureListener { e ->
-                            scope.launch {
-                                snackbarHostState.showSnackbar("Error: ${e.message}")
+                            .addOnFailureListener { e ->
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("Error: ${e.message}")
+                                }
                             }
-                        }
+                    } else {
+                        // For other products, use auto-generated IDs
+                        db.collection(selectedCategory.lowercase() + "s")
+                            .add(productData)
+                            .addOnSuccessListener { docRef ->
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("${selectedCategory} added successfully!")
+                                    productName = ""
+                                    imageUrl = ""
+                                    description = ""
+                                }
+                            }
+                            .addOnFailureListener { e ->
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("Error: ${e.message}")
+                                }
+                            }
+                    }
                 } else {
                     scope.launch {
                         snackbarHostState.showSnackbar("Please fill all fields and select category")
@@ -245,7 +271,8 @@ fun AddProductDetailsForm(
     padding: PaddingValues,
     onBack: () -> Unit
 ) {
-    var burgerName by remember { mutableStateOf("") }
+    var productName by remember { mutableStateOf("") }
+    //var burgerName by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
     var imageUrl by remember { mutableStateOf("") }
     var productDescription by remember { mutableStateOf("") }
@@ -262,8 +289,8 @@ fun AddProductDetailsForm(
             .padding(16.dp)
     ) {
         OutlinedTextField(
-            value = burgerName,
-            onValueChange = { burgerName = it },
+            value = productName,
+            onValueChange = { productName = it },
             label = { Text("Product Name") },
             modifier = Modifier.fillMaxWidth()
         )
@@ -341,7 +368,7 @@ fun AddProductDetailsForm(
         Button(
             onClick = {
                 val burgerData = hashMapOf(
-                    "name" to burgerName,
+                    "name" to productName,
                     "price" to price.toDouble(),
                     "imageUrl" to imageUrl,
                     "productDescription" to productDescription,
@@ -359,7 +386,7 @@ fun AddProductDetailsForm(
                     .addOnSuccessListener {
                         scope.launch {
                             snackbarHostState.showSnackbar("Product details added successfully!")
-                            burgerName = ""
+                            productName = ""
                             price = ""
                             imageUrl = ""
                             productDescription = ""

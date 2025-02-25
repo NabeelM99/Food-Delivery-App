@@ -19,7 +19,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun ProductDetailsScreen(
-    burgerId: String,
+    productType: String,
+    productId: String,
     navController: NavController,
     cardViewModel: CartViewModel = viewModel()
 ) {
@@ -30,12 +31,17 @@ fun ProductDetailsScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    Log.d("ProductDetailsScreen", "Received burgerId: $burgerId")
+    //Log.d("ProductDetailsScreen", "Received burgerId: $burgerId")
 
-    LaunchedEffect(burgerId) {
+    LaunchedEffect(productType, productId) {
         try {
-            val docRef = db.collection("productdetails").document("burger$burgerId")
-            Log.d("Firestore", "Attempting to Fetching document: burger$burgerId")
+            val docRef = if (productType == "burger") {
+                db.collection("productdetails").document("burger$productId")
+            } else {
+                db.collection("productdetails").document(productId)
+            }
+            //val docRef = db.collection("productdetails").document("burger$burgerId")
+            //Log.d("Firestore", "Attempting to Fetching document: burger$burgerId")
             val document = docRef.get().await()
             Log.d("Firestore", "Document exists: ${document.exists()}")
             if (document.exists()) {
@@ -74,7 +80,7 @@ fun ProductDetailsScreen(
                     )
                 }
             } else {
-                Log.e("Firestore", "Document does not exist for burgerId: burger$burgerId")
+                Log.e("Firestore", "Document does not exist for productId: $productId")
             }
         } catch (e: Exception) {
             Log.e("Firestore", "Error fetching product details", e)
