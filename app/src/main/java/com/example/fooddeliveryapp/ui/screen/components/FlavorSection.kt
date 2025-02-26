@@ -34,7 +34,6 @@ fun FlavorSection(
         SectionHeader(
             title = "Add More Flavor",
             emotion = ""
-
         )
         Row(
             modifier = Modifier
@@ -115,12 +114,12 @@ private fun ProductFlavorItem(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = state.name,
+                    text = state.name.ifEmpty { "Unknown Flavor" },
                     style = AppTheme.typography.bodySmall,
                     color = AppTheme.colors.onRegularSurface
                 )
                 Text(
-                    text = "+${state.price}",
+                    text = "+$${"%.2f".format(state.price)}", // Format price as currency
                     style = AppTheme.typography.bodySmall,
                     color = AppTheme.colors.onRegularSurface
                 )
@@ -133,41 +132,26 @@ private fun ProductFlavorItem(
 private fun getFlavorDrawableId(imgName: String): Int {
     Log.d("FlavorSection", "Attempting to get drawable ID for: $imgName")
     return when (imgName) {
-        "img_cheese" -> {
-            Log.d("FlavorSection", "Found match for img_cheese")
-            R.drawable.img_cheese
-        }
-        "img_bacon" -> {
-            Log.d("FlavorSection", "Found match for img_bacon")
-            R.drawable.img_bacon
-        }
-        "img_onion" -> {
-            Log.d("FlavorSection", "Found match for img_onion")
-            R.drawable.img_onion
-        }
-        "img_orangepulp" -> {
-            Log.d("FlavorSection", "Found match for img_onion")
-            R.drawable.img_orangepulp
-        }
-        "img_limepulp" -> {
-            Log.d("FlavorSection", "Found match for img_onion")
-            R.drawable.img_limepulp
-        }
-        "img_pineapplepulp" -> {
-            Log.d("FlavorSection", "Found match for img_onion")
-            R.drawable.img_pineapplepulp
-        }
+        "img_cheese" -> R.drawable.img_cheese
+        "img_bacon" -> R.drawable.img_bacon
+        "img_onion" -> R.drawable.img_onion
+        "img_orangepulp" -> R.drawable.img_orangepulp
+        "img_limepulp" -> R.drawable.img_limepulp
+        "img_pineapplepulp" -> R.drawable.img_pineapplepulp
+        "img_garlicsauce" -> R.drawable.img_garlicsauce
+        "img_chillsauce" -> R.drawable.img_chillsauce
+        "img_greenchillisauce" -> R.drawable.img_greenchillisauce
 
         else -> {
             Log.d("FlavorSection", "No match found for $imgName, using fallback image")
-            R.drawable.img_placeholder
+            R.drawable.img_placeholder // Fallback image if no match is found.
         }
     }
 }
 
-// Data class for flavor state
+// Data class for flavor state with updated price type.
 data class ProductFlavorState(
     val name: String,
-    val price: String,
-    val imgRes: String
+    val price: Double,  // Ensure this matches Firestore's numeric type.
+    val imgRes: String  // Image resource name.
 )

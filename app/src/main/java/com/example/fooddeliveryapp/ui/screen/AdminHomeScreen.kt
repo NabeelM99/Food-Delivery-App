@@ -239,14 +239,13 @@ fun AddProductForm(
                                 }
                             }
                     } else {
-                        // For other products, use auto-generated ID
-                        /*val collectionName = when (selectedCategory) {
-                            "Fries" -> "fries"
-                            "Pasta" -> "pasta"
+                        // With explicit collection mapping:
+                        val collectionName = when (selectedCategory) {
+                            "Fry" -> "fries"
+                            "Pasta" -> "pasta" // Matches your rules
                             else -> "${selectedCategory.lowercase()}s"
                         }
-                        val collection = db.collection(collectionName)*/
-                        val collection = db.collection("${selectedCategory.lowercase()}s")
+                        val collection = db.collection(collectionName)
                         collection.add(productData)
                             .addOnSuccessListener { docRef ->
                                 // Create matching productdetails entry

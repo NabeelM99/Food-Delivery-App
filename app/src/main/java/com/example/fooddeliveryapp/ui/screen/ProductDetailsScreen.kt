@@ -74,7 +74,7 @@ fun ProductDetailsScreen(
                         flavors = flavorsData.map {
                             ProductFlavorState(
                                 name = it["name"] as? String ?: "",
-                                price = it["price"] as? String ?: "",
+                                price = (it["price"] as? Number)?.toDouble() ?: 0.0,
                                 imgRes = it["imgRes"] as? String ?: ""
                             )
                         }
