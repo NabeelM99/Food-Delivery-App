@@ -1,7 +1,9 @@
 package com.example.fooddeliveryapp.ui.screen.home_components.menusection_components
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,50 +21,51 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
+import com.google.firebase.firestore.FirebaseFirestore
 
-data class Fries(
-    val id: Int,
-    val name: String,
-    val price: Double,
-    val imageResId: Int,
-    val description: String
+data class Fry(
+    val id: String = "",
+    val name: String = "",
+    val price: Double = 0.0,
+    val imageUrl: String = "",
+    val description: String = "",
+    val productDescription: String = ""
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FriesScreen(navController: NavController) {
-    val friesList = remember {
-        listOf(
-            Fries(
-                1,
-                "Classic Fries",
-                3.99,
-                R.drawable.img_fries,
-                "Crispy golden fries with sea salt"
-            ),
-            Fries(
-                2,
-                "Cheese Fries",
-                4.99,
-                R.drawable.img_fries,
-                "Fries topped with melted cheese"
-            ),
-            Fries(
-                3,
-                "Spicy Fries",
-                4.49,
-                R.drawable.img_fries,
-                "Crispy fries with a spicy seasoning"
-            ),
-            Fries(
-                4,
-                "Curly Fries",
-                4.79,
-                R.drawable.img_fries,
-                "Seasoned curly fries, perfectly crispy"
-            ),
-            // Add more fries as needed
-        )
+fun FryScreen(navController: NavController) {
+    val fries = remember { mutableStateListOf<Fry>() }
+    var loading by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("fries")
+            .get()
+            .addOnSuccessListener { result ->
+                val fetchedFries = result.documents.mapNotNull { doc ->
+                    try {
+                        Fry(
+                            id = doc.id,
+                            name = doc.getString("name") ?: "",
+                            price = doc.getDouble("price") ?: 0.0,
+                            imageUrl = doc.getString("imageUrl") ?: "",
+                            description = doc.getString("description") ?: "",
+                            productDescription = doc.getString("productDescription") ?: ""
+                        )
+                    } catch (e: Exception) {
+                        Log.e("Firestore", "Error parsing fry: ${doc.id}", e)
+                        null
+                    }
+                }
+                fries.clear()
+                fries.addAll(fetchedFries)
+                loading = false
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Error fetching fries", e)
+                loading = false
+            }
     }
 
     Scaffold(
@@ -91,8 +94,8 @@ fun FriesScreen(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
-            items(friesList) { fries ->
-                FriesCard(fries = fries)
+            items(fries) { fry ->
+                FryCard(fry = fry, navController = navController)
             }
         }
     }
@@ -101,18 +104,18 @@ fun FriesScreen(navController: NavController) {
 @SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FriesCard(fries: Fries) {
+fun FryCard(fry: Fry, navController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp),
+            .height(120.dp)
+            .clickable {
+                Log.d("Navigation", "Navigating to fry with ID: ${fry.id}")
+                navController.navigate("productDetailsScreen/fries/${fry.id}")
+            },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
-        )
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
             modifier = Modifier
@@ -121,17 +124,15 @@ fun FriesCard(fries: Fries) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Fries Image
             Image(
-                painter = painterResource(id = fries.imageResId),
-                contentDescription = fries.name,
+                painter = painterResource(id = getFryImageResourceId(fry.imageUrl)),
+                contentDescription = fry.name,
                 modifier = Modifier
                     .size(100.dp)
                     .clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Crop
             )
 
-            // Fries Details
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -139,43 +140,28 @@ fun FriesCard(fries: Fries) {
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = fries.name,
+                    text = fry.name,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = fries.description,
+                    text = fry.description,
                     fontSize = 14.sp,
                     color = Color.Gray
                 )
             }
-
-            // Price and Add to Cart Button
-            Button(
-                onClick = { /* Handle add to cart */ },
-                modifier = Modifier
-                    .width(100.dp)
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFFFA500)
-                ),
-                shape = RoundedCornerShape(25.dp)
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "$${String.format("%.2f", fries.price)}",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "Add",
-                        fontSize = 12.sp
-                    )
-                }
-            }
         }
+    }
+}
+
+fun getFryImageResourceId(imageName: String): Int {
+    return when (imageName) {
+        "img_pimiento" -> R.drawable.img_pimiento
+        "img_potatotornado" -> R.drawable.img_potatotornado
+        "img_sweetpotatofries" -> R.drawable.img_sweetpotatofries
+        "img_thricefires" -> R.drawable.img_thricefries
+        "img_wedgecutfries" -> R.drawable.img_wedgecutfries
+        else -> R.drawable.img_placeholder
     }
 }

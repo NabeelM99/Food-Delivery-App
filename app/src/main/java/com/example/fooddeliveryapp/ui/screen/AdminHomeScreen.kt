@@ -125,7 +125,7 @@ fun AddProductForm(
     var description by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
 
-    val categories = listOf("Burger", "Juice", "Fries", "Pasta", "Drink")
+    val categories = listOf("Burger", "Juice", "Fry", "Pasta", "Drink")
     var categoryExpanded by remember { mutableStateOf(false) }
 
     Column(
@@ -240,6 +240,12 @@ fun AddProductForm(
                             }
                     } else {
                         // For other products, use auto-generated ID
+                        /*val collectionName = when (selectedCategory) {
+                            "Fries" -> "fries"
+                            "Pasta" -> "pasta"
+                            else -> "${selectedCategory.lowercase()}s"
+                        }
+                        val collection = db.collection(collectionName)*/
                         val collection = db.collection("${selectedCategory.lowercase()}s")
                         collection.add(productData)
                             .addOnSuccessListener { docRef ->
