@@ -132,15 +132,23 @@ private fun ProductFlavorItem(
 private fun getFlavorDrawableId(imgName: String): Int {
     Log.d("FlavorSection", "Attempting to get drawable ID for: $imgName")
     return when (imgName) {
+        //burger flavor
         "img_cheese" -> R.drawable.img_cheese
         "img_bacon" -> R.drawable.img_bacon
         "img_onion" -> R.drawable.img_onion
+        //juice flavor
         "img_orangepulp" -> R.drawable.img_orangepulp
         "img_limepulp" -> R.drawable.img_limepulp
         "img_pineapplepulp" -> R.drawable.img_pineapplepulp
+        //Fries flavor
         "img_garlicsauce" -> R.drawable.img_garlicsauce
         "img_chillsauce" -> R.drawable.img_chillsauce
         "img_greenchillisauce" -> R.drawable.img_greenchillisauce
+        //pasta flavor
+        "img_oreganoandbasil" -> R.drawable.img_oreganoandbasil
+        "img_italianseasoning" -> R.drawable.img_italianseasoning
+        "img_saltandpepper" -> R.drawable.img_saltandpepper
+
 
         else -> {
             Log.d("FlavorSection", "No match found for $imgName, using fallback image")

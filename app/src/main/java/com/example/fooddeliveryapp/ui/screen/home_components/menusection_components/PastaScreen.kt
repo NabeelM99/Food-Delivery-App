@@ -1,6 +1,5 @@
 package com.example.fooddeliveryapp.ui.screen.home_components.menusection_components
 
-
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Image

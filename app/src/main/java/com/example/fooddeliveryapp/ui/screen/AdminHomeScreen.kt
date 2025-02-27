@@ -1,5 +1,7 @@
 package com.example.fooddeliveryapp.ui.screen
 
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -28,6 +30,14 @@ fun AdminHomeScreen(navController: NavController) {
     val db = FirebaseFirestore.getInstance()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+    BackHandler {
+        navController.navigate("signInScreen") {
+            popUpTo(navController.graph.startDestinationId)
+            launchSingleTop = true
+        }
+    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },

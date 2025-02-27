@@ -1,5 +1,7 @@
 package com.example.fooddeliveryapp.ui.screen
 
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -19,6 +21,14 @@ import com.example.fooddeliveryapp.ui.screen.home_components.BestOfferSection
 fun HomeScreen(navController: NavController) {
     var currentRoute by remember { mutableStateOf("home") }
     val scrollState = rememberScrollState()
+    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+    BackHandler {
+        navController.navigate("signInScreen") {
+            popUpTo(navController.graph.startDestinationId)
+            launchSingleTop = true
+        }
+    }
 
     Box(
         modifier = Modifier.fillMaxSize()
