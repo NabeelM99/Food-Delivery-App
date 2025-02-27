@@ -1,26 +1,27 @@
 package com.example.fooddeliveryapp
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
-import androidx.core.view.WindowCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.example.fooddeliveryapp.ui.screen.* // Import all your screens here
-import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.BurgerScreen
-import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.DrinksScreen
-import com.example.fooddeliveryapp.ui.theme.AppTheme
+import androidx.compose.ui.Modifier
 import com.google.firebase.FirebaseApp
 import androidx.navigation.navArgument
+import androidx.core.view.WindowCompat
+import androidx.compose.material3.Surface
+import androidx.activity.ComponentActivity
+import androidx.navigation.compose.NavHost
+import androidx.activity.compose.setContent
+import androidx.navigation.compose.composable
+import com.example.fooddeliveryapp.ui.screen.*
+import com.example.fooddeliveryapp.ui.theme.AppTheme
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.navigation.compose.rememberNavController
+import androidx.compose.foundation.layout.statusBarsPadding
+import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.BurgerScreen
+import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.DrinksScreen
 import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.FryScreen
 import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.JuiceScreen
+import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.PastaScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -70,6 +71,11 @@ class MainActivity : ComponentActivity() {
                         // Juices Screen
                         composable("JuiceScreen") {
                             JuiceScreen(navController)
+                        }
+
+                        // Pasta Screen
+                        composable("PastaScreen") {
+                            PastaScreen(navController)
                         }
 
                         // Location Selection Screen

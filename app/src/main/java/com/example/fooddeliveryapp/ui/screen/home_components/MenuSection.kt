@@ -70,6 +70,7 @@ fun MenuSection(navController: NavController) {
                             "Fries" -> navController.navigate("FryScreen")
                             "Drinks" -> navController.navigate("DrinksScreen")
                             "Juices" -> navController.navigate("JuiceScreen")
+                            "Pastas" -> navController.navigate("PastaScreen")
 
                         }
                     }

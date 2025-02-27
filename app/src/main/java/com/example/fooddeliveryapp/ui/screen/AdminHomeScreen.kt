@@ -242,7 +242,7 @@ fun AddProductForm(
                         // With explicit collection mapping:
                         val collectionName = when (selectedCategory) {
                             "Fry" -> "fries"
-                            "Pasta" -> "pasta" // Matches your rules
+                            "Pasta" -> "pastas"
                             else -> "${selectedCategory.lowercase()}s"
                         }
                         val collection = db.collection(collectionName)
