@@ -25,7 +25,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
 data class Drink(
-    val id: Int = 0,
+    val id: String = "",
     val name: String = "",
     val price: Double = 0.0,
     val imageUrl: String = "",
@@ -47,11 +47,7 @@ fun DrinksScreen(navController: NavController) {
                 val fetchedDrinks = result.documents.mapNotNull { doc ->
                     try {
                         Drink(
-                            id = when (val idValue = doc.get("id")) {
-                                is Number -> idValue.toInt()
-                                is String -> idValue.toIntOrNull() ?: 0
-                                else -> 0
-                            },
+                            id = doc.id,
                             name = doc.getString("name") ?: "",
                             price = doc.getDouble("price") ?: 0.0,
                             imageUrl = doc.getString("imageUrl") ?: "",
@@ -110,8 +106,6 @@ fun DrinksScreen(navController: NavController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DrinkCard(drink: Drink, navController: NavController) {
-    val imageResId = getDrinkImageResourceId(drink.imageUrl)
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -136,7 +130,7 @@ fun DrinkCard(drink: Drink, navController: NavController) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = painterResource(id = imageResId),
+                painter = painterResource(id = getDrinkImageResourceId(drink.imageUrl)),
                 contentDescription = drink.name,
                 modifier = Modifier
                     .size(100.dp)
