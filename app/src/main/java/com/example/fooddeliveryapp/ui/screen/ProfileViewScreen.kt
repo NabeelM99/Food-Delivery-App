@@ -27,7 +27,7 @@ fun ProfileViewScreen(navController: NavController) {
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
-    var profileImage by remember { mutableStateOf("img_profile_placeholder") }
+    var profileImage by remember { mutableStateOf("img_placeholder") }
 
     LaunchedEffect(userId) {
         db.collection("users").document(userId).get()
@@ -36,7 +36,7 @@ fun ProfileViewScreen(navController: NavController) {
                     firstName = document.getString("firstName") ?: ""
                     lastName = document.getString("lastName") ?: ""
                     phoneNumber = document.getString("phoneNumber") ?: ""
-                    profileImage = document.getString("profileImage") ?: "img_profile_placeholder"
+                    profileImage = document.getString("profileImage") ?: "img_placeholder"
                 }
             }
     }

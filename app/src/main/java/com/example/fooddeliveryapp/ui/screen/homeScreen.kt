@@ -62,7 +62,7 @@ fun HomeScreen(navController: NavController) {
                     .verticalScroll(scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                TopSection()
+                TopSection(navController)
                 Spacer(modifier = Modifier.height(2.dp))
                 TodaysMenuSection()
                 Spacer(modifier = Modifier.height(2.dp))
