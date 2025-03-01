@@ -25,7 +25,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
 data class Burger(
-    val id: Int = 0,
+    val id: String = "",
     val name: String = "",
     val price: Double = 0.0,
     val imageUrl: String = "",
@@ -47,11 +47,7 @@ fun BurgerScreen(navController: NavController) {
                 val fetchedBurgers = result.documents.mapNotNull { doc ->
                     try {
                         Burger(
-                            id = when (val idValue = doc.get("id")) {
-                                is Number -> idValue.toInt()
-                                is String -> idValue.toIntOrNull() ?: 0
-                                else -> 0
-                            },
+                            id = doc.id,
                             name = doc.getString("name") ?: "",
                             price = doc.getDouble("price") ?: 0.0, // Ensure correct type
                             imageUrl = doc.getString("imageUrl") ?: "",

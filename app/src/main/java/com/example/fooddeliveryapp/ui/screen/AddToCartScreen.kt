@@ -36,7 +36,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 // Data class for cart items
 data class CartItem(
-    val id: Long,
+    val id: String,
     val name: String,
     val price: Double,
     val imageName: String,
@@ -68,14 +68,14 @@ class CartViewModel : ViewModel() {
     }
 
     // Remove an item from the cart
-    fun removeFromCart(itemId: Long) {
+    fun removeFromCart(itemId: String) {
         viewModelScope.launch {
             _cartItems.value = _cartItems.value.filter { it.id != itemId }
         }
     }
 
     // Update the quantity of an item in the cart
-    fun updateQuantity(itemId: Long, quantity: Int) {
+    fun updateQuantity(itemId: String, quantity: Int) {
         viewModelScope.launch {
             _cartItems.value = _cartItems.value.map {
                 if (it.id == itemId) it.copy(quantity = quantity) else it
@@ -173,9 +173,9 @@ fun AddToCartScreen(
 @Composable
 fun CartItemCard(
     cartItem: CartItem,
-    onIncreaseQuantity: (Long) -> Unit,
-    onDecreaseQuantity: (Long) -> Unit,
-    onRemoveItem: (Long) -> Unit
+    onIncreaseQuantity: (String) -> Unit,
+    onDecreaseQuantity: (String) -> Unit,
+    onRemoveItem: (String) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -364,5 +364,34 @@ fun EmptyCartView(modifier: Modifier = Modifier) {
             }
 
         }
+    }
+}
+
+fun getImageResourceId(imageName: String): Int {
+    return when (imageName) {
+        "img_classiccheeseburger" -> R.drawable.img_classiccheeseburger
+        "img_doubleburger" -> R.drawable.img_doubleburger
+        "img_chickenburger" -> R.drawable.img_chickenburger
+        "img_veggieburger" -> R.drawable.img_veggieburger
+        "img_beefburger" -> R.drawable.img_beefburger
+        "img_orangejuice" -> R.drawable.img_orangejuice
+        "img_mangojuice" -> R.drawable.img_mangojuice
+        "img_avocadojuice" -> R.drawable.img_avocadojuice
+        "img_pineapplejuice" -> R.drawable.img_pineapplejuice
+        "img_papayajuice" -> R.drawable.img_papayajuice
+        "img_watermelonjuice" -> R.drawable.img_watermelonjuice
+        "img_pimiento" -> R.drawable.img_pimiento
+        "img_potatotornado" -> R.drawable.img_potatotornado
+        "img_sweetpotatofries" -> R.drawable.img_sweetpotatofries
+        "img_thricefries" -> R.drawable.img_thricefries
+        "img_wedgecutfries" -> R.drawable.img_wedgecutfries
+        "img_bbqchickenpasta" -> R.drawable.img_bbqchickenpasta
+        "img_tomatoandgarlicpasta" -> R.drawable.img_tomatoandgarlicpasta
+        "img_pastaalavodka" -> R.drawable.img_pastaalavodka
+        "img_chickpeapasta" -> R.drawable.img_chickpeapasta
+        "img_fettuccinealfredopasta" -> R.drawable.img_fettuccinealfredopasta
+        "img_greenpasta" -> R.drawable.img_greenpasta
+        "img_lemonpasta" -> R.drawable.img_lemonpasta
+        else -> R.drawable.img_placeholder // Fallback image
     }
 }

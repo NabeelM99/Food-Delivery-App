@@ -171,24 +171,3 @@ fun getPastaImageResourceId(imageName: String): Int {
         else -> R.drawable.img_placeholder
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

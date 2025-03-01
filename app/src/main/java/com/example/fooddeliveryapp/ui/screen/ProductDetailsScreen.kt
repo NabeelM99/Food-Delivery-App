@@ -37,7 +37,7 @@ fun ProductDetailsScreen(
         try {
 
             val docRef = if (productType == "burger") {
-                db.collection("productdetails").document("burger$productId")
+                db.collection("productdetails").document(productId)
             } else {
                 db.collection("productdetails").document(productId)
             }
@@ -53,7 +53,7 @@ fun ProductDetailsScreen(
                     val flavorsData = data["flavors"] as? List<Map<String, Any>> ?: emptyList()
 
                     productDetails = ProductDetails(
-                        id = (data["id"] as? Long) ?: 0,
+                        id = (data["id"] as? Long) ?.toString() ?: "",
                         name = data["name"] as? String ?: "",
                         price = data["price"] as? Double ?: 0.0,
                         imageUrl = data["imageUrl"] as? String ?: "",
@@ -118,7 +118,7 @@ fun ProductDetailsScreen(
                         scope.launch {
                             snackbarHostState.showSnackbar("Item is added to the cart")
                             val item = CartItem(
-                                id = productDetails?.id ?: 0,
+                                id = productId,
                                 name = productDetails?.name ?: "",
                                 price = productDetails?.price ?: 0.0,
                                 imageName = productDetails?.imageUrl ?: "",
@@ -190,7 +190,7 @@ fun getDrawableId(imageName: String): Int {
 
 // Data class for product details
 data class ProductDetails(
-    val id: Long,
+    val id: String,
     val name: String,
     val price: Double,
     val imageUrl: String,
