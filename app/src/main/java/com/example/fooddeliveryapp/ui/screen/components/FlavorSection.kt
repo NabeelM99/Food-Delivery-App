@@ -16,6 +16,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.fooddeliveryapp.R
+import com.example.fooddeliveryapp.ui.screen.getDrawableId
 import com.example.fooddeliveryapp.ui.theme.AppTheme
 
 @Composable
@@ -78,7 +79,7 @@ private fun ProductFlavorItem(
     modifier: Modifier = Modifier,
     state: ProductFlavorState
 ) {
-    val drawableId = getFlavorDrawableId(state.imgRes)
+    val drawableId = getDrawableId(state.imgRes)
     Log.d("FlavorSection", "Loading flavor image for ${state.name}: ${state.imgRes}, resolved to resource ID: $drawableId")
 
     Box(
@@ -128,38 +129,9 @@ private fun ProductFlavorItem(
     }
 }
 
-// Dedicated function for flavor images
-private fun getFlavorDrawableId(imgName: String): Int {
-    Log.d("FlavorSection", "Attempting to get drawable ID for: $imgName")
-    return when (imgName) {
-        //burger flavor
-        "img_cheese" -> R.drawable.img_cheese
-        "img_bacon" -> R.drawable.img_bacon
-        "img_onion" -> R.drawable.img_onion
-        //juice flavor
-        "img_orangepulp" -> R.drawable.img_orangepulp
-        "img_limepulp" -> R.drawable.img_limepulp
-        "img_pineapplepulp" -> R.drawable.img_pineapplepulp
-        //Fries flavor
-        "img_garlicsauce" -> R.drawable.img_garlicsauce
-        "img_chillsauce" -> R.drawable.img_chillsauce
-        "img_greenchillisauce" -> R.drawable.img_greenchillisauce
-        //pasta flavor
-        "img_oreganoandbasil" -> R.drawable.img_oreganoandbasil
-        "img_italianseasoning" -> R.drawable.img_italianseasoning
-        "img_saltandpepper" -> R.drawable.img_saltandpepper
-
-
-        else -> {
-            Log.d("FlavorSection", "No match found for $imgName, using fallback image")
-            R.drawable.img_placeholder // Fallback image if no match is found.
-        }
-    }
-}
-
 // Data class for flavor state with updated price type.
 data class ProductFlavorState(
     val name: String,
-    val price: Double,  // Ensure this matches Firestore's numeric type.
-    val imgRes: String  // Image resource name.
+    val price: Double,
+    val imgRes: String
 )
