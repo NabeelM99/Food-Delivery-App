@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
+import com.example.fooddeliveryapp.ui.screen.getDrawableId
 import com.google.firebase.firestore.FirebaseFirestore
 
 data class Juice(
@@ -125,7 +126,7 @@ fun JuiceCard(juice: Juice, navController: NavController) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = painterResource(id = getJuiceImageResourceId(juice.imageUrl)),
+                painter = painterResource(id = getDrawableId(juice.imageUrl)),
                 contentDescription = juice.name,
                 modifier = Modifier
                     .size(100.dp)
@@ -152,17 +153,5 @@ fun JuiceCard(juice: Juice, navController: NavController) {
                 )
             }
         }
-    }
-}
-
-fun getJuiceImageResourceId(imageName: String): Int {
-    return when (imageName) {
-        "img_orangejuice" -> R.drawable.img_orangejuice
-        "img_mangojuice" -> R.drawable.img_mangojuice
-        "img_avocadojuice" -> R.drawable.img_avocadojuice
-        "img_pineapplejuice" -> R.drawable.img_pineapplejuice
-        "img_papayajuice" -> R.drawable.img_papayajuice
-        "img_watermelonjuice" -> R.drawable.img_watermelonjuice
-        else -> R.drawable.img_placeholder
     }
 }

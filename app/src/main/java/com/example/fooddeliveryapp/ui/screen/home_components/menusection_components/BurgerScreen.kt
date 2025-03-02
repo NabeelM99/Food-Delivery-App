@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
+import com.example.fooddeliveryapp.ui.screen.getDrawableId
 import com.google.firebase.firestore.FirebaseFirestore
 
 data class Burger(
@@ -129,7 +130,7 @@ fun BurgerCard(burger: Burger, navController: NavController) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = painterResource(id = getBurgerResourceId(burger.imageUrl)),
+                painter = painterResource(id = getDrawableId(burger.imageUrl)),
                 contentDescription = burger.name,
                 modifier = Modifier
                     .size(100.dp)
@@ -159,13 +160,3 @@ fun BurgerCard(burger: Burger, navController: NavController) {
     }
 }
 
-fun getBurgerResourceId(imageName: String): Int {
-    return when (imageName) {
-        "img_classiccheeseburger" -> R.drawable.img_classiccheeseburger
-        "img_doubleburger" -> R.drawable.img_doubleburger
-        "img_chickenburger" -> R.drawable.img_chickenburger
-        "img_veggieburger" -> R.drawable.img_veggieburger
-        "img_beefburger" -> R.drawable.img_beefburger
-        else -> R.drawable.img_placeholder
-    }
-}

@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
+import com.example.fooddeliveryapp.ui.screen.getDrawableId
 import com.google.firebase.firestore.FirebaseFirestore
 
 data class Fry(
@@ -125,7 +126,7 @@ fun FryCard(fry: Fry, navController: NavController) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = painterResource(id = getFryImageResourceId(fry.imageUrl)),
+                painter = painterResource(id = getDrawableId(fry.imageUrl)),
                 contentDescription = fry.name,
                 modifier = Modifier
                     .size(100.dp)
@@ -152,16 +153,5 @@ fun FryCard(fry: Fry, navController: NavController) {
                 )
             }
         }
-    }
-}
-
-fun getFryImageResourceId(imageName: String): Int {
-    return when (imageName) {
-        "img_pimiento" -> R.drawable.img_pimiento
-        "img_potatotornado" -> R.drawable.img_potatotornado
-        "img_sweetpotatofries" -> R.drawable.img_sweetpotatofries
-        "img_thricefires" -> R.drawable.img_thricefries
-        "img_wedgecutfries" -> R.drawable.img_wedgecutfries
-        else -> R.drawable.img_placeholder
     }
 }

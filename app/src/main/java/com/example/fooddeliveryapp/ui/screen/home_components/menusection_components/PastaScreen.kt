@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
+import com.example.fooddeliveryapp.ui.screen.getDrawableId
 import com.google.firebase.firestore.FirebaseFirestore
 
 data class Pasta(
@@ -128,7 +129,7 @@ fun PastaCard (pasta: Pasta, navController: NavController){
             verticalAlignment = Alignment.CenterVertically
         ){
             Image(
-                painter = painterResource(id = getPastaImageResourceId(pasta.imageUrl)),
+                painter = painterResource(id = getDrawableId(pasta.imageUrl)),
                 contentDescription = pasta.name,
                 modifier = Modifier
                     .size(100.dp)
@@ -155,19 +156,5 @@ fun PastaCard (pasta: Pasta, navController: NavController){
                 )
             }
         }
-    }
-}
-
-
-fun getPastaImageResourceId(imageName: String): Int {
-    return when (imageName){
-        "img_bbqchickenpasta" -> R.drawable.img_bbqchickenpasta
-        "img_tomatoandgarlicpasta" -> R.drawable.img_tomatoandgarlicpasta
-        "img_pastaalavodka" -> R.drawable.img_pastaalavodka
-        "img_chickpeapasta" -> R.drawable.img_chickpeapasta
-        "img_fettuccinealfredopasta" -> R.drawable.img_fettuccinealfredopasta
-        "img_greenpasta" -> R.drawable.img_greenpasta
-        "img_lemonpasta" -> R.drawable.img_lemonpasta
-        else -> R.drawable.img_placeholder
     }
 }
