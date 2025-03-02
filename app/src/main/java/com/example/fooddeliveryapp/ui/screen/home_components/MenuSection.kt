@@ -68,7 +68,7 @@ fun MenuSection(navController: NavController) {
                         when (category.label) {
                             "Burgers" -> navController.navigate("BurgerScreen")
                             "Fries" -> navController.navigate("FryScreen")
-                            "Drinks" -> navController.navigate("DrinksScreen")
+                            "Drinks" -> navController.navigate("DrinkScreen")
                             "Juices" -> navController.navigate("JuiceScreen")
                             "Pasta" -> navController.navigate("PastaScreen")
 

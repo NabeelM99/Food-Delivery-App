@@ -78,6 +78,13 @@ class MainActivity : ComponentActivity() {
                             PastaScreen(navController)
                         }
 
+                        composable("cart") {
+                            AddToCartScreen(
+                                navController = navController,
+                                cartViewModel = cartViewModel // Pass same ViewModel instance
+                            )
+                        }
+
                         // Location Selection Screen
                         composable("location") {
                             LocationMapScreen(navController)

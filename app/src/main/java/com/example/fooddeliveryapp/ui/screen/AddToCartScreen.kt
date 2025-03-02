@@ -32,6 +32,8 @@ import com.example.fooddeliveryapp.ui.theme.Orange
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import com.example.fooddeliveryapp.ui.screen.getDrawableId
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 // Data class for cart items
 data class CartItem(
@@ -42,14 +44,54 @@ data class CartItem(
     var quantity: Int = 1
 )
 
+data class CartDocument(val items: List<CartItem> = emptyList())
+
 // ViewModel to manage cart state
 class CartViewModel : ViewModel() {
+    private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+    private var userId: String? = null
     // State to hold the list of cart items
     private val _cartItems = MutableStateFlow<List<CartItem>>(emptyList())
     val cartItems: StateFlow<List<CartItem>> get() = _cartItems
 
+
+    // Initialize when user logs in
+    fun initializeUserId() {
+        userId = auth.currentUser?.uid
+        loadCartFromFirestore()
+    }
+
+    private fun loadCartFromFirestore() {
+        userId?.let { uid ->
+            db.collection("carts").document(uid)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        val firestoreCart = document.toObject(CartDocument::class.java)
+                        _cartItems.value = firestoreCart?.items ?: emptyList()
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.e("CartViewModel", "Error loading cart", e)
+                }
+        }
+    }
+
+    private fun saveCartToFirestore() {
+        userId?.let { uid ->
+            db.collection("carts").document(uid)
+                .set(CartDocument(_cartItems.value))
+                .addOnFailureListener { e ->
+                    Log.e("CartViewModel", "Error saving cart", e)
+                }
+        }
+    }
+
+
+
     // Add an item to the cart
-    fun addToCart(item: CartItem) {
+    /*fun addToCart(item: CartItem) {
         viewModelScope.launch {
             Log.d("CartViewModel", "Adding item to cart: ${item.name} (ID: ${item.id})")
             val existingItem = _cartItems.value.find { it.id == item.id }
@@ -63,6 +105,20 @@ class CartViewModel : ViewModel() {
                 _cartItems.value = _cartItems.value + item
             }
             Log.d("CartViewModel", "Cart items: ${_cartItems.value}")
+        }
+    }*/
+
+    fun addToCart(item: CartItem) {
+        viewModelScope.launch {
+            val existingItem = _cartItems.value.find { it.id == item.id }
+            _cartItems.value = if (existingItem != null) {
+                _cartItems.value.map {
+                    if (it.id == item.id) it.copy(quantity = it.quantity + item.quantity) else it
+                }
+            } else {
+                _cartItems.value + item
+            }
+            saveCartToFirestore()
         }
     }
 
@@ -79,7 +135,12 @@ class CartViewModel : ViewModel() {
             _cartItems.value = _cartItems.value.map {
                 if (it.id == itemId) it.copy(quantity = quantity) else it
             }
+            saveCartToFirestore()
         }
+    }
+    fun clearCart() {
+        _cartItems.value = emptyList()
+        userId = null
     }
 }
 

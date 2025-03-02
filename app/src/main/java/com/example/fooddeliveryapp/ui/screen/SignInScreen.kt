@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
 import com.example.fooddeliveryapp.ui.theme.AppTheme
@@ -31,6 +32,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(navController: NavController) {
+    val cartViewModel: CartViewModel = viewModel() // Get CartViewModel instance
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val auth = FirebaseAuth.getInstance()
@@ -118,6 +120,8 @@ fun SignInScreen(navController: NavController) {
                                 auth.signInWithEmailAndPassword(email, password)
                                     .addOnCompleteListener { task ->
                                         if (task.isSuccessful) {
+                                            // Initialize cart for logged-in user
+                                            cartViewModel.initializeUserId()
                                             // Check if logged in user is admin
                                             val user = auth.currentUser
                                             if (user?.email == ADMIN_EMAIL && password == ADMIN_PASSWORD) {
