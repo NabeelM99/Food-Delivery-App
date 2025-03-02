@@ -29,7 +29,6 @@ import kotlinx.coroutines.launch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope // For viewModelScope
 import com.example.fooddeliveryapp.R
-import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.getImageResourceId
 import com.example.fooddeliveryapp.ui.theme.Orange
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

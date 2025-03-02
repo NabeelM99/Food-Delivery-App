@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
 
 data class Burger(
     val id: String = "",
@@ -49,9 +48,10 @@ fun BurgerScreen(navController: NavController) {
                         Burger(
                             id = doc.id,
                             name = doc.getString("name") ?: "",
-                            price = doc.getDouble("price") ?: 0.0, // Ensure correct type
+                            price = doc.getDouble("price") ?: 0.0,
                             imageUrl = doc.getString("imageUrl") ?: "",
-                            description = doc.getString("description") ?: ""
+                            description = doc.getString("description") ?: "",
+                            productDescription = doc.getString("productDescription") ?: ""
                         )
                     } catch (e: Exception) {
                         Log.e("Firestore", "Error parsing document: ${doc.id}", e)
@@ -105,17 +105,13 @@ fun BurgerScreen(navController: NavController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BurgerCard(burger: Burger, navController: NavController) {
-    val imageResId = getImageResourceId(burger.imageUrl)
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(120.dp)
             .clickable {
                 Log.d("Navigation", "Navigating to burger with ID: ${burger.id}")
-                val documentPath = "burger${burger.id}"
-                Log.d("Navigation", "Will look for document: $documentPath")
-                navController.navigate("productDetailsScreen/burger/${burger.id}")
+                navController.navigate("productDetailsScreen/burgers/${burger.id}")
             },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
@@ -133,7 +129,7 @@ fun BurgerCard(burger: Burger, navController: NavController) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = painterResource(id = getImageResourceId(burger.imageUrl)),
+                painter = painterResource(id = getBurgerResourceId(burger.imageUrl)),
                 contentDescription = burger.name,
                 modifier = Modifier
                     .size(100.dp)
@@ -163,7 +159,7 @@ fun BurgerCard(burger: Burger, navController: NavController) {
     }
 }
 
-fun getImageResourceId(imageName: String): Int {
+fun getBurgerResourceId(imageName: String): Int {
     return when (imageName) {
         "img_classiccheeseburger" -> R.drawable.img_classiccheeseburger
         "img_doubleburger" -> R.drawable.img_doubleburger

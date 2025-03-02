@@ -31,18 +31,11 @@ fun ProductDetailsScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    //Log.d("ProductDetailsScreen", "Received burgerId: $burgerId")
 
     LaunchedEffect(productType, productId) {
         try {
 
-            val docRef = if (productType == "burger") {
-                db.collection("productdetails").document(productId)
-            } else {
-                db.collection("productdetails").document(productId)
-            }
-            //val docRef = db.collection("productdetails").document("burger$burgerId")
-            //Log.d("Firestore", "Attempting to Fetching document: burger$burgerId")
+            val docRef = db.collection("productdetails").document(productId)
             val document = docRef.get().await()
             Log.d("Firestore", "Document exists: ${document.exists()}")
             if (document.exists()) {
@@ -175,20 +168,8 @@ fun ProductDetailsScreen(
     }
 }
 
-// Helper function to format double values
 fun Double.format(digits: Int) = "%.${digits}f".format(this)
 
-// 🔹 Function to get drawable resource ID from a string name
-fun getDrawableId(imageName: String): Int {
-    return when (imageName) {
-        "img_cheese" -> R.drawable.img_cheese
-        "img_bacon" -> R.drawable.img_bacon
-        "img_onion" -> R.drawable.img_onion
-        else -> R.drawable.img_placeholder // Default fallback image
-    }
-}
-
-// Data class for product details
 data class ProductDetails(
     val id: String,
     val name: String,
