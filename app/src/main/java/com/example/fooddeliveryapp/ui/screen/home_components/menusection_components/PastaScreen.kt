@@ -103,8 +103,6 @@ fun PastaScreen(navController: NavController){
     }
 }
 
-
-
 @SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

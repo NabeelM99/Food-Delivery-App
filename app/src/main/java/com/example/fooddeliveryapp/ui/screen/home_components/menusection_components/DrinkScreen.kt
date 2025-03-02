@@ -21,8 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
+import com.example.fooddeliveryapp.ui.screen.getDrawableId
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
 
 data class Drink(
     val id: String = "",
@@ -30,12 +30,12 @@ data class Drink(
     val price: Double = 0.0,
     val imageUrl: String = "",
     val description: String = "",
-    val productDescription: String = ""  // Added to match Burger structure
+    val productDescription: String = ""
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DrinksScreen(navController: NavController) {
+fun DrinkScreen(navController: NavController) {
     val drinks = remember { mutableStateListOf<Drink>() }
     var loading by remember { mutableStateOf(true) }
 
@@ -130,7 +130,7 @@ fun DrinkCard(drink: Drink, navController: NavController) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = painterResource(id = getDrinkImageResourceId(drink.imageUrl)),
+                painter = painterResource(id = getDrawableId(drink.imageUrl)),
                 contentDescription = drink.name,
                 modifier = Modifier
                     .size(100.dp)
@@ -157,17 +157,5 @@ fun DrinkCard(drink: Drink, navController: NavController) {
                 )
             }
         }
-    }
-}
-
-fun getDrinkImageResourceId(imageName: String): Int {
-    return when (imageName) {
-        "img_kinzacola" -> R.drawable.img_kinzacola
-        "img_kinzalemon" -> R.drawable.img_kinzalemon
-        "img_kinzaorange" -> R.drawable.img_kinzaorange
-        "img_kinzablackcurrant" -> R.drawable.img_kinzablackcurrant
-        "img_pamircola1" -> R.drawable.img_pamircola1
-        "img_pamirlemonlime" -> R.drawable.img_pamirlemonlime
-        else -> R.drawable.img_placeholder
     }
 }
