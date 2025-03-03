@@ -42,90 +42,116 @@ data class CartItem(
     val price: Double,
     val imageName: String,
     var quantity: Int = 1
-)
+){
+    constructor() : this("", "", 0.0, "", 1) // Explicit no-arg constructor
+}
 
-data class CartDocument(val items: List<CartItem> = emptyList())
+//data class CartDocument(val items: List<CartItem> = emptyList())
 
 // ViewModel to manage cart state
 class CartViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
-    private var userId: String? = null
+    //private val auth = FirebaseAuth.getInstance()
+    private var userId: String? = FirebaseAuth.getInstance().currentUser?.uid
     // State to hold the list of cart items
     private val _cartItems = MutableStateFlow<List<CartItem>>(emptyList())
     val cartItems: StateFlow<List<CartItem>> get() = _cartItems
 
+    init {
+        userId?.let { loadCartFromFirestore() } // Auto-load if user is logged in
+    }
+
+
+    // Data class for Firestore serialization
+    data class CartData(
+        val items: List<CartItem> = emptyList()
+    ) {
+        constructor() : this(emptyList()) // No-arg constructor for Firestore
+    }
 
     // Initialize when user logs in
-    fun initializeUserId() {
-        userId = auth.currentUser?.uid
+    fun initialize(userId: String) {
+        this.userId = userId
         loadCartFromFirestore()
     }
 
-    private fun loadCartFromFirestore() {
+    /*private fun loadCartFromFirestore() {
         userId?.let { uid ->
             db.collection("carts").document(uid)
                 .get()
-                .addOnSuccessListener { document ->
-                    if (document.exists()) {
-                        val firestoreCart = document.toObject(CartDocument::class.java)
-                        _cartItems.value = firestoreCart?.items ?: emptyList()
+                .addOnSuccessListener { doc ->
+                    if (doc.exists()) {
+                        val cartData = doc.toObject(CartData::class.java)
+                        _cartItems.value = cartData?.items ?: emptyList()
+                        Log.d("CartViewModel", "Cart loaded: ${_cartItems.value}")
                     }
                 }
                 .addOnFailureListener { e ->
                     Log.e("CartViewModel", "Error loading cart", e)
                 }
         }
-    }
+    }*/
 
+    // Save cart to Firestore
     private fun saveCartToFirestore() {
+        userId = FirebaseAuth.getInstance().currentUser?.uid // Refresh UID
         userId?.let { uid ->
+            val cartData = CartData(_cartItems.value)
             db.collection("carts").document(uid)
-                .set(CartDocument(_cartItems.value))
-                .addOnFailureListener { e ->
-                    Log.e("CartViewModel", "Error saving cart", e)
+                .set(cartData)
+                .addOnSuccessListener {
+                    println("DEBUG: Cart saved for UID: $uid")
                 }
+                .addOnFailureListener { e ->
+                    println("DEBUG: Firestore write error: ${e.message}")
+                }
+        } ?: run {
+            println("DEBUG: User ID is null. Cannot save cart.")
         }
     }
 
 
 
     // Add an item to the cart
-    /*fun addToCart(item: CartItem) {
-        viewModelScope.launch {
-            Log.d("CartViewModel", "Adding item to cart: ${item.name} (ID: ${item.id})")
-            val existingItem = _cartItems.value.find { it.id == item.id }
-            if (existingItem != null) {
-                Log.d("CartViewModel", "Updating quantity for item: ${item.name}")
-                _cartItems.value = _cartItems.value.map {
-                    if (it.id == item.id) it.copy(quantity = it.quantity + item.quantity) else it
-                }
-            } else {
-                Log.d("CartViewModel", "Adding new item: ${item.name}")
-                _cartItems.value = _cartItems.value + item
-            }
-            Log.d("CartViewModel", "Cart items: ${_cartItems.value}")
-        }
-    }*/
-
     fun addToCart(item: CartItem) {
         viewModelScope.launch {
             val existingItem = _cartItems.value.find { it.id == item.id }
-            _cartItems.value = if (existingItem != null) {
+            val newList = if (existingItem != null) {
                 _cartItems.value.map {
-                    if (it.id == item.id) it.copy(quantity = it.quantity + item.quantity) else it
+                    if (it.id == item.id) it.copy(quantity = it.quantity + item.quantity)
+                    else it
                 }
             } else {
                 _cartItems.value + item
             }
-            saveCartToFirestore()
+            _cartItems.value = newList
+            saveCartToFirestore() // Explicit save
         }
     }
+
+    // Load cart from Firestore
+    private fun loadCartFromFirestore() {
+        userId?.let { uid ->
+            db.collection("carts").document(uid)
+                .get()
+                .addOnSuccessListener { doc ->
+                    if (doc.exists()) {
+                        val items = doc.toObject(CartData::class.java)?.items ?: emptyList()
+                        _cartItems.value = items
+                        println("DEBUG: Cart loaded for UID: $uid")
+                    }
+                }
+        }
+    }
+
+
+
 
     // Remove an item from the cart
     fun removeFromCart(itemId: String) {
         viewModelScope.launch {
             _cartItems.value = _cartItems.value.filter { it.id != itemId }
+            saveCartToFirestore()
         }
     }
 

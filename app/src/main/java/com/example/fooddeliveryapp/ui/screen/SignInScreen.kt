@@ -4,12 +4,14 @@ import android.os.Bundle
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -116,41 +118,66 @@ fun SignInScreen(navController: NavController) {
                     // Login Button
                     Button(
                         onClick = {
-                            if (email.isNotEmpty() && password.isNotEmpty()) {
-                                auth.signInWithEmailAndPassword(email, password)
-                                    .addOnCompleteListener { task ->
-                                        if (task.isSuccessful) {
-                                            // Initialize cart for logged-in user
-                                            cartViewModel.initializeUserId()
-                                            // Check if logged in user is admin
-                                            val user = auth.currentUser
-                                            if (user?.email == ADMIN_EMAIL && password == ADMIN_PASSWORD) {
-                                                navController.navigate("adminHomeScreen") {
-                                                    popUpTo("signInScreen") { inclusive = true }
-                                                }
-                                            } else {
-                                                navController.navigate("homeScreen") {
-                                                    popUpTo("signInScreen") { inclusive = true }
-                                                }
-                                            }
-                                        } else {
-                                            scope.launch {
-                                                snackbarHostState.showSnackbar(
-                                                    task.exception?.message ?: "Authentication failed"
-                                                )
-                                            }
-                                        }
-                                    }
-                            } else {
+                            if (email.isEmpty() || password.isEmpty()) {
                                 scope.launch {
                                     snackbarHostState.showSnackbar("Please fill all fields")
                                 }
+                                return@Button
                             }
+
+                            // Handle admin login
+                            if (email == ADMIN_EMAIL && password == ADMIN_PASSWORD) {
+                                auth.signInWithEmailAndPassword(email, password)
+                                    .addOnCompleteListener { task ->
+                                        if (task.isSuccessful) {
+                                            // Initialize admin's cart
+                                            val user = auth.currentUser
+                                            user?.uid?.let { uid ->
+                                                cartViewModel.initialize(uid)
+                                            }
+                                            navController.navigate("adminHomeScreen") {
+                                                popUpTo("signInScreen") { inclusive = true }
+                                            }
+                                        } else {
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar("Admin login failed")
+                                            }
+                                        }
+                                    }
+                                return@Button
+                            }
+
+                            // Regular user login
+                            auth.signInWithEmailAndPassword(email, password)
+                                .addOnCompleteListener { task ->
+                                    if (task.isSuccessful) {
+                                        val user = auth.currentUser
+                                        user?.let {
+                                            // Initialize user-specific cart
+                                            cartViewModel.initialize(it.uid)
+                                            navController.navigate("homeScreen") {
+                                                popUpTo("signInScreen") { inclusive = true }
+                                            }
+                                        }
+                                    } else {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar("Login failed: ${task.exception?.message}")
+                                        }
+                                    }
+                                }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500)),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp)
+                            .height(40.dp)
+                            .background(
+                                brush = Brush.horizontalGradient(
+                                    colors = listOf(Color(0xFFFFA500), Color(0xFFFF6347))
+                                ),
+                                shape = RoundedCornerShape(50.dp)
+                            ),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent // Transparent to show gradient
+                        )
                     ) {
                         Text(
                             text = "Login",
