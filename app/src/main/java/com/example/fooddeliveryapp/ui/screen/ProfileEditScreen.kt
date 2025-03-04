@@ -11,6 +11,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -19,6 +21,8 @@ fun ProfileEditScreen(navController: NavController) {
     var name by remember { mutableStateOf("") }
     var dob by remember { mutableStateOf("") }
     var nationality by remember { mutableStateOf("") }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     // Load existing data
     LaunchedEffect(currentUser?.uid) {
@@ -34,6 +38,7 @@ fun ProfileEditScreen(navController: NavController) {
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("Edit Profile") },
@@ -58,7 +63,18 @@ fun ProfileEditScreen(navController: NavController) {
                             .document(uid)
                             .update(updates)
                             .addOnSuccessListener {
-                                navController.popBackStack()
+                                scope.launch {
+                                    // Show success message
+                                    snackbarHostState.showSnackbar("Changes saved successfully!")
+                                    // Navigate back after message is shown
+                                    delay(1000) // Optional delay
+                                    navController.popBackStack()
+                                }
+                            }
+                            .addOnFailureListener { e ->
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("Failed to save: ${e.message}")
+                                }
                             }
                     }
                 },

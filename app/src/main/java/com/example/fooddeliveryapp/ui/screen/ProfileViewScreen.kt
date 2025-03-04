@@ -25,11 +25,25 @@ fun ProfileViewScreen(navController: NavController) {
     // Fetch user data from Firestore
     LaunchedEffect(currentUser?.uid) {
         currentUser?.uid?.let { uid ->
-            FirebaseFirestore.getInstance().collection("users").document(uid)
-                .get()
-                .addOnSuccessListener { doc ->
-                    userData = doc.toObject(UserProfile::class.java)
-                }
+            val docRef = FirebaseFirestore.getInstance().collection("users").document(uid)
+            val listener = docRef.addSnapshotListener { doc, _ ->
+                userData = doc?.toObject(UserProfile::class.java)
+            }
+        }
+    }
+
+    DisposableEffect(currentUser?.uid) {
+        val listener = currentUser?.uid?.let { uid ->
+            val docRef = FirebaseFirestore.getInstance().collection("users").document(uid)
+            val listenerRegistration = docRef.addSnapshotListener { doc, _ ->
+                userData = doc?.toObject(UserProfile::class.java)
+            }
+            listenerRegistration // Return the listener for cleanup
+        }
+
+        // Cleanup listener when the composable is disposed
+        onDispose {
+            listener?.remove() // Remove the listener
         }
     }
 
