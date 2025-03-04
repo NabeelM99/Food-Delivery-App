@@ -25,6 +25,7 @@ import com.example.fooddeliveryapp.ui.theme.AppTheme
 import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHostState
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
 private val YummyFoodiesFontFamily = FontFamily(
@@ -136,9 +137,29 @@ fun SignUpScreen(navController: NavController) {
                             if (email.isNotEmpty() && password.isNotEmpty()) {
                                 auth.createUserWithEmailAndPassword(email, password)
                                     .addOnCompleteListener { task ->
-                                        if (task.isSuccessful) {
+                                        /*if (task.isSuccessful) {
                                             // Navigate to login screen or home
                                             navController.navigate("signInScreen")
+                                        }*/
+                                        if (task.isSuccessful) {
+                                            // Get the newly created user
+                                            val user = auth.currentUser
+                                            user?.let {
+                                                // Create a default profile document in Firestore
+                                                FirebaseFirestore.getInstance().collection("users")
+                                                    .document(user.uid)
+                                                    .set(UserProfile()) // Initialize with empty/default values
+                                                    .addOnSuccessListener {
+                                                        // Navigate after Firestore write succeeds
+                                                        navController.navigate("signInScreen")
+                                                    }
+                                                    .addOnFailureListener { e ->
+                                                        // Handle Firestore error
+                                                        scope.launch {
+                                                            snackbarHostState.showSnackbar("Failed to create profile: ${e.message}")
+                                                        }
+                                                    }
+                                            }
                                         } else {
                                             val message = task.exception?.message ?: "Sign-up failed"
 

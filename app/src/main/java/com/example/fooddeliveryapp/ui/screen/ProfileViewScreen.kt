@@ -1,17 +1,17 @@
 package com.example.fooddeliveryapp.ui.screen
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.fooddeliveryapp.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -19,70 +19,81 @@ import com.google.firebase.firestore.FirebaseFirestore
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileViewScreen(navController: NavController) {
-    val auth = FirebaseAuth.getInstance()
-    val db = FirebaseFirestore.getInstance()
-    val userId = auth.currentUser?.uid ?: ""
-    val email = auth.currentUser?.email ?: ""
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    var userData by remember { mutableStateOf<UserProfile?>(null) }
 
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
-    var phoneNumber by remember { mutableStateOf("") }
-    var profileImage by remember { mutableStateOf("img_placeholder") }
-
-    LaunchedEffect(userId) {
-        db.collection("users").document(userId).get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    firstName = document.getString("firstName") ?: ""
-                    lastName = document.getString("lastName") ?: ""
-                    phoneNumber = document.getString("phoneNumber") ?: ""
-                    profileImage = document.getString("profileImage") ?: "img_placeholder"
+    // Fetch user data from Firestore
+    LaunchedEffect(currentUser?.uid) {
+        currentUser?.uid?.let { uid ->
+            FirebaseFirestore.getInstance().collection("users").document(uid)
+                .get()
+                .addOnSuccessListener { doc ->
+                    userData = doc.toObject(UserProfile::class.java)
                 }
-            }
+        }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Profile") },
-                actions = {
-                    IconButton(onClick = { navController.navigate("profileEdit") }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_edit),
-                            contentDescription = "Edit Profile"
-                        )
-                    }
-                }
+                title = { Text("My Profile") }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navController.navigate("profileEdit") },
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(Icons.Default.Edit, "Edit Profile")
+            }
         }
     ) { paddingValues ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
+                .padding(16.dp)
+                .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = getProfileImageResource(profileImage)),
-                contentDescription = "Profile Picture",
+            // Profile Picture
+            AsyncImage(
+                model = userData?.profilePicture ?: R.drawable.img_profile1,
+                contentDescription = "Profile",
                 modifier = Modifier
                     .size(120.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
+                    .clip(CircleShape)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // Rest of the fields same as before...
+            // User Details
+            ProfileDetailItem("Name", userData?.name ?: "Not set")
+            ProfileDetailItem("Email", currentUser?.email ?: "No email")
+            ProfileDetailItem("Date of Birth", userData?.dob ?: "Not set")
+            ProfileDetailItem("Nationality", userData?.nationality ?: "Not set")
         }
     }
 }
 
-fun getProfileImageResource(imageName: String): Int {
-    return when (imageName) {
-        "img_profile1" -> R.drawable.img_profile1
-        "img_profile2" -> R.drawable.img_profile2
-        else -> R.drawable.img_placeholder
+@Composable
+fun ProfileDetailItem(label: String, value: String) {
+    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyLarge
+        )
     }
 }
+
+// Data class for Firestore
+data class UserProfile(
+    val name: String = "",
+    val dob: String = "",
+    val nationality: String = "",
+    val profilePicture: String = ""
+)

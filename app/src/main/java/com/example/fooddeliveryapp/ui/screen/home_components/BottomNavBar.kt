@@ -138,6 +138,6 @@ private val bottomNavItems = listOf(
     NavItem(
         icon = Icons.Default.Person,
         label = "Me",
-        route = "profile"
+        route = "profileView"
     )
 )
