@@ -9,6 +9,7 @@ val Green = Color (0xFF84A59D)
 val Yellow = Color (0xFFF7EDE2)
 val YellowLight = Color (0xFFFFFFF2)
 val Dark = Color (0xFF3D405B)
+val Red = Color(0xFFFF6347)
 
 @Immutable
 data class AppColors (

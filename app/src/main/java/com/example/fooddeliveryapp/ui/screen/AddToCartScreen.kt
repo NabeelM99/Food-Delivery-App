@@ -75,24 +75,7 @@ class CartViewModel : ViewModel() {
         loadCartFromFirestore()
     }
 
-    /*private fun loadCartFromFirestore() {
-        userId?.let { uid ->
-            db.collection("carts").document(uid)
-                .get()
-                .addOnSuccessListener { doc ->
-                    if (doc.exists()) {
-                        val cartData = doc.toObject(CartData::class.java)
-                        _cartItems.value = cartData?.items ?: emptyList()
-                        Log.d("CartViewModel", "Cart loaded: ${_cartItems.value}")
-                    }
-                }
-                .addOnFailureListener { e ->
-                    Log.e("CartViewModel", "Error loading cart", e)
-                }
-        }
-    }*/
-
-    // Save cart to Firestore
+    // Save cart to FireStore
     private fun saveCartToFirestore() {
         userId = FirebaseAuth.getInstance().currentUser?.uid // Refresh UID
         userId?.let { uid ->
