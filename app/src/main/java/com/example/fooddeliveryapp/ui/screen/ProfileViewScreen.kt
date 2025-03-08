@@ -43,14 +43,79 @@ fun ProfileViewScreen(
     }
 
     Scaffold(
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = {navController.navigate("profileEdit")},
+                containerColor = Orange,
+                contentColor = Color.White
+            ) {
+                Icon(Icons.Default.Edit,"Edit Profile")
+                Spacer(Modifier.width(8.dp))
+                Text("Edit Profile")
+            }
+        },
         topBar = {
-            TopAppBar(
-                title = { Text("") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
-                    actionIconContentColor = Color.White
-                )
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(350.dp)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Orange, Red)
+                        )
+                    )
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(modifier = Modifier.height(60.dp))
+
+                    // Profile Picture
+                    AsyncImage(
+                        model = userProfile?.profilePicture ?: R.drawable.img_profile1,
+                        contentDescription = "Profile",
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // User Information
+                    Text(
+                        text = userProfile?.name ?: "User Name",
+                        color = Color.White,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = FirebaseAuth.getInstance().currentUser?.email ?: "user@example.com",
+                        color = Color.White.copy(alpha = 0.8f),
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+
+                    // Back to Home Button
+                    Button(
+                        onClick = { navController.navigate("homeScreen") },
+                        modifier = Modifier
+                            .padding(top = 24.dp)
+                            .fillMaxWidth(0.6F),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White,
+                            contentColor = Orange
+                        )
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_minus),
+                            contentDescription = "Back"
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Back to Home")
+                    }
+                }
+            }
         }
     ) { paddingValues ->
         LazyColumn(
@@ -59,69 +124,6 @@ fun ProfileViewScreen(
                 .fillMaxSize()
         ) {
             item {
-                // Gradient Header Section
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp)
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(Orange, Red)
-                            )
-                        )
-                ) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Spacer(modifier = Modifier.height(60.dp))
-
-                        // Profile Picture
-                        AsyncImage(
-                            model = userProfile?.profilePicture ?: R.drawable.img_profile1,
-                            contentDescription = "Profile",
-                            modifier = Modifier
-                                .size(120.dp)
-                                .clip(CircleShape),
-                            contentScale = ContentScale.Crop
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // User Information
-                        Text(
-                            text = userProfile?.name ?: "User Name",
-                            color = Color.White,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = FirebaseAuth.getInstance().currentUser?.email ?: "user@example.com",
-                            color = Color.White.copy(alpha = 0.8f),
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
-
-                        // Back to Home Button
-                        Button(
-                            onClick = { navController.navigate("homeScreen") },
-                            modifier = Modifier
-                                .padding(top = 24.dp)
-                                .fillMaxWidth(0.6F),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.White,
-                                contentColor = Orange
-                            )
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_minus),
-                                contentDescription = "Back"
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Back to Home")
-                        }
-                    }
-                }
-
                 // Account Information Section
                 Column(
                     modifier = Modifier

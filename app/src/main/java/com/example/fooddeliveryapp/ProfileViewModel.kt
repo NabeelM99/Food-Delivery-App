@@ -1,5 +1,6 @@
 package com.example.fooddeliveryapp.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -7,6 +8,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class ProfileViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
@@ -26,15 +28,32 @@ class ProfileViewModel : ViewModel() {
 
     fun updateProfile(name: String, mobile: String, address: String, dob: String) {
         viewModelScope.launch {
-            FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
-                db.collection("users").document(uid).update(
+            /*FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
+                val userRef = db.collection("users").document(uid)
+                userRef.set(
                     mapOf(
                         "name" to name,
                         "mobile" to mobile,
                         "address" to address,
                         "dob" to dob
                     )
-                )
+                ),
+                com.google.firebase.firestore.SetOptions.merge()
+                ), await()
+            }*/
+            try {
+                FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
+                    db.collection("users").document(uid)
+                        .addSnapshotListener { doc, error ->
+                            if (error != null) {
+                                Log.e("ProfileViewModel", "Listen failed: $error")
+                                return@addSnapshotListener
+                            }
+                            _userProfile.value = doc?.toObject(UserProfile::class.java)
+                        }
+                }
+            } catch (e: Exception) {
+                Log.e("ProfileViewModel", "Error loading profile: ${e.message}")
             }
         }
     }
