@@ -53,7 +53,10 @@ data class LocationDetails(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LocationMapScreen(navController: NavController) {
+fun LocationMapScreen(
+    navController: NavController,
+    onLocationSelected: (String) -> Unit
+) {
     val context = LocalContext.current
     var mapView by remember { mutableStateOf<MapView?>(null) }
     var selectedLocation by remember { mutableStateOf<LocationDetails?>(null) }
@@ -193,7 +196,11 @@ fun LocationMapScreen(navController: NavController) {
             selectedLocation?.let { location ->
                 LocationConfirmationCard(
                     navController = navController,
-                    locationDetails = location
+                    locationDetails = location,
+                    onConfirm = {
+                        // Update both ViewModel and Firestore
+                        onLocationSelected(location.address)
+                    }
                 )
             }
         }
@@ -255,20 +262,18 @@ fun LocationMapScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(8.dp))
             Button(
                 onClick = {
-                    scope.launch {
-                        getCurrentLocation(context, mapView) { locationDetails ->
-                            locationDetails?.let {
-                                selectedLocation = it
-                                showSheet = true
-                                scope.launch { sheetState.show() }
-                            }
-                        }
+                    selectedLocation?.let { location ->
+                        onLocationSelected(location.address)
+                        navController.popBackStack(
+                            route = "profileEdit", // Target specific route
+                            inclusive = false
+                        )
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500))
             ) {
-                Text("Use Current Location")
+                Text("Confirm Location")
             }
         }
     }
@@ -279,7 +284,8 @@ fun LocationMapScreen(navController: NavController) {
 @Composable
 fun LocationConfirmationCard(
     navController: NavController,
-    locationDetails: LocationDetails
+    locationDetails: LocationDetails,
+    onConfirm: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -305,13 +311,14 @@ fun LocationConfirmationCard(
 
             Button(
                 onClick = {
-                    navController.navigate("homeScreen") {
-                        popUpTo("homeScreen") { inclusive = true }
-                    }
+                    onConfirm()
+                    navController.popBackStack(
+                        route = "profileEdit",
+                        inclusive = false
+                    )
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500))
-
             ) {
                 Text("Confirm Location")
             }
@@ -319,19 +326,6 @@ fun LocationConfirmationCard(
     }
 }
 
-
-
-/*private object BahrainBounds {
-    const val NORTH = 26.417
-    const val SOUTH = 25.567
-    const val EAST = 50.933
-    const val WEST = 50.267
-}
-
-private fun isLocationInBahrain(latitude: Double, longitude: Double): Boolean {
-    return latitude in BahrainBounds.SOUTH..BahrainBounds.NORTH &&
-            longitude in BahrainBounds.WEST..BahrainBounds.EAST
-}*/
 
 
 private fun setupOpenStreetMap(

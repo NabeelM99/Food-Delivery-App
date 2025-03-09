@@ -23,7 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.fooddeliveryapp.R
-import com.example.fooddeliveryapp.viewmodel.ProfileViewModel
+import com.example.fooddeliveryapp.ProfileViewModel
 import com.example.fooddeliveryapp.ui.theme.Orange
 import com.example.fooddeliveryapp.ui.theme.Red
 import com.google.firebase.auth.FirebaseAuth
@@ -33,17 +33,19 @@ import com.google.firebase.auth.FirebaseAuth
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileViewScreen(
-    navController: NavController,
-    profileViewModel: ProfileViewModel = viewModel()
-) {
+    navController: NavController) {
+    val profileViewModel: ProfileViewModel = viewModel()
     val userProfile by profileViewModel.userProfile.collectAsState()
 
-    LaunchedEffect(navController) {
+    /*LaunchedEffect(navController) {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             if (destination.route == "profileView") {
                 profileViewModel.refreshProfile()
             }
         }
+    }*/
+    LaunchedEffect(Unit) {
+        profileViewModel.loadProfile()
     }
 
     Scaffold(

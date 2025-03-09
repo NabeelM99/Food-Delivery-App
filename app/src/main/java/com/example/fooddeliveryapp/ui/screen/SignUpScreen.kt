@@ -23,9 +23,8 @@ import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
 import com.example.fooddeliveryapp.ui.theme.AppTheme
 import com.google.firebase.auth.FirebaseAuth
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHostState
-import com.example.fooddeliveryapp.viewmodel.UserProfile
+import com.example.fooddeliveryapp.UserProfile
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 

@@ -85,14 +85,45 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        // Location Selection Screen
                         composable("location") {
-                            LocationMapScreen(navController)
+                            LocationMapScreen(
+                                navController = navController,
+                                onLocationSelected = { address ->
+                                    navController.previousBackStackEntry?.savedStateHandle?.set("selectedAddress", address)
+                                    navController.popBackStack()
+                                }
+                            )
                         }
 
-                        // Location Map Screen
                         composable("locationMapScreen") {
-                            LocationMapScreen(navController)
+                            LocationMapScreen(
+                                navController = navController,
+                                onLocationSelected = { address ->
+                                    navController.previousBackStackEntry?.savedStateHandle?.set("selectedAddress", address)
+                                    navController.popBackStack()
+                                }
+                            )
+                        }
+
+                        composable(
+                            "locationScreen/{source}",
+                            arguments = listOf(navArgument("source") { type = NavType.StringType })
+                        ) { backStackEntry ->
+                            val source = backStackEntry.arguments?.getString("source")
+                            val profileViewModel: ProfileViewModel = viewModel()
+                            LocationMapScreen(
+                                navController = navController,
+                                onLocationSelected = { address ->
+                                    when (source) {
+                                        "profileEdit" -> {
+                                            profileViewModel.updateAddress(address)
+                                            profileViewModel.loadProfile()
+                                            //profileViewModel.refreshProfile()
+                                            //navController.popBackStack()
+                                        }
+                                    }
+                                }
+                            )
                         }
 
                         // Sign In Screen
