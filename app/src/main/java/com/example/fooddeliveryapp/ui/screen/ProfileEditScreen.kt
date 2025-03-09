@@ -42,19 +42,9 @@ fun ProfileEditScreen(
     var name by remember { mutableStateOf("") }
     var mobile by remember { mutableStateOf("") }
     val currentAddress = userProfile?.address ?: ""
-    var dob by remember { mutableStateOf("") }
+    var dob by remember { mutableStateOf(userProfile?.dob ?: "") }
     var showDatePicker by remember { mutableStateOf(false) }
 
-
-    // Load existing data when screen opens
-    /*LaunchedEffect(userProfile) {
-        userProfile?.let {
-            name = it.name
-            mobile = it.mobile.removePrefix("+973")
-            address = it.address
-            dob = it.dob
-        }
-    }*/
 
     LaunchedEffect(Unit) {
         profileViewModel.loadProfile()
@@ -109,22 +99,7 @@ fun ProfileEditScreen(
             }
         },
         floatingActionButton = {
-            /*ExtendedFloatingActionButton(
-                onClick = {
-                    scope.launch {
-                        try {
-                            profileViewModel.updateProfile(name, mobile, address, dob)
-                            snackbarHostState.showSnackbar("Profile updated successfully!")
-                            delay(300)
-                            navController.popBackStack()
-                        } catch (e: Exception) {
-                            snackbarHostState.showSnackbar("Error: ${e.message}")
-                        }
-                    }
-                },
-                containerColor = Orange,
-                contentColor = Color.White
-            )*/ExtendedFloatingActionButton(
+           ExtendedFloatingActionButton(
             onClick = {
                 scope.launch {
                     try {

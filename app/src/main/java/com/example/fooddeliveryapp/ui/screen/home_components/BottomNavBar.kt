@@ -128,12 +128,12 @@ private val bottomNavItems = listOf(
     NavItem(
         icon = Icons.Default.Home,
         label = "Home",
-        route = "home"
+        route = "homeScreen"
     ),
     NavItem(
         icon = Icons.Default.ShoppingCart,
         label = "My Cart",
-        route = "cart" // This route will navigate to AddToCartScreen
+        route = "cart"
     ),
     NavItem(
         icon = Icons.Default.Person,

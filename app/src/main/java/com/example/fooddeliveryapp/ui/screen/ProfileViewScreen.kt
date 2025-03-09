@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import com.example.fooddeliveryapp.components.BottomNavBar
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -16,7 +17,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -36,19 +39,29 @@ fun ProfileViewScreen(
     navController: NavController) {
     val profileViewModel: ProfileViewModel = viewModel()
     val userProfile by profileViewModel.userProfile.collectAsState()
+    var currentRoute by remember { mutableStateOf("") }
 
-    /*LaunchedEffect(navController) {
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.route == "profileView") {
-                profileViewModel.refreshProfile()
-            }
-        }
-    }*/
+
     LaunchedEffect(Unit) {
         profileViewModel.loadProfile()
     }
 
     Scaffold(
+        bottomBar = {
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shadowElevation = 8.dp,
+                color = MaterialTheme.colorScheme.surface
+            ) {
+                BottomNavBar(
+                    currentRoute = currentRoute,
+                    onNavigate = { route ->
+                        currentRoute = route
+                        navController.navigate(route)
+                    }
+                )
+            }
+        },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {navController.navigate("profileEdit")},
@@ -70,33 +83,45 @@ fun ProfileViewScreen(
                             colors = listOf(Orange, Red)
                         )
                     )
-            ) {
+            )
+            {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Spacer(modifier = Modifier.height(60.dp))
+                    Spacer(modifier = Modifier.height(100.dp))
 
                     // Profile Picture
                     AsyncImage(
                         model = userProfile?.profilePicture?.takeIf { it.isNotEmpty() }
-                            ?: R.drawable.img_profile1,
+                            ?: R.drawable.food_logo1,
                         contentDescription = "Profile",
                         modifier = Modifier
-                            .size(120.dp)
+                            .size(150.dp)
                             .clip(CircleShape),
                         contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "Profile",
+                        fontFamily = FontFamily.SansSerif,
+                        fontWeight = FontWeight.ExtraBold,
+                        style = MaterialTheme.typography.headlineMedium,
+                        textAlign = TextAlign.Center,
+                        color = Color(0xFFFFFFFF),
+                        fontSize = 30.sp
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // User Information
-                    Text(
+                    /*Text(
                         text = userProfile?.name ?: "User Name",
                         color = Color.White,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold
-                    )
+                    )*/
 
                     Text(
                         text = userProfile?.email ?: "user@example.com",
@@ -105,7 +130,7 @@ fun ProfileViewScreen(
                     )
 
                     // Back to Home Button
-                    Button(
+                    /*Button(
                         onClick = { navController.navigate("homeScreen") },
                         modifier = Modifier
                             .padding(top = 24.dp)
@@ -121,7 +146,7 @@ fun ProfileViewScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("Back to Home")
-                    }
+                    }*/
                 }
             }
         }

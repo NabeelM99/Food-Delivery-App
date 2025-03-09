@@ -6,24 +6,24 @@
       
     <path
         android:fillAlpha="0.5"
-        android:fillColor="#FFA500"
+        android:fillColor="#000000"
         android:pathData="M12,9m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0"
         android:strokeAlpha="0.5"
-        android:strokeColor="#FFA500"
+        android:strokeColor="#000000"
         android:strokeWidth="1.5"/>
       
     <path
         android:fillColor="#00000000"
         android:pathData="M12,12m-10,0a10,10 0,1 1,20 0a10,10 0,1 1,-20 0"
-        android:strokeColor="#FFA500"
+        android:strokeColor="#000000"
         android:strokeWidth="1.5"/>
       
     <path
         android:fillAlpha="0.5"
-        android:fillColor="#FFA500"
+        android:fillColor="#000000"
         android:pathData="M17.969,20C17.81,17.108 16.925,15 12,15C7.075,15 6.19,17.108 6.031,20"
         android:strokeAlpha="0.5"
-        android:strokeColor="#FFA500"
+        android:strokeColor="#000000"
         android:strokeLineCap="round"
         android:strokeWidth="1.5"/>
     
