@@ -38,8 +38,12 @@ fun ProfileViewScreen(
 ) {
     val userProfile by profileViewModel.userProfile.collectAsState()
 
-    LaunchedEffect(Unit) {
-        profileViewModel.loadProfile()
+    LaunchedEffect(navController) {
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.route == "profileView") {
+                profileViewModel.refreshProfile()
+            }
+        }
     }
 
     Scaffold(
@@ -73,7 +77,8 @@ fun ProfileViewScreen(
 
                     // Profile Picture
                     AsyncImage(
-                        model = userProfile?.profilePicture ?: R.drawable.img_profile1,
+                        model = userProfile?.profilePicture?.takeIf { it.isNotEmpty() }
+                            ?: R.drawable.img_profile1,
                         contentDescription = "Profile",
                         modifier = Modifier
                             .size(120.dp)
@@ -90,8 +95,9 @@ fun ProfileViewScreen(
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold
                     )
+
                     Text(
-                        text = FirebaseAuth.getInstance().currentUser?.email ?: "user@example.com",
+                        text = userProfile?.email ?: "user@example.com",
                         color = Color.White.copy(alpha = 0.8f),
                         modifier = Modifier.padding(top = 8.dp)
                     )

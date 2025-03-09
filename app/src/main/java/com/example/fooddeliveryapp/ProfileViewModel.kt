@@ -17,13 +17,27 @@ class ProfileViewModel : ViewModel() {
 
     fun loadProfile() {
         viewModelScope.launch {
-            FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
-                db.collection("users").document(uid)
-                    .addSnapshotListener { doc, _ ->
-                        _userProfile.value = doc?.toObject(UserProfile::class.java)
-                    }
+            try {
+                FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
+                    db.collection("users").document(uid)
+                        .addSnapshotListener { doc, error ->
+                            if (error != null) {
+                                Log.e("ProfileVM", "Listen error: ${error.message}")
+                                return@addSnapshotListener
+                            }
+                            _userProfile.value = doc?.toObject(UserProfile::class.java).apply {
+                                Log.d("ProfileVM", "Loaded profile: ${this?.name}")
+                            }
+                        }
+                }
+            } catch (e: Exception) {
+                Log.e("ProfileVM", "Load error: ${e.message}")
             }
         }
+    }
+
+    fun refreshProfile() {
+        loadProfile()
     }
 
     fun updateProfile(name: String, mobile: String, address: String, dob: String) {
@@ -43,14 +57,15 @@ class ProfileViewModel : ViewModel() {
             }*/
             try {
                 FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
-                    db.collection("users").document(uid)
-                        .addSnapshotListener { doc, error ->
-                            if (error != null) {
-                                Log.e("ProfileViewModel", "Listen failed: $error")
-                                return@addSnapshotListener
-                            }
-                            _userProfile.value = doc?.toObject(UserProfile::class.java)
-                        }
+                    db.collection("users").document(uid).set(
+                        mapOf(
+                            "name" to name,
+                            "mobile" to mobile,
+                            "address" to address,
+                            "dob" to dob
+                        ),
+                        com.google.firebase.firestore.SetOptions.merge()
+                    ).await() // Wait for Firestore operation
                 }
             } catch (e: Exception) {
                 Log.e("ProfileViewModel", "Error loading profile: ${e.message}")
@@ -64,5 +79,6 @@ data class UserProfile(
     val mobile: String = "",
     val address: String = "",
     val dob: String = "",
-    val profilePicture: String = ""
+    val profilePicture: String = "",
+    val email: String = ""
 )

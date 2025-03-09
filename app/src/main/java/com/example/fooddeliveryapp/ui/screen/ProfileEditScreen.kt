@@ -20,6 +20,7 @@ import com.example.fooddeliveryapp.ui.theme.Orange
 import com.example.fooddeliveryapp.ui.theme.Red
 import com.example.fooddeliveryapp.viewmodel.ProfileViewModel
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -92,7 +93,8 @@ fun ProfileEditScreen(
                         try {
                             profileViewModel.updateProfile(name, mobile, address, dob)
                             snackbarHostState.showSnackbar("Profile updated successfully!")
-                            navController.popBackStack() // Navigate AFTER successful save
+                            delay(300)
+                            navController.popBackStack()
                         } catch (e: Exception) {
                             snackbarHostState.showSnackbar("Error: ${e.message}")
                         }
@@ -127,7 +129,7 @@ fun ProfileEditScreen(
             Spacer(Modifier.height(16.dp))
 
             OutlinedTextField(
-                value = FirebaseAuth.getInstance().currentUser?.email ?: "",
+                value = userProfile?.email ?: "",
                 onValueChange = {},
                 label = { Text("Email (Read-only)") },
                 modifier = Modifier.fillMaxWidth(),

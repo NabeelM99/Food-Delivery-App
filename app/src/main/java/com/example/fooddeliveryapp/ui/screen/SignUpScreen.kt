@@ -149,7 +149,15 @@ fun SignUpScreen(navController: NavController) {
                                                 // Create a default profile document in Firestore
                                                 FirebaseFirestore.getInstance().collection("users")
                                                     .document(user.uid)
-                                                    .set(UserProfile()) // Initialize with empty/default values
+                                                    .set(
+                                                        UserProfile(
+                                                            name = name,
+                                                            email = email,
+                                                            mobile = "",
+                                                            address = "",
+                                                            dob = ""
+                                                        )
+                                                    )
                                                     .addOnSuccessListener {
                                                         // Navigate after Firestore write succeeds
                                                         navController.navigate("signInScreen")
