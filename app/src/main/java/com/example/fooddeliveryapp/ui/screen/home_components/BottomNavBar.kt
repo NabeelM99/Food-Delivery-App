@@ -28,7 +28,7 @@ fun BottomNavBar(
     NavigationBar(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp)
+            .height(90.dp)
             .zIndex(1f),
         containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 8.dp
@@ -40,8 +40,8 @@ fun BottomNavBar(
                 icon = {
                     Box(
                         modifier = Modifier
-                            .padding(top = 12.dp) // Add padding to move icon down
-                            .size(48.dp)
+                            .padding(top = 20.dp) // Add padding to move icon down
+                            .size(50.dp)
                             .clip(CircleShape)
                             .background(
                                 if (currentRoute == item.route)
@@ -117,27 +117,27 @@ private data class NavItem(
 private val bottomNavItems = listOf(
     NavItem(
         icon = Icons.Default.LocationOn,
-        label = "Location",
+        label = "",
         route = "location"
     ),
     NavItem(
         icon = Icons.Default.Search,
-        label = "Search",
-        route = "search"
+        label = "",
+        route = "search",
     ),
     NavItem(
         icon = Icons.Default.Home,
-        label = "Home",
+        label = "",
         route = "homeScreen"
     ),
     NavItem(
         icon = Icons.Default.ShoppingCart,
-        label = "My Cart",
+        label = "",
         route = "cart"
     ),
     NavItem(
         icon = Icons.Default.Person,
-        label = "Me",
+        label = "",
         route = "profileView"
     )
 )
