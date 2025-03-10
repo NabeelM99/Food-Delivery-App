@@ -48,7 +48,9 @@ fun ProfileEditScreen(
     var initialDob by remember { mutableStateOf("") }
 
     var name by remember { mutableStateOf("") }
-    var mobile by remember { mutableStateOf("") }
+    var mobile by remember { mutableStateOf(
+        userProfile?.mobile?.removePrefix("+973 ") ?: ""
+    )}
     val currentAddress = userProfile?.address ?: ""
     var dob by remember { mutableStateOf(userProfile?.dob ?: "") }
     var showDatePicker by remember { mutableStateOf(false) }
@@ -59,6 +61,18 @@ fun ProfileEditScreen(
 
     LaunchedEffect(Unit) {
         profileViewModel.loadProfile()
+    }
+
+    // Sync initial data when userProfile changes
+    LaunchedEffect(userProfile) {
+        userProfile?.let {
+            initialName = it.name
+            initialMobile = it.mobile.removePrefix("+973 ")
+            initialDob = it.dob
+            name = initialName
+            mobile = initialMobile
+            dob = initialDob
+        }
     }
 
     val hasUnsavedChanges = name != initialName || mobile != initialMobile || dob != initialDob
