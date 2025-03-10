@@ -69,8 +69,6 @@ fun ProfileViewScreen(
                 contentColor = Color.White
             ) {
                 Icon(Icons.Default.Edit,"Edit Profile")
-                Spacer(Modifier.width(8.dp))
-                Text("Edit Profile")
             }
         },
         topBar = {

@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -24,6 +25,7 @@ import androidx.navigation.NavController
 import com.example.fooddeliveryapp.ui.theme.Orange
 import com.example.fooddeliveryapp.ui.theme.Red
 import com.example.fooddeliveryapp.ProfileViewModel
+import com.example.fooddeliveryapp.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -39,11 +41,14 @@ fun ProfileEditScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
+
     var name by remember { mutableStateOf("") }
     var mobile by remember { mutableStateOf("") }
     val currentAddress = userProfile?.address ?: ""
     var dob by remember { mutableStateOf(userProfile?.dob ?: "") }
     var showDatePicker by remember { mutableStateOf(false) }
+
+
 
 
     LaunchedEffect(Unit) {
@@ -122,9 +127,11 @@ fun ProfileEditScreen(
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.Search, "Save")
-                    Spacer(Modifier.width(8.dp))
-                    Text("Save Changes")
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_save),
+                        contentDescription = "Save",
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
             }
         }
