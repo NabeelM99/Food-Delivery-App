@@ -1,5 +1,6 @@
 package com.example.fooddeliveryapp.ui.screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -41,18 +42,62 @@ fun ProfileEditScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
+    // Track initial values to detect unsaved changes
+    var initialName by remember { mutableStateOf("") }
+    var initialMobile by remember { mutableStateOf("") }
+    var initialDob by remember { mutableStateOf("") }
 
     var name by remember { mutableStateOf("") }
     var mobile by remember { mutableStateOf("") }
     val currentAddress = userProfile?.address ?: ""
     var dob by remember { mutableStateOf(userProfile?.dob ?: "") }
     var showDatePicker by remember { mutableStateOf(false) }
+    var showUnsavedDialog by remember { mutableStateOf(false) } // Dialog state
 
 
 
 
     LaunchedEffect(Unit) {
         profileViewModel.loadProfile()
+    }
+
+    val hasUnsavedChanges = name != initialName || mobile != initialMobile || dob != initialDob
+
+    BackHandler(enabled = hasUnsavedChanges) {
+        showUnsavedDialog = true
+    }
+
+    // Dialog for unsaved changes
+    if (showUnsavedDialog) {
+        AlertDialog(
+            onDismissRequest = { showUnsavedDialog = false },
+            title = { Text("Unsaved Changes") },
+            text = { Text("Do you want to save your changes before exiting?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                profileViewModel.updateProfile(name, mobile, address, dob)
+                                snackbarHostState.showSnackbar("Profile updated successfully!")
+                                navController.popBackStack()
+                            } catch (e: Exception) {
+                                snackbarHostState.showSnackbar("Error: ${e.message}")
+                            }
+                        }
+                        showUnsavedDialog = false
+                    }
+                ) { Text("Save") }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        navController.popBackStack() // Discard changes
+                        showUnsavedDialog = false
+                    }
+                ) { Text("Discard") }
+            }
+        )
     }
 
     if (showDatePicker) {
@@ -87,7 +132,13 @@ fun ProfileEditScreen(
                     },
                     navigationIcon = {
                         IconButton(
-                            onClick = { navController.popBackStack() }
+                            onClick = {
+                                if (hasUnsavedChanges) {
+                                    showUnsavedDialog = true
+                                } else {
+                                    navController.popBackStack()
+                                }
+                            }
                         ) {
                             Icon(
                                 imageVector = Icons.Default.ArrowBack,
