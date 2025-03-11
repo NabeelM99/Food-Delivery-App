@@ -171,14 +171,21 @@ fun AddToCartScreen(
     var currentRoute by remember { mutableStateOf("cart") }
 
     Scaffold(
-
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("My Cart") },
+                title = { Text("My Cart",  color = Color.White,
+                    fontWeight = FontWeight.Bold
+                    //modifier = Modifier.padding(start = 16.dp)
+                ) },
+
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, "Back")
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -206,6 +213,11 @@ fun AddToCartScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(Color(0xFFF8F9FA), Color(0xFFE9ECEF))
+                    )
+                )
         ) {
             if (cartItems.isEmpty()) {
                 EmptyCartView(modifier = Modifier.padding(paddingValues))
@@ -239,6 +251,7 @@ fun AddToCartScreen(
                         )
                     }
                 }
+                }
                 Column(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
@@ -261,7 +274,6 @@ fun AddToCartScreen(
                         },
                     )
                 }
-            }
         }
     }
 }
@@ -289,15 +301,18 @@ fun CartItemCard(
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Left: Item Image
-            Image(
-                painter = painterResource(id = getDrawableId(cartItem.imageName)),
-                contentDescription = cartItem.name,
+            Box(
                 modifier = Modifier
-                    .size(70.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop
-            )
+                    .size(80.dp)
+                    .clip(RoundedCornerShape(12.dp))
+            ) {
+                Image(
+                    painter = painterResource(id = getDrawableId(cartItem.imageName)),
+                    contentDescription = cartItem.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
 
             Spacer(modifier = Modifier.width(16.dp))
 
@@ -310,8 +325,8 @@ fun CartItemCard(
                 )
                 Text(
                     text = "$${cartItem.price.format(2)}",
-                    fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.primary
+                    fontSize = 18.sp,
+                    color = Orange,
                 )
             }
 
@@ -381,21 +396,21 @@ fun BottomCheckoutBar(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp),
+            .height(50.dp),
         color = MaterialTheme.colorScheme.surface,
-        shadowElevation = 8.dp
+        //shadowElevation = 8.dp
     ) {
         Row(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
+                .fillMaxSize(),
+               // .padding(10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
                 Text(
                     text = "Total:",
-                    fontSize = 14.sp,
+                    fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
@@ -409,8 +424,8 @@ fun BottomCheckoutBar(
             Button(
                 onClick = onCheckoutClicked,
                 modifier = Modifier
-                    .height(48.dp)
-                    .width(160.dp)
+                    .height(50.dp)
+                    .width(120.dp)
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(Orange, Red)
@@ -458,10 +473,16 @@ fun EmptyCartView(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = { /* Navigate to menu */ },
-                modifier = Modifier.height(48.dp),
-                shape = RoundedCornerShape(24.dp)
+                modifier = Modifier
+                    .height(48.dp)
+                    .width(200.dp),
+                shape = RoundedCornerShape(24.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Orange,
+                    contentColor = Color.White
+                )
             ) {
-                Text("Browse Menu")
+                Text("Browse Menu", fontWeight = FontWeight.Bold)
             }
 
         }

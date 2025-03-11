@@ -46,6 +46,7 @@ fun ProfileViewScreen(
         profileViewModel.loadProfile()
     }
 
+
     Scaffold(
         bottomBar = {
             Surface(
@@ -113,38 +114,11 @@ fun ProfileViewScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // User Information
-                    /*Text(
-                        text = userProfile?.name ?: "User Name",
-                        color = Color.White,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    )*/
-
                     Text(
                         text = userProfile?.email ?: "user@example.com",
                         color = Color.White.copy(alpha = 0.8f),
                         modifier = Modifier.padding(top = 8.dp)
                     )
-
-                    // Back to Home Button
-                    /*Button(
-                        onClick = { navController.navigate("homeScreen") },
-                        modifier = Modifier
-                            .padding(top = 24.dp)
-                            .fillMaxWidth(0.6F),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.White,
-                            contentColor = Orange
-                        )
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_minus),
-                            contentDescription = "Back"
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Back to Home")
-                    }*/
                 }
             }
         }

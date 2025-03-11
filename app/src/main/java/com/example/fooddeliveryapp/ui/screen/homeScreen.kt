@@ -16,6 +16,8 @@ import com.example.fooddeliveryapp.ui.screen.home_components.TodaysMenuSection
 import com.example.fooddeliveryapp.ui.screen.home_components.TopSection
 import com.example.fooddeliveryapp.components.BottomNavBar
 import com.example.fooddeliveryapp.ui.screen.home_components.BestOfferSection
+import android.app.Activity
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun HomeScreen(navController: NavController) {
