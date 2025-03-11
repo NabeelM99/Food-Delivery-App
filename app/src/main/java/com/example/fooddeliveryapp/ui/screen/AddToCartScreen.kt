@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.material3.Surface
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -34,6 +35,7 @@ import com.example.fooddeliveryapp.ui.theme.Orange
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import com.example.fooddeliveryapp.ui.screen.getDrawableId
+import com.example.fooddeliveryapp.ui.theme.Red
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -179,8 +181,8 @@ fun AddToCartScreen(
                         Icon(Icons.Default.ArrowBack, "Back")
                     }
                 },
-                colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFFFFA500)
                 )
             )
         },
@@ -408,10 +410,15 @@ fun BottomCheckoutBar(
                 onClick = onCheckoutClicked,
                 modifier = Modifier
                     .height(48.dp)
-                    .width(160.dp),
-                shape = RoundedCornerShape(24.dp),
+                    .width(160.dp)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Orange, Red)
+                        ),
+                        shape = RoundedCornerShape(24.dp)
+                    ),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
+                    containerColor = Color.Transparent
                 )
             ) {
                 Text(
