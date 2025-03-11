@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.material3.Surface
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -28,6 +29,7 @@ import kotlinx.coroutines.launch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fooddeliveryapp.R
+import com.example.fooddeliveryapp.components.BottomNavBar
 import com.example.fooddeliveryapp.ui.theme.Orange
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -163,21 +165,18 @@ fun AddToCartScreen(
     val cartItems by cartViewModel.cartItems.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-
-    // Calculate the total price
     val totalPrice = cartItems.sumOf { it.price * it.quantity }
+    var currentRoute by remember { mutableStateOf("cart") }
 
     Scaffold(
+
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("My Cart") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
-                        )
+                        Icon(Icons.Default.ArrowBack, "Back")
                     }
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
@@ -186,52 +185,78 @@ fun AddToCartScreen(
             )
         },
         bottomBar = {
-            BottomCheckoutBar(
-                totalPrice = totalPrice,
-                onCheckoutClicked = {
-                    scope.launch {
-                        if (cartItems.isEmpty()) {
-                            snackbarHostState.showSnackbar("Your cart is empty")
-                        } else {
-                            snackbarHostState.showSnackbar("Proceeding to checkout")
-                            // Here you would navigate to checkout screen
-                            // navController.navigate("checkout")
-                        }
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shadowElevation = 8.dp,
+                color = MaterialTheme.colorScheme.surface
+            ) {
+                BottomNavBar(
+                    currentRoute = currentRoute,
+                    onNavigate = { route ->
+                        currentRoute = route
+                        navController.navigate(route)
                     }
-                }
-            )
+                )
+            }
         }
     ) { paddingValues ->
-        if (cartItems.isEmpty()) {
-            EmptyCartView(modifier = Modifier.padding(paddingValues))
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(vertical = 16.dp)
-            ) {
-                items(cartItems) { cartItem ->
-                    CartItemCard(
-                        cartItem = cartItem,
-                        onIncreaseQuantity = { id ->
-                            cartViewModel.updateQuantity(id, cartItem.quantity + 1)
-                        },
-                        onDecreaseQuantity = { id ->
-                            if (cartItem.quantity > 1) {
-                                cartViewModel.updateQuantity(id, cartItem.quantity - 1)
-                            } else {
+        Box(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+        ) {
+            if (cartItems.isEmpty()) {
+                EmptyCartView(modifier = Modifier.padding(paddingValues))
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 120.dp), // Space for checkout + nav
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(cartItems) { cartItem ->
+                        CartItemCard(
+                            cartItem = cartItem,
+                            onIncreaseQuantity = { id ->
+                                cartViewModel.updateQuantity(id, cartItem.quantity + 1)
+                            },
+                            onDecreaseQuantity = { id ->
+                                if (cartItem.quantity > 1) {
+                                    cartViewModel.updateQuantity(id, cartItem.quantity - 1)
+                                } else {
+                                    cartViewModel.removeFromCart(id)
+                                }
+                            },
+                            onRemoveItem = { id ->
                                 cartViewModel.removeFromCart(id)
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("Item removed from cart")
+                                }
+                            }
+                        )
+                    }
+                }
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(16.dp)
+                ) {
+                    BottomCheckoutBar(
+                        totalPrice = totalPrice,
+                        onCheckoutClicked = {
+                            scope.launch {
+                                if (cartItems.isEmpty()) {
+                                    snackbarHostState.showSnackbar("Your cart is empty")
+                                } else {
+                                    snackbarHostState.showSnackbar("Proceeding to checkout")
+                                    // Here you would navigate to checkout screen
+                                    // navController.navigate("checkout")
+                                }
                             }
                         },
-                        onRemoveItem = { id ->
-                            cartViewModel.removeFromCart(id)
-                            scope.launch {
-                                snackbarHostState.showSnackbar("Item removed from cart")
-                            }
-                        }
                     )
                 }
             }
