@@ -153,7 +153,6 @@ fun SignInScreen(navController: NavController) {
                                     if (task.isSuccessful) {
                                         val user = auth.currentUser
                                         user?.let {
-                                            // Initialize user-specific cart
                                             cartViewModel.initialize(it.uid)
                                             navController.navigate("homeScreen") {
                                                 popUpTo("signInScreen") { inclusive = true }

@@ -120,13 +120,11 @@ class CartViewModel : ViewModel() {
     private fun loadCartFromFirestore() {
         userId?.let { uid ->
             db.collection("carts").document(uid)
-                .get()
-                .addOnSuccessListener { doc ->
-                    if (doc.exists()) {
-                        val items = doc.toObject(CartData::class.java)?.items ?: emptyList()
-                        _cartItems.value = items
-                        println("DEBUG: Cart loaded for UID: $uid")
-                    }
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) return@addSnapshotListener
+
+                    val items = snapshot?.toObject(CartData::class.java)?.items ?: emptyList()
+                    _cartItems.value = items
                 }
         }
     }
@@ -152,8 +150,20 @@ class CartViewModel : ViewModel() {
         }
     }
     fun clearCart() {
-        _cartItems.value = emptyList()
-        userId = null
+        viewModelScope.launch {
+            // Clear local state
+            _cartItems.value = emptyList()
+
+            // Clear Firestore data if needed
+            userId?.let { uid ->
+                db.collection("carts").document(uid)
+                    .delete()
+                    .addOnFailureListener { e ->
+                        Log.e("CartViewModel", "Error clearing cart: ${e.message}")
+                    }
+            }
+            userId = null
+        }
     }
 }
 
