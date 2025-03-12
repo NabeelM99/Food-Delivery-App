@@ -183,7 +183,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("profileView") {
-                            ProfileViewScreen(navController)
+                            ProfileViewScreen(navController = navController)
                         }
                         composable("profileEdit") {
                             ProfileEditScreen(navController)

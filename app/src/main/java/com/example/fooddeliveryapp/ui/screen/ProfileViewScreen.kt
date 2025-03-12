@@ -40,6 +40,8 @@ fun ProfileViewScreen(
     val profileViewModel: ProfileViewModel = viewModel()
     val userProfile by profileViewModel.userProfile.collectAsState()
     var currentRoute by remember { mutableStateOf("") }
+    val cartViewModel: CartViewModel = viewModel()
+    val auth = FirebaseAuth.getInstance()
 
 
     LaunchedEffect(Unit) {
@@ -149,6 +151,34 @@ fun ProfileViewScreen(
                     AccountInfoItem(Icons.Default.DateRange, "D.O.B", userProfile?.dob ?: "Not set")
                 }
             }
+            item {
+                Button(
+                    onClick = {
+                        // 1. Sign out from Firebase
+                        auth.signOut()
+
+                        // 2. Clear cart data
+                        cartViewModel.clearCart()
+
+                        // 3. Navigate to SignInScreen and reset back stack
+                        navController.navigate("signInScreen") {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true // Closes all previous screens
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        //.height(40.dp)
+                        .padding(bottom = 20.dp, start = 20.dp, end = 20.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Red,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Logout", fontSize = 16.sp)
+                }
+            }
         }
     }
 }
@@ -165,7 +195,7 @@ private fun AccountInfoItem(icon: ImageVector, label: String, value: String) {
             imageVector = icon,
             contentDescription = label,
             tint = Orange,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(25.dp)
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column {
