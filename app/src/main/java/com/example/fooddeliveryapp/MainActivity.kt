@@ -189,6 +189,13 @@ class MainActivity : ComponentActivity() {
                             ProfileEditScreen(navController)
                         }
 
+                        composable("checkout") {
+                            CheckoutScreen(
+                                navController = navController,
+                                cartViewModel = cartViewModel
+                            )
+                        }
+
                     }
                 }
             }

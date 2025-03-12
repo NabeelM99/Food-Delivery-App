@@ -150,19 +150,11 @@ class CartViewModel : ViewModel() {
         }
     }
     fun clearCart() {
-        viewModelScope.launch {
-            // Clear local state
-            _cartItems.value = emptyList()
-
-            // Clear Firestore data if needed
-            userId?.let { uid ->
-                db.collection("carts").document(uid)
-                    .delete()
-                    .addOnFailureListener { e ->
-                        Log.e("CartViewModel", "Error clearing cart: ${e.message}")
-                    }
-            }
-            userId = null
+        _cartItems.value = emptyList()
+        userId = null
+        userId = FirebaseAuth.getInstance().currentUser?.uid
+        userId?.let { uid ->
+            db.collection("carts").document(uid).delete()
         }
     }
 }
@@ -278,7 +270,7 @@ fun AddToCartScreen(
                                 } else {
                                     snackbarHostState.showSnackbar("Proceeding to checkout")
                                     // Here you would navigate to checkout screen
-                                    // navController.navigate("checkout")
+                                     navController.navigate("checkout")
                                 }
                             }
                         },

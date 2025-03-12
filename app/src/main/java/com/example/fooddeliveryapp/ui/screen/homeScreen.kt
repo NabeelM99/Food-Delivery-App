@@ -24,12 +24,10 @@ fun HomeScreen(navController: NavController) {
     var currentRoute by remember { mutableStateOf("home") }
     val scrollState = rememberScrollState()
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    val context = LocalContext.current
 
     BackHandler {
-        navController.navigate("signInScreen") {
-            popUpTo(navController.graph.startDestinationId)
-            launchSingleTop = true
-        }
+        (context as Activity).finish()
     }
 
     Box(

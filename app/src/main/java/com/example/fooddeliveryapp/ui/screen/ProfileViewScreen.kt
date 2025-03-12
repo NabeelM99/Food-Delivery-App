@@ -44,12 +44,15 @@ fun ProfileViewScreen(
     val auth = FirebaseAuth.getInstance()
 
 
+
     LaunchedEffect(Unit) {
         profileViewModel.loadProfile()
     }
 
 
+
     Scaffold(
+
         bottomBar = {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
@@ -74,6 +77,7 @@ fun ProfileViewScreen(
                 Icon(Icons.Default.Edit,"Edit Profile")
             }
         },
+
         topBar = {
             Box(
                 modifier = Modifier
@@ -85,6 +89,7 @@ fun ProfileViewScreen(
                         )
                     )
             )
+
             {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -121,7 +126,9 @@ fun ProfileViewScreen(
                         color = Color.White.copy(alpha = 0.8f),
                         modifier = Modifier.padding(top = 8.dp)
                     )
+
                 }
+
             }
         }
     ) { paddingValues ->
