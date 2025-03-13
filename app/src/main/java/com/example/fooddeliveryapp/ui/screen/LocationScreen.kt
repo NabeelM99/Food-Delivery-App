@@ -24,7 +24,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.fooddeliveryapp.ProfileViewModel
 import com.example.fooddeliveryapp.R
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.Dispatchers
@@ -55,7 +57,8 @@ data class LocationDetails(
 @Composable
 fun LocationMapScreen(
     navController: NavController,
-    onLocationSelected: (String) -> Unit
+    onLocationSelected: (String) -> Unit,
+    profileViewModel: ProfileViewModel = viewModel()
 ) {
     val context = LocalContext.current
     var mapView by remember { mutableStateOf<MapView?>(null) }

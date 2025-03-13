@@ -1,5 +1,6 @@
 package com.example.fooddeliveryapp.ui.screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -9,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.fooddeliveryapp.ProfileViewModel
 import com.example.fooddeliveryapp.R
 import com.example.fooddeliveryapp.ui.theme.Orange
 import com.example.fooddeliveryapp.ui.theme.Red
@@ -34,15 +37,17 @@ import java.util.*
 @Composable
 fun CheckoutScreen(
     navController: NavController,
-    cartViewModel: CartViewModel = viewModel()
+    cartViewModel: CartViewModel = viewModel(),
+    profileViewModel: ProfileViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val cartItems by cartViewModel.cartItems.collectAsState()
+    val userProfile by profileViewModel.userProfile.collectAsState()
     val totalPrice = cartItems.sumOf { it.price * it.quantity }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    var deliveryAddress by remember { mutableStateOf("") }
+    var deliveryAddress by remember { mutableStateOf(userProfile?. address ?: "") }
     var phoneNumber by remember { mutableStateOf("") }
     var paymentMethod by remember { mutableStateOf("Cash on Delivery") }
     var expanded by remember { mutableStateOf(false) }
@@ -104,9 +109,18 @@ fun CheckoutScreen(
                         value = deliveryAddress,
                         onValueChange = { deliveryAddress = it },
                         label = { Text("Delivery Address") },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = false,
-                        maxLines = 3
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable{
+                                navController.navigate("locationScreen/checkout")
+                            },
+                        readOnly = true,
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.LocationOn,
+                                contentDescription = "Select Location"
+                            )
+                        }
                     )
 
                     OutlinedTextField(
@@ -191,15 +205,15 @@ fun CheckoutScreen(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp),
-                    shape = RoundedCornerShape(12.dp),
+                        .height(45.dp),
+                    shape = RoundedCornerShape(50.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Red,
+                        containerColor = Orange,
                         contentColor = Color.White
                     )
                 ) {
                     Text(
-                        text = "Place Order - $${"%.2f".format(totalPrice)}",
+                        text = "Place Order -> $${"%.2f".format(totalPrice)}",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
