@@ -126,7 +126,7 @@ fun CheckoutScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable{
-                                navController.navigate("locationScreen/${"checkout"}")
+                                navController.navigate("locationScreen/checkout")
                             },
                         readOnly = true,
                         trailingIcon = {
