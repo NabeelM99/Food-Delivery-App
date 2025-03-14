@@ -47,7 +47,7 @@ fun CheckoutScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    var deliveryAddress by remember { mutableStateOf(userProfile?. address ?: "") }
+    var deliveryAddress by remember { mutableStateOf(userProfile?.address ?: "") }
     var phoneNumber by remember { mutableStateOf("") }
     var paymentMethod by remember { mutableStateOf("Cash on Delivery") }
     var expanded by remember { mutableStateOf(false) }
@@ -55,6 +55,20 @@ fun CheckoutScreen(
 
     val db = FirebaseFirestore.getInstance()
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+
+
+    DisposableEffect(Unit) {
+        val observer = androidx.lifecycle.Observer<String> { newAddress ->
+            deliveryAddress = newAddress
+        }
+        val liveData = navController.currentBackStackEntry
+            ?.savedStateHandle
+            ?.getLiveData<String>("deliveryAddress")
+        liveData?.observeForever(observer)
+        onDispose {
+            liveData?.removeObserver(observer)
+        }
+    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -112,7 +126,7 @@ fun CheckoutScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable{
-                                navController.navigate("locationScreen/checkout")
+                                navController.navigate("locationScreen/${"checkout"}")
                             },
                         readOnly = true,
                         trailingIcon = {

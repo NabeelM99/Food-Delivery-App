@@ -267,10 +267,7 @@ fun LocationMapScreen(
                 onClick = {
                     selectedLocation?.let { location ->
                         onLocationSelected(location.address)
-                        navController.popBackStack(
-                            route = "profileEdit", // Target specific route
-                            inclusive = false
-                        )
+                        navController.popBackStack( route = "profileEdit", inclusive = false )
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -314,17 +311,27 @@ fun LocationConfirmationCard(
 
             Button(
                 onClick = {
-                    onConfirm()
-                    navController.popBackStack(
-                        route = "profileEdit",
-                        inclusive = false
-                    )
+                    // Get the source route from navigation arguments
+                    val source = navController.previousBackStackEntry
+                        ?.arguments
+                        ?.getString("source")
+
+                    if (source == "checkout") {
+                        // Save to CheckoutScreen's state
+                        navController.previousBackStackEntry
+                            ?.savedStateHandle
+                            ?.set("deliveryAddress", locationDetails.address)
+                    } else {
+                        // Existing profile update logic
+                        onConfirm()
+                    }
+                    navController.popBackStack()
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500))
-            ) {
-                Text("Confirm Location")
-            }
+            ){
+                    Text("Confirm Location")
+                }
         }
     }
 }
