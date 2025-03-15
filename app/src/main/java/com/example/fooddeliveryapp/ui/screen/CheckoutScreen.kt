@@ -47,7 +47,9 @@ fun CheckoutScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    var deliveryAddress by remember { mutableStateOf(userProfile?.address ?: "") }
+    var deliveryAddress by remember {
+        mutableStateOf(userProfile?.address ?: "Select delivery address")
+    }
     var phoneNumber by remember { mutableStateOf("") }
     var paymentMethod by remember { mutableStateOf("Cash on Delivery") }
     var expanded by remember { mutableStateOf(false) }
@@ -121,14 +123,14 @@ fun CheckoutScreen(
 
                     OutlinedTextField(
                         value = deliveryAddress,
-                        onValueChange = { deliveryAddress = it },
+                        onValueChange = {  },
                         label = { Text("Delivery Address") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable{
                                 navController.navigate("locationScreen/checkout")
                             },
-                        readOnly = true,
+                        enabled = false,
                         trailingIcon = {
                             Icon(
                                 imageVector = Icons.Default.LocationOn,
