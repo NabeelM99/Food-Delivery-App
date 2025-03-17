@@ -30,7 +30,6 @@ class ProfileViewModel : ViewModel() {
                         Log.e("ProfileVM", "Listen error: ${error.message}")
                         return@addSnapshotListener
                     }
-
                     // Update full user profile
                     val profile = doc?.toObject(UserProfile::class.java)
                     _userProfile.value = profile

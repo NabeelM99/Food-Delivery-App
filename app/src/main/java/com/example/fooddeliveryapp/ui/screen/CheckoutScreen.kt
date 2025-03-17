@@ -46,10 +46,7 @@ fun CheckoutScreen(
     val totalPrice = cartItems.sumOf { it.price * it.quantity }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-
-    var deliveryAddress by remember {
-        mutableStateOf(userProfile?.address ?: "Select delivery address")
-    }
+    var deliveryAddress by remember { mutableStateOf(userProfile?.address ?: "") }
     var phoneNumber by remember { mutableStateOf("") }
     var paymentMethod by remember { mutableStateOf("Cash on Delivery") }
     var expanded by remember { mutableStateOf(false) }
@@ -63,9 +60,9 @@ fun CheckoutScreen(
         val observer = androidx.lifecycle.Observer<String> { newAddress ->
             deliveryAddress = newAddress
         }
-        val liveData = navController.currentBackStackEntry
+        val liveData = navController.previousBackStackEntry
             ?.savedStateHandle
-            ?.getLiveData<String>("deliveryAddress")
+            ?.getLiveData<String>("selectedDeliveryAddress")
         liveData?.observeForever(observer)
         onDispose {
             liveData?.removeObserver(observer)
