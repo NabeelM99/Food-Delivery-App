@@ -47,7 +47,16 @@ data class CartItem(
     val imageName: String,
     var quantity: Int = 1
 ){
-    constructor() : this("", "", 0.0, "", 1) // Explicit no-arg constructor
+    constructor() : this("", "", 0.0, "", 1)
+    fun toFirestoreMap(): HashMap<String, Any> {
+        return hashMapOf(
+            "id" to id,
+            "name" to name,
+            "price" to price,
+            "imageName" to imageName,
+            "quantity" to quantity
+        )
+    }
 }
 
 //data class CartDocument(val items: List<CartItem> = emptyList())

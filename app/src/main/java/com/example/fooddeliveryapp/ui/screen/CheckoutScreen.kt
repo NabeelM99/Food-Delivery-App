@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.fooddeliveryapp.ProfileViewModel
-import com.example.fooddeliveryapp.R
 import com.example.fooddeliveryapp.ui.theme.Orange
 import com.example.fooddeliveryapp.ui.theme.Red
 import com.google.firebase.auth.FirebaseAuth
@@ -55,10 +54,23 @@ fun CheckoutScreen(
     val db = FirebaseFirestore.getInstance()
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
+    val addressResult = navController.previousBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow<String?>("selectedDeliveryAddress", null)
+        ?.collectAsState()
+
+    LaunchedEffect(addressResult?.value) {
+        addressResult?.value?.let { newAddress ->
+            deliveryAddress = newAddress
+            // Clear the result to prevent reprocessing
+            navController.previousBackStackEntry?.savedStateHandle?.remove<String>("selectedDeliveryAddress")
+        }
+    }
+
 
     DisposableEffect(Unit) {
         val observer = androidx.lifecycle.Observer<String> { newAddress ->
-            deliveryAddress = newAddress
+            deliveryAddress = newAddress ?: userProfile?.address ?: ""
         }
         val liveData = navController.previousBackStackEntry
             ?.savedStateHandle
@@ -66,6 +78,9 @@ fun CheckoutScreen(
         liveData?.observeForever(observer)
         onDispose {
             liveData?.removeObserver(observer)
+            navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.remove<String>("selectedDeliveryAddress")
         }
     }
 
@@ -190,6 +205,8 @@ fun CheckoutScreen(
                             return@Button
                         }
 
+                        val firestoreItems = cartItems.map { it.toFirestoreMap() }
+
                         val order = hashMapOf(
                             "orderId" to UUID.randomUUID().toString(),
                             "userId" to userId,
@@ -198,7 +215,8 @@ fun CheckoutScreen(
                             "deliveryAddress" to deliveryAddress,
                             "phoneNumber" to phoneNumber,
                             "paymentMethod" to paymentMethod,
-                            "timestamp" to Date()
+                            "timestamp" to Date(),
+                            "orderStatus" to "Processing"
                         )
 
                         db.collection("orders").document(order["orderId"].toString())

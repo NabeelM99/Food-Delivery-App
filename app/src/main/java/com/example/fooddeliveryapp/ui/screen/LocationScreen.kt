@@ -60,6 +60,11 @@ fun LocationMapScreen(
     onLocationSelected: (String) -> Unit,
     profileViewModel: ProfileViewModel = viewModel()
 ) {
+
+    val source = navController.previousBackStackEntry
+        ?.arguments
+        ?.getString("source")
+
     val context = LocalContext.current
     var mapView by remember { mutableStateOf<MapView?>(null) }
     var selectedLocation by remember { mutableStateOf<LocationDetails?>(null) }
@@ -287,6 +292,10 @@ fun LocationConfirmationCard(
     locationDetails: LocationDetails,
     onConfirm: () -> Unit
 ) {
+    val source = navController.previousBackStackEntry
+        ?.arguments
+        ?.getString("source")
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -311,18 +320,11 @@ fun LocationConfirmationCard(
 
             Button(
                 onClick = {
-                    // Get the source route from navigation arguments
-                    val source = navController.previousBackStackEntry
-                        ?.arguments
-                        ?.getString("source")
-
                     if (source == "checkout") {
-                        // Save to CheckoutScreen's state
                         navController.previousBackStackEntry
                             ?.savedStateHandle
-                            ?.set("deliveryAddress", locationDetails.address)
+                            ?.set("selectedDeliveryAddress", locationDetails.address)
                     } else {
-                        // Existing profile update logic
                         onConfirm()
                     }
                     navController.popBackStack()
