@@ -54,21 +54,26 @@ fun CheckoutScreen(
     val db = FirebaseFirestore.getInstance()
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
-    val addressResult = navController.previousBackStackEntry
-        ?.savedStateHandle
-        ?.getStateFlow<String?>("selectedDeliveryAddress", null)
-        ?.collectAsState()
-
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
-    val selectedAddress by savedStateHandle?.getStateFlow<String?>("selectedDeliveryAddress", null)
-        ?.collectAsState() ?: remember { mutableStateOf(null) }
+    val selectedAddress = savedStateHandle?.get<String>("selectedDeliveryAddress")
 
-    // Update delivery address when selectedAddress changes
+    /*LaunchedEffect(selectedAddress) {
+        selectedAddress?.let {
+            deliveryAddress = it
+            //savedStateHandle.remove<String>("selectedDeliveryAddress") // Remove after use
+        }
+    }*/
     LaunchedEffect(selectedAddress) {
-        selectedAddress?.let { address ->
-            deliveryAddress = address
+        println("DEBUG: LaunchedEffect triggered in CheckoutScreen. selectedAddress = $selectedAddress")
+
+        selectedAddress?.let {
+            deliveryAddress = it
+            println("DEBUG: Updating deliveryAddress -> $deliveryAddress")
+
+            savedStateHandle?.remove<String>("selectedDeliveryAddress")  // Clear after use
         }
     }
+
 
     LaunchedEffect(userProfile) {
         if (deliveryAddress.isEmpty()) {
