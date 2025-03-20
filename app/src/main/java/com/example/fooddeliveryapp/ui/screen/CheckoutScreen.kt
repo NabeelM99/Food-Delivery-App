@@ -45,7 +45,7 @@ fun CheckoutScreen(
     val totalPrice = cartItems.sumOf { it.price * it.quantity }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    var deliveryAddress by remember { mutableStateOf(userProfile?.address ?: "") }
+    var deliveryAddress by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
     var paymentMethod by remember { mutableStateOf("Cash on Delivery") }
     var expanded by remember { mutableStateOf(false) }
@@ -59,18 +59,29 @@ fun CheckoutScreen(
         ?.getStateFlow<String?>("selectedDeliveryAddress", null)
         ?.collectAsState()
 
-    LaunchedEffect(addressResult?.value) {
-        addressResult?.value?.let { newAddress ->
-            deliveryAddress = newAddress
-            // Clear the result to prevent reprocessing
-            navController.previousBackStackEntry?.savedStateHandle?.remove<String>("selectedDeliveryAddress")
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+    val selectedAddress by savedStateHandle?.getStateFlow<String?>("selectedDeliveryAddress", null)
+        ?.collectAsState() ?: remember { mutableStateOf(null) }
+
+    // Update delivery address when selectedAddress changes
+    LaunchedEffect(selectedAddress) {
+        selectedAddress?.let { address ->
+            deliveryAddress = address
+        }
+    }
+
+    LaunchedEffect(userProfile) {
+        if (deliveryAddress.isEmpty()) {
+            userProfile?.address?.let { deliveryAddress = it }
         }
     }
 
 
-    DisposableEffect(Unit) {
-        val observer = androidx.lifecycle.Observer<String> { newAddress ->
-            deliveryAddress = newAddress ?: userProfile?.address ?: ""
+    /*DisposableEffect(Unit) {
+        val observer = androidx.lifecycle.Observer<String?> { newAddress ->
+            newAddress?.let { safeAddress ->
+                deliveryAddress = safeAddress
+            }
         }
         val liveData = navController.previousBackStackEntry
             ?.savedStateHandle
@@ -82,7 +93,7 @@ fun CheckoutScreen(
                 ?.savedStateHandle
                 ?.remove<String>("selectedDeliveryAddress")
         }
-    }
+    }*/
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -139,7 +150,7 @@ fun CheckoutScreen(
                         label = { Text("Delivery Address") },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable{
+                            .clickable {
                                 navController.navigate("locationScreen/checkout")
                             },
                         enabled = false,

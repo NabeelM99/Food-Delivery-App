@@ -58,8 +58,14 @@ data class LocationDetails(
 fun LocationMapScreen(
     navController: NavController,
     onLocationSelected: (String) -> Unit,
-    profileViewModel: ProfileViewModel = viewModel()
+    profileViewModel: ProfileViewModel = viewModel(),
+    source: String? = "profileEdit"
 ) {
+    LaunchedEffect(Unit) {
+        navController.currentBackStackEntry?.savedStateHandle?.apply {
+            remove<String>("selectedDeliveryAddress")
+        }
+    }
 
     val source = navController.previousBackStackEntry
         ?.arguments
@@ -101,6 +107,12 @@ fun LocationMapScreen(
         } else {
             showLocationPermissionDialog = true
         }
+    }
+
+    LaunchedEffect(Unit) {
+        navController.currentBackStackEntry
+            ?.savedStateHandle
+            ?.remove<String>("selectedDeliveryAddress")
     }
 
     // Initialize map
@@ -294,7 +306,12 @@ fun LocationConfirmationCard(
 ) {
     val source = navController.previousBackStackEntry
         ?.arguments
-        ?.getString("source")
+        ?.getString("source") ?: "profileEdit"
+
+    val safeAddress = locationDetails.address.ifEmpty {
+        "Selected Location (${String.format("%.6f", locationDetails.geoPoint.latitude)}, " +
+                "${String.format("%.6f", locationDetails.geoPoint.longitude)})"
+    }
 
     Card(
         modifier = Modifier
@@ -306,7 +323,7 @@ fun LocationConfirmationCard(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                locationDetails.address,
+                safeAddress,
                 style = MaterialTheme.typography.bodyMedium
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -315,25 +332,32 @@ fun LocationConfirmationCard(
                         "Longitude: ${String.format("%.6f", locationDetails.geoPoint.longitude)}",
                 style = MaterialTheme.typography.bodyMedium
             )*/
+            Text(
+                text = locationDetails.address,
+                style = MaterialTheme.typography.bodyMedium
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
-                    if (source == "checkout") {
-                        navController.previousBackStackEntry
-                            ?.savedStateHandle
-                            ?.set("selectedDeliveryAddress", locationDetails.address)
-                    } else {
-                        onConfirm()
+                    when (source) {
+                        "checkout" -> {
+                            navController.previousBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("selectedDeliveryAddress", safeAddress)
+                        }
+                        else -> {
+                            onConfirm()
+                        }
                     }
                     navController.popBackStack()
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500))
-            ){
-                    Text("Confirm Location")
-                }
+            ) {
+                Text("Confirm Location")
+            }
         }
     }
 }

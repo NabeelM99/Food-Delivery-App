@@ -107,23 +107,24 @@ class MainActivity : ComponentActivity() {
 
                         composable(
                             "locationScreen/{source}",
-                            arguments = listOf(navArgument("source") { type = NavType.StringType })
+                            arguments = listOf(navArgument("source") {
+                                type = NavType.StringType
+                                defaultValue = "profileEdit"
+                            })
                         ) { backStackEntry ->
-                            val source = backStackEntry.arguments?.getString("source")
+                            val source = backStackEntry.arguments?.getString("source") ?: "profileEdit"
                             val profileViewModel: ProfileViewModel = viewModel()
+
                             LocationMapScreen(
                                 navController = navController,
                                 onLocationSelected = { address ->
-                                    when (source) {
-                                        "profileEdit" -> {
-                                            profileViewModel.updateAddress(address)
-                                            profileViewModel.loadProfile()
-                                            //profileViewModel.refreshProfile()
-                                            //navController.popBackStack()
-                                        }
+                                    if (source == "profileEdit") {
+                                        profileViewModel.updateAddress(address)
+                                        profileViewModel.loadProfile()
                                     }
-                                }
-
+                                },
+                                profileViewModel = profileViewModel,
+                                source = source
                             )
                         }
 
