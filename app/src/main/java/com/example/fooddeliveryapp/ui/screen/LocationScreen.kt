@@ -308,7 +308,7 @@ fun LocationConfirmationCard(
         ?.arguments
         ?.getString("source") ?: "profileEdit"
 
-    val newAddress = locationDetails.address.ifEmpty {
+    val safeAddress = locationDetails.address.ifEmpty {
         "Selected Location (${String.format("%.6f", locationDetails.geoPoint.latitude)}, " +
                 "${String.format("%.6f", locationDetails.geoPoint.longitude)})"
     }
@@ -322,7 +322,10 @@ fun LocationConfirmationCard(
             modifier = Modifier.padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
+            Text(
+                safeAddress,
+                style = MaterialTheme.typography.bodyMedium
+            )
             Spacer(modifier = Modifier.height(8.dp))
             /*Text(
                 "Latitude: ${String.format("%.6f", locationDetails.geoPoint.latitude)}\n" +
@@ -335,30 +338,8 @@ fun LocationConfirmationCard(
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = {
-                    when (source) {
-                        "checkout" -> {
-                            navController.previousBackStackEntry?.savedStateHandle?.set(
-                                "selectedDeliveryAddress",
-                                newAddress
-                            )
-                            println("✅ [CHECKOUT] Saved address: $newAddress")
-                        }
-                        "profileEdit" -> {
-                            onConfirm()
-                            println("✅ [PROFILE] Updated address: $newAddress")
-                        }
-                    }
-                    navController.popBackStack()
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500)))
-                {
-                    Text("Confirm Location")
-                }
 
-            /*Button(
+            Button(
                 onClick = {
                     when (source) {
                         "checkout" -> {
@@ -375,7 +356,7 @@ fun LocationConfirmationCard(
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500))
-            )*/
+            )
             /*Button(
                 onClick = {
                     val newAddress = locationDetails.address
@@ -393,10 +374,9 @@ fun LocationConfirmationCard(
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500))
-            ){
+            )*/{
                 Text("Confirm Location")
-            }*/
-
+            }
         }
     }
 }

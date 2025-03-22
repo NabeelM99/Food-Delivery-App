@@ -55,6 +55,10 @@ fun ProfileEditScreen(
     var dob by remember { mutableStateOf(userProfile?.dob ?: "") }
     var showDatePicker by remember { mutableStateOf(false) }
     var showUnsavedDialog by remember { mutableStateOf(false) } // Dialog state
+    val selectedAddress = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.get<String>("selectedProfileAddress")
+
 
 
 

@@ -118,10 +118,10 @@ class MainActivity : ComponentActivity() {
                             LocationMapScreen(
                                 navController = navController,
                                 onLocationSelected = { address ->
-                                    if (source == "profileEdit") {
+
                                         profileViewModel.updateAddress(address)
                                         profileViewModel.loadProfile()
-                                    }
+
                                 },
                                 profileViewModel = profileViewModel,
                                 source = source

@@ -57,23 +57,12 @@ fun CheckoutScreen(
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
     val selectedAddress = savedStateHandle?.get<String>("selectedDeliveryAddress")
 
-    /*LaunchedEffect(selectedAddress) {
+    LaunchedEffect(selectedAddress) {
         selectedAddress?.let {
             deliveryAddress = it
             //savedStateHandle.remove<String>("selectedDeliveryAddress") // Remove after use
         }
-    }*/
-    LaunchedEffect(selectedAddress) {
-        println("DEBUG: LaunchedEffect triggered in CheckoutScreen. selectedAddress = $selectedAddress")
-
-        selectedAddress?.let {
-            deliveryAddress = it
-            println("DEBUG: Updating deliveryAddress -> $deliveryAddress")
-
-            savedStateHandle?.remove<String>("selectedDeliveryAddress")  // Clear after use
-        }
     }
-
 
     LaunchedEffect(userProfile) {
         if (deliveryAddress.isEmpty()) {
