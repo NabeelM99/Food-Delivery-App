@@ -117,11 +117,18 @@ class MainActivity : ComponentActivity() {
 
                             LocationMapScreen(
                                 navController = navController,
-                                onLocationSelected = { address ->
-
-                                        profileViewModel.updateAddress(address)
-                                        profileViewModel.loadProfile()
-
+                                onLocationSelected = { locationDetails: LocationDetails -> // Ensure the type is specified
+                                    when (source) {
+                                        "checkout" -> {
+                                            navController.previousBackStackEntry
+                                                ?.savedStateHandle
+                                                ?.set("selectedDeliveryAddress", locationDetails.address) // Accessing address
+                                        }
+                                        "profileEdit" -> {
+                                            profileViewModel.updateAddress(locationDetails.address) // Accessing address
+                                            profileViewModel.loadProfile()
+                                        }
+                                    }
                                 },
                                 profileViewModel = profileViewModel,
                                 source = source

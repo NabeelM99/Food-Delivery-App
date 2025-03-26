@@ -57,7 +57,7 @@ data class LocationDetails(
 @Composable
 fun LocationMapScreen(
     navController: NavController,
-    onLocationSelected: (String) -> Unit,
+    onLocationSelected: (LocationDetails) -> Unit,
     profileViewModel: ProfileViewModel = viewModel(),
     source: String? = "profileEdit"
 ) {
@@ -208,7 +208,27 @@ fun LocationMapScreen(
     }
 
     // Bottom Sheet
-    if (showSheet) {
+    /*if (showSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showSheet = false },
+            sheetState = sheetState
+        ) {
+            selectedLocation?.let { location ->
+                Button(
+                    onClick = {
+                        onLocationSelected(location) // Use the passed function
+                        navController.popBackStack()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500))
+                ) {
+                    Text("Confirm Location")
+                }
+            }
+        }
+    }*/
+
+    /*if (showSheet) {
         ModalBottomSheet(
             onDismissRequest = { showSheet = false },
             sheetState = sheetState
@@ -224,7 +244,28 @@ fun LocationMapScreen(
                 )
             }
         }
+    }*/
+
+
+    if (showSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showSheet = false },
+            sheetState = sheetState
+        ) {
+            selectedLocation?.let { location ->
+                LocationConfirmationCard(
+                    navController = navController,
+                    locationDetails = location,
+                    onConfirm = {
+                        // This will handle the address update logic
+                        onLocationSelected(location) // Call the onLocationSelected function
+                    }
+                )
+            }
+        }
     }
+
+
     Box(modifier = Modifier.fillMaxSize()) {
         // Map at the bottom layer
         mapView?.let { map ->
@@ -283,7 +324,7 @@ fun LocationMapScreen(
             Button(
                 onClick = {
                     selectedLocation?.let { location ->
-                        onLocationSelected(location.address)
+                        onLocationSelected(location)
                         navController.popBackStack( route = "profileEdit", inclusive = false )
                     }
                 },
@@ -341,40 +382,12 @@ fun LocationConfirmationCard(
 
             Button(
                 onClick = {
-                    when (source) {
-                        "checkout" -> {
-                            navController.previousBackStackEntry
-                                ?.savedStateHandle
-                                ?.set("selectedDeliveryAddress", locationDetails.address)
-                        }
-                        else -> {
-                            onConfirm()
-                        }
-                    }
-                    navController.popBackStack()
-
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500))
-            )
-            /*Button(
-                onClick = {
-                    val newAddress = locationDetails.address
-                    val previousEntry = navController.previousBackStackEntry
-
-                    if (previousEntry == null) {
-                        println("❌ ERROR: previousBackStackEntry is NULL! Address not saved.")
-                    } else {
-                        previousEntry.savedStateHandle["selectedDeliveryAddress"] = newAddress
-                        println("✅ DEBUG: Successfully set selectedDeliveryAddress -> $newAddress")
-                    }
-
-                    println("🔙 DEBUG: Navigating back from LocationScreen")
+                    onConfirm()
                     navController.popBackStack()
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500))
-            )*/{
+            ) {
                 Text("Confirm Location")
             }
         }
