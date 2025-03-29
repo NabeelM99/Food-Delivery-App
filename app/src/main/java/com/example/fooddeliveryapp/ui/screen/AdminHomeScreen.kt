@@ -2,6 +2,8 @@ package com.example.fooddeliveryapp.ui.screen
 
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -21,6 +23,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import com.example.fooddeliveryapp.R
 import kotlinx.coroutines.CoroutineScope
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,6 +45,8 @@ fun AdminHomeScreen(navController: NavController) {
         }
     }
 
+
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
@@ -54,9 +62,14 @@ fun AdminHomeScreen(navController: NavController) {
                     }) {
                         Icon(Icons.Default.ArrowBack, "Back")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFFFFA500)
+                )
             )
+
         }
+
     ) { padding ->
         when (currentScreen) {
             "main" -> AdminMainMenu(
@@ -64,6 +77,7 @@ fun AdminHomeScreen(navController: NavController) {
                 onAddDetailsClick = { currentScreen = "addDetails" },
                 padding = padding
             )
+
             "addProduct" -> AddProductForm(
                 db = db,
                 snackbarHostState = snackbarHostState,
@@ -79,7 +93,9 @@ fun AdminHomeScreen(navController: NavController) {
                 onBack = { currentScreen = "main" }
             )
         }
+
     }
+
 }
 
 @Composable
@@ -102,7 +118,8 @@ fun AdminMainMenu(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(60.dp)
-                .padding(vertical = 8.dp)
+                .padding(vertical = 8.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500))
         ) {
             Text("Add Products")
         }
@@ -112,7 +129,8 @@ fun AdminMainMenu(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(60.dp)
-                .padding(vertical = 8.dp)
+                .padding(vertical = 8.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500))
         ) {
             Text("Add Product Details")
         }
@@ -193,7 +211,8 @@ fun AddProductForm(
             value = productName,
             onValueChange = { productName = it },
             label = { Text("Product Name") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+
         )
 
         OutlinedTextField(

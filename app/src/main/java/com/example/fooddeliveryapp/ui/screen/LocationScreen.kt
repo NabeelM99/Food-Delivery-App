@@ -207,44 +207,6 @@ fun LocationMapScreen(
         )
     }
 
-    // Bottom Sheet
-    /*if (showSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showSheet = false },
-            sheetState = sheetState
-        ) {
-            selectedLocation?.let { location ->
-                Button(
-                    onClick = {
-                        onLocationSelected(location) // Use the passed function
-                        navController.popBackStack()
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500))
-                ) {
-                    Text("Confirm Location")
-                }
-            }
-        }
-    }*/
-
-    /*if (showSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showSheet = false },
-            sheetState = sheetState
-        ) {
-            selectedLocation?.let { location ->
-                LocationConfirmationCard(
-                    navController = navController,
-                    locationDetails = location,
-                    onConfirm = {
-                        // Update both ViewModel and Firestore
-                        onLocationSelected(location.address)
-                    }
-                )
-            }
-        }
-    }*/
 
 
     if (showSheet) {
@@ -373,12 +335,7 @@ fun LocationConfirmationCard(
                         "Longitude: ${String.format("%.6f", locationDetails.geoPoint.longitude)}",
                 style = MaterialTheme.typography.bodyMedium
             )*/
-            Text(
-                text = locationDetails.address,
-                style = MaterialTheme.typography.bodyMedium
-            )
 
-            Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
