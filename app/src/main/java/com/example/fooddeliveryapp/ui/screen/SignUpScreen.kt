@@ -3,6 +3,7 @@ package com.example.fooddeliveryapp.ui.screen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,6 +25,8 @@ import com.example.fooddeliveryapp.R
 import com.example.fooddeliveryapp.ui.theme.AppTheme
 import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import com.example.fooddeliveryapp.UserProfile
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
@@ -38,6 +41,7 @@ fun SignUpScreen(navController: NavController) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
     val auth = FirebaseAuth.getInstance()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -99,34 +103,50 @@ fun SignUpScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(24.dp)) // Add this between components
 
                     // Name TextBox
-                    PlaceholderTextField(
+                    OutlinedTextField(
                         value = name,
                         onValueChange = { name = it },
-                        placeholder = "Name",
-                        keyboardType = KeyboardType.Text,
+                        label = { Text("Name") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        modifier = Modifier.fillMaxWidth()
                         //fontFamily = YummyFoodiesFontFamily
                     )
 
                     Spacer(modifier = Modifier.height(5.dp))
 
-                    // Email TextBox
-                    PlaceholderTextField(
+
+                    OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
-                        placeholder = "Email",
-                        keyboardType = KeyboardType.Email,
-                        //fontFamily = YummyFoodiesFontFamily
+                        label = { Text("Email") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        modifier = Modifier.fillMaxWidth()
                     )
 
                     Spacer(modifier = Modifier.height(5.dp))
 
-                    // Password TextBox
-                    PlaceholderTextField(
+                    OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
-                        placeholder = "Password",
-                        keyboardType = KeyboardType.Password,
-                        //fontFamily = YummyFoodiesFontFamily
+                        label = { Text("Password") },
+                        visualTransformation = if (passwordVisible) VisualTransformation.None
+                        else PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        trailingIcon = {
+                            IconButton(
+                                onClick = { passwordVisible = !passwordVisible }
+                            ) {
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (passwordVisible) R.drawable.ic_visibility_on
+                                        else R.drawable.ic_visibility_off
+                                    ),
+                                    contentDescription = "Toggle password visibility",
+                                    tint = Color.Gray
+                                )
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
                     )
 
                     Spacer(modifier = Modifier.height(10.dp))
