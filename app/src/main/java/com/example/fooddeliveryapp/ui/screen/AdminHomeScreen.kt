@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import com.example.fooddeliveryapp.R
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,6 +76,14 @@ fun AdminHomeScreen(navController: NavController) {
             "main" -> AdminMainMenu(
                 onAddProductClick = { currentScreen = "addProduct" },
                 onAddDetailsClick = { currentScreen = "addDetails" },
+                onLogoutClick = {
+                    // Handle logout
+                    FirebaseAuth.getInstance().signOut()
+                    navController.navigate("signInScreen") {
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
                 padding = padding
             )
 
@@ -102,6 +111,7 @@ fun AdminHomeScreen(navController: NavController) {
 fun AdminMainMenu(
     onAddProductClick: () -> Unit,
     onAddDetailsClick: () -> Unit,
+    onLogoutClick: () -> Unit,
     padding: PaddingValues
 ) {
     Column(
@@ -133,6 +143,19 @@ fun AdminMainMenu(
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500))
         ) {
             Text("Add Product Details")
+        }
+
+        Button(
+            onClick = onLogoutClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp)
+                .padding(vertical = 8.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFFFF6347)  // Different color for logout
+            )
+        ) {
+            Text("Logout")
         }
     }
 }
