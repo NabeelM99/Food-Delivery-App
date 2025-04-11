@@ -103,7 +103,7 @@ fun SignUpScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(24.dp)) // Add this between components
 
                     // Name TextBox
-                    OutlinedTextField(
+                    CustomOutlinedTextField(
                         value = name,
                         onValueChange = { name = it },
                         label = { Text("Name") },
@@ -115,7 +115,7 @@ fun SignUpScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(5.dp))
 
 
-                    OutlinedTextField(
+                    CustomOutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
                         label = { Text("Email") },
@@ -125,7 +125,7 @@ fun SignUpScreen(navController: NavController) {
 
                     Spacer(modifier = Modifier.height(5.dp))
 
-                    OutlinedTextField(
+                    CustomOutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
                         label = { Text("Password") },

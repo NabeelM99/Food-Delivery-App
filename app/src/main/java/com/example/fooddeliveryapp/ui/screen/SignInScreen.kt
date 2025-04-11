@@ -104,7 +104,7 @@ fun SignInScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(24.dp))
 
                     // Email TextBox
-                    OutlinedTextField(
+                    CustomOutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
                         label = { Text("Email") },
@@ -114,7 +114,7 @@ fun SignInScreen(navController: NavController) {
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    OutlinedTextField(
+                    CustomOutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
                         label = { Text("Password") },
@@ -226,29 +226,17 @@ fun SignInScreen(navController: NavController) {
         }
     )
 }
-
-
-
-@SuppressLint("RememberReturnType")
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CustomOutlinedTextField(
+/*@Composable
+fun PlaceholderTextField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
     keyboardType: KeyboardType,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    trailingIcon: @Composable (() -> Unit)? = null
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isFocused by interactionSource.collectIsFocusedAsState()
-
     BasicTextField(
         value = value,
         onValueChange = onValueChange,
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = keyboardType),
-        visualTransformation = visualTransformation,
-        interactionSource = interactionSource,
         singleLine = true,
         textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
         modifier = Modifier
@@ -256,14 +244,6 @@ fun CustomOutlinedTextField(
             .height(56.dp)
             .background(
                 color = Color.LightGray.copy(alpha = 0.5f),
-                shape = MaterialTheme.shapes.medium
-            )
-            .border(
-                width = 1.dp,
-                color = when {
-                    isFocused -> Color(0xFFFFA500)
-                    else -> Color.Transparent
-                },
                 shape = MaterialTheme.shapes.medium
             )
             .padding(horizontal = 16.dp),
@@ -280,6 +260,64 @@ fun CustomOutlinedTextField(
                         )
                     )
                 }
+                innerTextField() // Render the input field
+            }
+        }
+    )
+}
+*/
+
+
+@Composable
+fun CustomOutlinedTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: @Composable () -> Unit,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    modifier: Modifier = Modifier
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+
+    BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        keyboardOptions = keyboardOptions,
+        visualTransformation = visualTransformation,
+        interactionSource = interactionSource,
+        singleLine = true,
+        textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .background(
+                color = Color.LightGray.copy(alpha = 0.5f),
+                shape = MaterialTheme.shapes.medium
+            )
+            .border(
+                width = 1.dp,
+                color = when {
+                    isFocused -> Color(0xFFFFA500)  // Orange border when focused
+                    else -> Color.Transparent
+                },
+                shape = MaterialTheme.shapes.medium
+            ),
+        decorationBox = { innerTextField ->
+            Box(
+                contentAlignment = Alignment.CenterStart,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+            ) {
+                // This is for the label floating or showing as placeholder
+                if (value.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        label()
+                    }
+                }
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -288,7 +326,9 @@ fun CustomOutlinedTextField(
                     Box(modifier = Modifier.weight(1f)) {
                         innerTextField()
                     }
-                    trailingIcon?.invoke()
+                    if (trailingIcon != null) {
+                        trailingIcon()
+                    }
                 }
             }
         }
