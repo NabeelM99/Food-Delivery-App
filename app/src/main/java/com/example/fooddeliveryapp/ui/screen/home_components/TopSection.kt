@@ -2,11 +2,14 @@ package com.example.fooddeliveryapp.ui.screen.home_components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,32 +20,38 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.fooddeliveryapp.ProfileViewModel
 import com.example.fooddeliveryapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopSection() {
+fun TopSection(navController: NavController) {  // Add NavController parameter
+    val profileViewModel: ProfileViewModel = viewModel()
+    val userProfile by profileViewModel.userProfile.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
-            .zIndex(1f) // Ensure header stays above other content
+            .zIndex(1f)
     ) {
-        // User Profile Header
-        UserProfileHeader(userName = "Pin") // Pass the user name dynamically
-
-        // Search Bar Section
-        //SearchBarSection() // Now coming from a separate file
+        UserProfileHeader(
+            userName = userProfile?.name ?: "",
+            navController = navController
+        )
     }
 }
 
 @Composable
-fun UserProfileHeader(userName: String) {
+fun UserProfileHeader(userName: String, navController: NavController) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 16.dp),
+            .padding(bottom = 16.dp)
+            .clickable { navController.navigate("profileView") },
         color = Color(0xFFFFCC80),
         shape = RoundedCornerShape(12.dp),
         shadowElevation = 4.dp
@@ -67,10 +76,11 @@ fun UserProfileHeader(userName: String) {
 
             Column {
                 Text(
-                    text = "Welcome back, $userName!",
+                    text = if (userName.isNotEmpty()) "Welcome back, $userName!"
+                    else "Welcome!",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = Color.Black
                 )
                 Text(
                     text = "How hungry are you?",

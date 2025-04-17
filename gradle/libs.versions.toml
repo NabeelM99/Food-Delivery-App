@@ -19,6 +19,7 @@ playServicesLocationVersion = "21.3.0"
 firebaseFirestoreKtx = "25.1.2"
 firebase-bom = "33.9.0"
 firebaseAuthKtx = "23.2.0"
+playServicesAnalyticsImpl = "18.2.0"
 
 
 [libraries]
@@ -53,6 +54,7 @@ play-services-location = { group = "com.google.android.gms", name = "play-servic
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
+play-services-analytics-impl = { group = "com.google.android.gms", name = "play-services-analytics-impl", version.ref = "playServicesAnalyticsImpl" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

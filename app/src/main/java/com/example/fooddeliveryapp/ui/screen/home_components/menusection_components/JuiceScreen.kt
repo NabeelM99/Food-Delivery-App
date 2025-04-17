@@ -21,22 +21,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
+import com.example.fooddeliveryapp.ui.screen.components.Product
+import com.example.fooddeliveryapp.ui.screen.components.ProductCard
 import com.example.fooddeliveryapp.ui.screen.getDrawableId
 import com.google.firebase.firestore.FirebaseFirestore
-
-data class Juice(
-    val id: String = "",
-    val name: String = "",
-    val price: Double = 0.0,
-    val imageUrl: String = "",
-    val description: String = "",
-    val productDescription: String = ""
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun JuiceScreen(navController: NavController) {
-    val juices = remember { mutableStateListOf<Juice>() }
+    val juices = remember { mutableStateListOf<Product>() }
     var loading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
@@ -46,12 +39,13 @@ fun JuiceScreen(navController: NavController) {
             .addOnSuccessListener { result ->
                 val fetchedJuices = result.documents.mapNotNull { doc ->
                     try {
-                        Juice(
+                        Product(
                             id = doc.id,
                             name = doc.getString("name") ?: "",
                             price = doc.getDouble("price") ?: 0.0,
                             imageUrl = doc.getString("imageUrl") ?: "",
                             description = doc.getString("description") ?: "",
+                            type = "juices",
                             productDescription = doc.getString("productDescription") ?: ""
                         )
                     } catch (e: Exception) {
@@ -96,60 +90,11 @@ fun JuiceScreen(navController: NavController) {
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
             items(juices) { juice ->
-                JuiceCard(juice = juice, navController = navController)
-            }
-        }
-    }
-}
-
-@SuppressLint("DefaultLocale")
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun JuiceCard(juice: Juice, navController: NavController) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(120.dp)
-            .clickable {
-                Log.d("Navigation", "Navigating to juice with ID: ${juice.id}")
-                navController.navigate("productDetailsScreen/juices/${juice.id}")
-            },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(id = getDrawableId(juice.imageUrl)),
-                contentDescription = juice.name,
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(RoundedCornerShape(12.dp)),
-                contentScale = ContentScale.Crop
-            )
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 12.dp),
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = juice.name,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = juice.description,
-                    fontSize = 14.sp,
-                    color = Color.Gray
+                //JuiceCard(juice = juice, navController = navController)
+                ProductCard(
+                    product = juice,
+                    productType = "juices",
+                    navController = navController
                 )
             }
         }

@@ -21,22 +21,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
+import com.example.fooddeliveryapp.ui.screen.components.Product
+import com.example.fooddeliveryapp.ui.screen.components.ProductCard
 import com.example.fooddeliveryapp.ui.screen.getDrawableId
 import com.google.firebase.firestore.FirebaseFirestore
 
-data class Fry(
-    val id: String = "",
-    val name: String = "",
-    val price: Double = 0.0,
-    val imageUrl: String = "",
-    val description: String = "",
-    val productDescription: String = ""
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FryScreen(navController: NavController) {
-    val fries = remember { mutableStateListOf<Fry>() }
+    val fries = remember { mutableStateListOf<Product>() }
     var loading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
@@ -46,12 +40,13 @@ fun FryScreen(navController: NavController) {
             .addOnSuccessListener { result ->
                 val fetchedFries = result.documents.mapNotNull { doc ->
                     try {
-                        Fry(
+                        Product(
                             id = doc.id,
                             name = doc.getString("name") ?: "",
                             price = doc.getDouble("price") ?: 0.0,
                             imageUrl = doc.getString("imageUrl") ?: "",
                             description = doc.getString("description") ?: "",
+                            type = "fries",
                             productDescription = doc.getString("productDescription") ?: ""
                         )
                     } catch (e: Exception) {
@@ -96,60 +91,11 @@ fun FryScreen(navController: NavController) {
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
             items(fries) { fry ->
-                FryCard(fry = fry, navController = navController)
-            }
-        }
-    }
-}
-
-@SuppressLint("DefaultLocale")
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun FryCard(fry: Fry, navController: NavController) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(120.dp)
-            .clickable {
-                Log.d("Navigation", "Navigating to fry with ID: ${fry.id}")
-                navController.navigate("productDetailsScreen/fries/${fry.id}")
-            },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(id = getDrawableId(fry.imageUrl)),
-                contentDescription = fry.name,
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(RoundedCornerShape(12.dp)),
-                contentScale = ContentScale.Crop
-            )
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 12.dp),
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = fry.name,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = fry.description,
-                    fontSize = 14.sp,
-                    color = Color.Gray
+                //FryCard(fry = fry, navController = navController)
+                ProductCard(
+                    product = fry,
+                    productType = "fries",
+                    navController = navController
                 )
             }
         }

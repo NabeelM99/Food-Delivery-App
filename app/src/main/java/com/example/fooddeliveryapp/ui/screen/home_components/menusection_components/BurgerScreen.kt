@@ -21,22 +21,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
+import com.example.fooddeliveryapp.ui.screen.components.Product
+import com.example.fooddeliveryapp.ui.screen.components.ProductCard
 import com.example.fooddeliveryapp.ui.screen.getDrawableId
 import com.google.firebase.firestore.FirebaseFirestore
 
-data class Burger(
-    val id: String = "",
-    val name: String = "",
-    val price: Double = 0.0,
-    val imageUrl: String = "",
-    val description: String = "",
-    val productDescription: String = ""
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BurgerScreen(navController: NavController) {
-    val burgers = remember { mutableStateListOf<Burger>() }
+    val burgers = remember { mutableStateListOf<Product>() }
     var loading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
@@ -46,12 +40,13 @@ fun BurgerScreen(navController: NavController) {
             .addOnSuccessListener { result ->
                 val fetchedBurgers = result.documents.mapNotNull { doc ->
                     try {
-                        Burger(
+                        Product(
                             id = doc.id,
                             name = doc.getString("name") ?: "",
                             price = doc.getDouble("price") ?: 0.0,
                             imageUrl = doc.getString("imageUrl") ?: "",
                             description = doc.getString("description") ?: "",
+                            type = "burgers", // Set collection type
                             productDescription = doc.getString("productDescription") ?: ""
                         )
                     } catch (e: Exception) {
@@ -96,67 +91,13 @@ fun BurgerScreen(navController: NavController) {
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
             items(burgers) { burger ->
-                BurgerCard(burger = burger, navController = navController)
-            }
-        }
-    }
-}
-
-@SuppressLint("DefaultLocale")
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun BurgerCard(burger: Burger, navController: NavController) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(120.dp)
-            .clickable {
-                Log.d("Navigation", "Navigating to burger with ID: ${burger.id}")
-                navController.navigate("productDetailsScreen/burgers/${burger.id}")
-            },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(id = getDrawableId(burger.imageUrl)),
-                contentDescription = burger.name,
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(RoundedCornerShape(12.dp)),
-                contentScale = ContentScale.Crop
-            )
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 12.dp),
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = burger.name,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = burger.description,
-                    fontSize = 14.sp,
-                    color = Color.Gray
+                //BurgerCard(burger = burger, navController = navController)
+                ProductCard(
+                    product = burger,
+                    productType = "burgers",
+                    navController = navController
                 )
             }
         }
     }
 }
-

@@ -21,22 +21,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fooddeliveryapp.R
+import com.example.fooddeliveryapp.ui.screen.components.Product
+import com.example.fooddeliveryapp.ui.screen.components.ProductCard
 import com.example.fooddeliveryapp.ui.screen.getDrawableId
+//import com.google.android.gms.analytics.ecommerce.Product
 import com.google.firebase.firestore.FirebaseFirestore
 
-data class Drink(
-    val id: String = "",
-    val name: String = "",
-    val price: Double = 0.0,
-    val imageUrl: String = "",
-    val description: String = "",
-    val productDescription: String = ""
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DrinkScreen(navController: NavController) {
-    val drinks = remember { mutableStateListOf<Drink>() }
+    val drinks = remember { mutableStateListOf<Product>() } // Changed to Product
     var loading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
@@ -46,12 +41,14 @@ fun DrinkScreen(navController: NavController) {
             .addOnSuccessListener { result ->
                 val fetchedDrinks = result.documents.mapNotNull { doc ->
                     try {
-                        Drink(
+                        // Create Product instance instead of Drink
+                        Product(
                             id = doc.id,
                             name = doc.getString("name") ?: "",
+                            description = doc.getString("description") ?: "",
                             price = doc.getDouble("price") ?: 0.0,
                             imageUrl = doc.getString("imageUrl") ?: "",
-                            description = doc.getString("description") ?: "",
+                            type = "drinks", // Set collection type
                             productDescription = doc.getString("productDescription") ?: ""
                         )
                     } catch (e: Exception) {
@@ -83,8 +80,7 @@ fun DrinkScreen(navController: NavController) {
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFFFFA500)
-                )
-            )
+                ))
         }
     ) { paddingValues ->
         LazyColumn(
@@ -96,66 +92,14 @@ fun DrinkScreen(navController: NavController) {
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
             items(drinks) { drink ->
-                DrinkCard(drink = drink, navController = navController)
-            }
-        }
-    }
-}
-
-@SuppressLint("DefaultLocale")
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DrinkCard(drink: Drink, navController: NavController) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(120.dp)
-            .clickable {
-                Log.d("Navigation", "Navigating to drink with ID: ${drink.id}")
-                navController.navigate("productDetailsScreen/drinks/${drink.id}")
-            },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(id = getDrawableId(drink.imageUrl)),
-                contentDescription = drink.name,
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(RoundedCornerShape(12.dp)),
-                contentScale = ContentScale.Crop
-            )
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 12.dp),
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = drink.name,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = drink.description,
-                    fontSize = 14.sp,
-                    color = Color.Gray
+                ProductCard(
+                    product = drink, // Now matches Product type
+                    productType = "drinks",
+                    navController = navController
                 )
             }
         }
     }
 }
+
+// Delete the DrinkCard composable completely
