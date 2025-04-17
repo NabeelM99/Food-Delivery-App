@@ -3,5 +3,6 @@ FoodDeliveryApp is a sleek Android app for browsing and ordering food. Built wit
 
 ## 📽️ Demo Video
 
-👉 [Watch the demo video on Google Drive](https://drive.google.com/file/d/1XPrDiH593h5aMGfci3JdtsttYTFIPZwK/view)
+[![Watch the video](https://drive.google.com/uc?export=view&id=1qFfJuQH-DVcAXUpP3bZJ-8D894jkIgpl)](https://drive.google.com/file/d/1XPrDiH593h5aMGfci3JdtsttYTFIPZwK/view)
+
 
