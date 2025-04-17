@@ -112,7 +112,7 @@ fun DrinkCard(drink: Drink, navController: NavController) {
             .height(120.dp)
             .clickable {
                 Log.d("Navigation", "Navigating to drink with ID: ${drink.id}")
-                navController.navigate("productDetailsScreen/${drink.id}")
+                navController.navigate("productDetailsScreen/drinks/${drink.id}")
             },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(

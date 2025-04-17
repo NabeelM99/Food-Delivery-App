@@ -145,6 +145,8 @@ fun AdminMainMenu(
             Text("Add Product Details")
         }
 
+        Spacer(modifier = Modifier.height(60.dp))
+
         Button(
             onClick = onLogoutClick,
             modifier = Modifier
@@ -338,7 +340,8 @@ fun AddProductForm(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 16.dp)
+                .padding(vertical = 16.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500))
         ) {
             Text("Add Product")
         }
@@ -494,7 +497,8 @@ fun AddProductDetailsForm(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 16.dp)
+                .padding(vertical = 16.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500))
         ) {
             Text("Save Details")
         }
