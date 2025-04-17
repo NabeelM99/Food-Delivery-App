@@ -9,6 +9,18 @@ FoodDeliveryApp is a sleek Android app for browsing and ordering food. Built wit
 Click on the thumbnail to watch the complete features used in the project. 
 
 
+## 🛠️ Tech Stack
+
+- Kotlin
+- Jetpack Compose
+- MVVM Architecture
+- OpenStreetMap for location services
+- Google Drive (for demo hosting)
+
+
+
+
+
 
 
 
