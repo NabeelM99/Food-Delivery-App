@@ -174,7 +174,7 @@ class MainActivity : ComponentActivity() {
 
                         // Search Bar Section
                         composable("SearchBarSection") {
-                            //SearchScreen()
+                            SearchScreen(navController = navController)
                         }
 
                         composable("cart") {
