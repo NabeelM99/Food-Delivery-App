@@ -26,7 +26,12 @@ fun SearchScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
 
     LaunchedEffect(searchQuery) {
-        searchViewModel.searchProducts(searchQuery)
+        if (searchQuery.isNotEmpty()) {
+            delay(400)
+            searchViewModel.searchProducts(searchQuery)
+        } else {
+            //searchViewModel.searchResults.value = emptyList()
+        }
     }
 
     Scaffold(
@@ -48,33 +53,37 @@ fun SearchScreen(navController: NavController) {
             )
         }
     ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
+        Box(modifier = Modifier
+            .padding(paddingValues)
+            .fillMaxSize()) {
             when {
                 searchViewModel.isLoading.value -> {
                     CircularProgressIndicator(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .wrapContentSize(Alignment.Center)
+                            .align(Alignment.Center)
                     )
                 }
 
                 searchViewModel.error.value != null -> {
                     Text(
                         text = searchViewModel.error.value!!,
+                        color = MaterialTheme.colorScheme.error,
                         modifier = Modifier
                             .fillMaxSize()
                             .wrapContentSize(Alignment.Center)
                     )
                 }
 
-                searchViewModel.searchResults.value.isEmpty() -> {
+                searchViewModel.searchResults.value.isEmpty() ->
                     Text(
-                        text = if (searchQuery.isEmpty()) "Start typing to search" else "No results found",
+                        text = if (searchQuery.isEmpty())
+                            "Start typing to search"
+                        else
+                            "No results found for \"$searchQuery\"",
                         modifier = Modifier
-                            .fillMaxSize()
-                            .wrapContentSize(Alignment.Center)
+                            .align(Alignment.Center)
                     )
-                }
+
 
                 else -> {
                     LazyColumn(
@@ -95,10 +104,4 @@ fun SearchScreen(navController: NavController) {
             }
         }
     }
-}
-
-fun <T> LiveData<T>.debounce(duration: Long = 300L) = liveData {
-    val lastValue = value
-    delay(duration)
-    if (lastValue == value) emit(value)
 }

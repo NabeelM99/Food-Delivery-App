@@ -22,7 +22,13 @@ class SearchViewModel : ViewModel() {
     val error = _error.asStateFlow()
 
     private val db = FirebaseFirestore.getInstance()
-    private val collections = listOf("burgers", "drinks", "fries", "pastas", "juices")
+    private val collections = listOf(
+        "burgers",
+        "drinks",
+        "fries",
+        "pastas",
+        "juices"
+    )
 
     fun searchProducts(query: String) {
         if (query.isEmpty()) {
@@ -34,43 +40,52 @@ class SearchViewModel : ViewModel() {
             try {
                 _isLoading.value = true
                 _error.value = null
+                Log.d("SEARCH", "Init search for: '$query'")
 
+                val cleanQuery = query.lowercase().trim()
                 val results = mutableListOf<Product>()
-                val searchQuery = query.lowercase()
 
-                // Search across all collections
-                collections.forEach { collection ->
-                    val snapshot = db.collection(collection)
-                        .whereGreaterThanOrEqualTo("name_lowercase", searchQuery)
-                        .whereLessThanOrEqualTo("name_lowercase", searchQuery + "\uf8ff")
-                        .get()
-                        .await()
+                for (collection in collections) {
+                    try {
+                        Log.d("SEARCH", "Searching in $collection")
 
-                    results.addAll(snapshot.documents.mapNotNull { doc ->
-                        try {
-                            Product(
-                                id = doc.id,
-                                name = doc.getString("name") ?: "",
-                                description = doc.getString("description") ?: "",
-                                price = doc.getDouble("price") ?: 0.0,
-                                imageUrl = doc.getString("imageUrl") ?: "",
-                                type = collection,
-                                productDescription = doc.getString("productDescription") ?: ""
-                            )
-                        } catch (e: Exception) {
-                            null
+                        val querySnapshot = db.collection(collection)
+                            .whereGreaterThanOrEqualTo("name_lowercase", cleanQuery)
+                            .whereLessThanOrEqualTo("name_lowercase", "$cleanQuery\uF8FF")
+                            .get()
+                            .await()
+
+                        Log.d("SEARCH", "Found ${querySnapshot.size()} in $collection")
+
+                        querySnapshot.documents.forEach { doc ->
+                            try {
+                                val product = Product(
+                                    id = doc.id,
+                                    name = doc.getString("name") ?: "",
+                                    description = doc.getString("description") ?: "",
+                                    price = doc.getDouble("price") ?: 0.0,
+                                    imageUrl = doc.getString("imageUrl") ?: "",
+                                    type = collection,
+                                    productDescription = doc.getString("productDescription") ?: ""
+                                )
+                                results.add(product)
+                                Log.d("SEARCH", "Matched: ${product.name}")
+                            } catch (e: Exception) {
+                                Log.e("SEARCH", "Error parsing doc ${doc.id}: ${e.message}")
+                            }
                         }
-                    })
+                    } catch (e: Exception) {
+                        Log.e("SEARCH", "Error searching $collection: ${e.message}")
+                    }
                 }
 
                 _searchResults.value = results.distinctBy { it.id }
-                Log.d("Search", "Found ${results.size} results")
+                Log.d("SEARCH", "Total results: ${results.size}")
             } catch (e: Exception) {
-                _error.value = "Error searching products: ${e.message}"
-                Log.e("Search", "Search failed", e)
+                _error.value = "Search failed: ${e.message}"
+                Log.e("SEARCH", "Search error", e)
             } finally {
                 _isLoading.value = false
-                Log.d("Search", "Search completed")
             }
         }
     }
