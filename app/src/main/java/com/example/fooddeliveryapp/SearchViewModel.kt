@@ -31,16 +31,16 @@ class SearchViewModel : ViewModel() {
     )
 
     fun searchProducts(query: String) {
-        if (query.isEmpty()) {
-            _searchResults.value = emptyList()
-            return
-        }
-
         viewModelScope.launch {
             try {
                 _isLoading.value = true
                 _error.value = null
                 Log.d("SEARCH", "Init search for: '$query'")
+
+                if (query.isEmpty()) {
+                    _searchResults.value = emptyList()
+                    return@launch
+                }
 
                 val cleanQuery = query.lowercase().trim()
                 val results = mutableListOf<Product>()
@@ -49,27 +49,45 @@ class SearchViewModel : ViewModel() {
                     try {
                         Log.d("SEARCH", "Searching in $collection")
 
-                        val querySnapshot = db.collection(collection)
+                        /*val querySnapshot = db.collection(collection)
                             .whereGreaterThanOrEqualTo("name_lowercase", cleanQuery)
                             .whereLessThanOrEqualTo("name_lowercase", "$cleanQuery\uF8FF")
                             .get()
                             .await()
 
-                        Log.d("SEARCH", "Found ${querySnapshot.size()} in $collection")
+                        Log.d("SEARCH", "Found ${querySnapshot.size()} in $collection")*/
+
+                        val querySnapshot = db.collection(collection)
+                            .get()
+                            .await()
+
+                        /*
+                        val querySnapshot = db.collection(collection)
+                        .get()
+                        .await()
+                        .documents
+                        .filter { doc ->
+                            (doc.getString("name") ?: "").lowercase().contains(cleanQuery)
+                        }
+                    */
 
                         querySnapshot.documents.forEach { doc ->
                             try {
-                                val product = Product(
-                                    id = doc.id,
-                                    name = doc.getString("name") ?: "",
-                                    description = doc.getString("description") ?: "",
-                                    price = doc.getDouble("price") ?: 0.0,
-                                    imageUrl = doc.getString("imageUrl") ?: "",
-                                    type = collection,
-                                    productDescription = doc.getString("productDescription") ?: ""
-                                )
-                                results.add(product)
-                                Log.d("SEARCH", "Matched: ${product.name}")
+                                val name = doc.getString("name") ?: ""
+                                // Case-insensitive contains check
+                                if (name.lowercase().contains(cleanQuery)) {
+                                    val product = Product(
+                                        id = doc.id,
+                                        name = name,
+                                        description = doc.getString("description") ?: "",
+                                        price = doc.getDouble("price") ?: 0.0,
+                                        imageUrl = doc.getString("imageUrl") ?: "",
+                                        type = collection,
+                                        productDescription = doc.getString("productDescription") ?: ""
+                                    )
+                                    results.add(product)
+                                    Log.d("SEARCH", "Matched: ${product.name}")
+                                }
                             } catch (e: Exception) {
                                 Log.e("SEARCH", "Error parsing doc ${doc.id}: ${e.message}")
                             }

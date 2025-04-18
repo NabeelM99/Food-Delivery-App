@@ -25,13 +25,14 @@ fun SearchScreen(navController: NavController) {
     val searchViewModel: SearchViewModel = viewModel()
     var searchQuery by remember { mutableStateOf("") }
 
+    // Collect StateFlow values properly
+    val searchResults by searchViewModel.searchResults.collectAsState()
+    val isLoading by searchViewModel.isLoading.collectAsState()
+    val error by searchViewModel.error.collectAsState()
+
     LaunchedEffect(searchQuery) {
-        if (searchQuery.isNotEmpty()) {
-            delay(400)
-            searchViewModel.searchProducts(searchQuery)
-        } else {
-            //searchViewModel.searchResults.value = emptyList()
-        }
+        delay(400)
+        searchViewModel.searchProducts(searchQuery)
     }
 
     Scaffold(
@@ -57,16 +58,15 @@ fun SearchScreen(navController: NavController) {
             .padding(paddingValues)
             .fillMaxSize()) {
             when {
-                searchViewModel.isLoading.value -> {
+                isLoading -> {
                     CircularProgressIndicator(
-                        modifier = Modifier
-                            .align(Alignment.Center)
+                        modifier = Modifier.align(Alignment.Center)
                     )
                 }
 
-                searchViewModel.error.value != null -> {
+                error != null -> {
                     Text(
-                        text = searchViewModel.error.value!!,
+                        text = error!!,
                         color = MaterialTheme.colorScheme.error,
                         modifier = Modifier
                             .fillMaxSize()
@@ -74,7 +74,7 @@ fun SearchScreen(navController: NavController) {
                     )
                 }
 
-                searchViewModel.searchResults.value.isEmpty() ->
+                searchResults.isEmpty() ->
                     Text(
                         text = if (searchQuery.isEmpty())
                             "Start typing to search"
@@ -84,7 +84,6 @@ fun SearchScreen(navController: NavController) {
                             .align(Alignment.Center)
                     )
 
-
                 else -> {
                     LazyColumn(
                         modifier = Modifier
@@ -92,7 +91,7 @@ fun SearchScreen(navController: NavController) {
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        items(searchViewModel.searchResults.value) { product ->
+                        items(searchResults) { product ->
                             ProductCard(
                                 product = product,
                                 productType = product.type,
