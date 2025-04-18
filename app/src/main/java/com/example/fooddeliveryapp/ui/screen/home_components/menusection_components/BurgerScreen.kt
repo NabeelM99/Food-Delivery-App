@@ -46,6 +46,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.fooddeliveryapp.R
 import com.example.fooddeliveryapp.ui.screen.components.Product
+import com.example.fooddeliveryapp.ui.screen.getDrawableId
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -444,7 +445,7 @@ fun AnimatedBurgerCard(
                 spotColor = primaryColor.copy(alpha = 0.1f)
             )
             .clickable {
-                navController.navigate("product_details/${burger.type}/${burger.id}")
+                navController.navigate("productDetailsScreen/${burger.type}/${burger.id}")
             },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
@@ -484,11 +485,8 @@ fun AnimatedBurgerCard(
                 )
 
                 // Product image
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(burger.imageUrl)
-                        .crossfade(true)
-                        .build(),
+                Image(
+                    painter = painterResource(id = getDrawableId(burger.imageUrl)),
                     contentDescription = burger.name,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -1172,7 +1170,7 @@ fun BurgerHighlightCard(
                 shape = RoundedCornerShape(16.dp)
             )
             .clickable {
-                navController.navigate("product_details/${burger.type}/${burger.id}")
+                navController.navigate("productDetailsScreen/${burger.type}/${burger.id}")
             },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
