@@ -62,6 +62,10 @@ fun BurgerScreen(navController: NavController) {
     val scrollState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
+    var selectedCategory by remember { mutableStateOf("All") }
+    val selectedOptions = remember { mutableStateListOf<String>() }
+    var rating by remember { mutableStateOf(3) }
+
     // Animation states
     val headerHeight = 200.dp
     val headerOffsetHeightPx = remember { mutableStateOf(0f) }
@@ -158,6 +162,7 @@ fun BurgerScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(headerHeight)
+                .padding(start = 10.dp, end = 10.dp)
                 .graphicsLayer {
                     alpha = headerBgAlpha.value
                     // Parallax effect
@@ -174,7 +179,7 @@ fun BurgerScreen(navController: NavController) {
                 contentDescription = "Burger Banner",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
             )
 
             // Dark overlay for better text visibility
@@ -225,8 +230,8 @@ fun BurgerScreen(navController: NavController) {
                     onClick = { navController.navigateUp() },
                     modifier = Modifier
                         .padding(8.dp)
-                        .shadow(4.dp, CircleShape)
-                        .background(Color.White.copy(alpha = 0.8f), CircleShape)
+                        //.shadow(4.dp, CircleShape)
+                        //.background(Color.White.copy(alpha = 0.8f), CircleShape)
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.ArrowBack,
@@ -240,8 +245,8 @@ fun BurgerScreen(navController: NavController) {
                     onClick = { showFilters = !showFilters },
                     modifier = Modifier
                         .padding(8.dp)
-                        .shadow(4.dp, CircleShape)
-                        .background(Color.White.copy(alpha = 0.8f), CircleShape)
+                        //.shadow(4.dp, CircleShape)
+                        //.background(Color.White.copy(alpha = 0.8f), CircleShape)
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_filterlist),
@@ -356,6 +361,11 @@ fun BurgerScreen(navController: NavController) {
                         FilterPanel(
                             priceRange = priceRange,
                             onPriceRangeChange = { priceRange = it },
+                            selectedCategory = selectedCategory,          // Add these
+                            onCategoryChange = { selectedCategory = it },
+                            selectedOptions = selectedOptions,
+                            rating = rating,
+                            onRatingChange = { rating = it },
                             onClose = { showFilters = false },
                             primaryColor = primaryColor,
                             secondaryColor = secondaryColor
@@ -838,6 +848,11 @@ fun SortOptionsBar(
 fun FilterPanel(
     priceRange: ClosedFloatingPointRange<Float>,
     onPriceRangeChange: (ClosedFloatingPointRange<Float>) -> Unit,
+    selectedCategory: String,
+    onCategoryChange: (String) -> Unit,
+    selectedOptions: List<String>,
+    rating: Int,
+    onRatingChange: (Int) -> Unit,
     onClose: () -> Unit,
     primaryColor: Color,
     secondaryColor: Color,
@@ -855,6 +870,7 @@ fun FilterPanel(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
             // Header
@@ -1022,7 +1038,7 @@ fun FilterPanel(
                         tint = if (i <= rating) secondaryColor else Color.Gray,
                         modifier = Modifier
                             .size(32.dp)
-                            .clickable { rating = i }
+                            .clickable { onRatingChange(i) }
                     )
                 }
             }

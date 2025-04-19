@@ -159,7 +159,7 @@ class MainActivity : ComponentActivity() {
                                 productType = productType,
                                 productId = productId,
                                 navController = navController,
-                                cardViewModel = cartViewModel
+                                cartViewModel = cartViewModel
                             )
                         }
 
