@@ -1,4 +1,4 @@
-package com.example.fooddeliveryapp.ui.screen.home_components
+/*package com.example.fooddeliveryapp.ui.screen.home_components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -92,3 +92,6 @@ fun UserProfileHeader(userName: String, navController: NavController) {
         }
     }
 }
+
+
+ */

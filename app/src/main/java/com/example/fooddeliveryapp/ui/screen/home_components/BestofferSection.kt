@@ -1,4 +1,4 @@
-package com.example.fooddeliveryapp.ui.screen.home_components
+/*package com.example.fooddeliveryapp.ui.screen.home_components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -112,3 +112,6 @@ private val sampleOffers = listOf(
     FoodOffer(R.drawable.img_shawarma, "Turkish Shawarma", "Delicious and Cravy"),
     FoodOffer(R.drawable.img_fries, "French Fries", "Fresh and Crispy")
 )
+
+
+ */

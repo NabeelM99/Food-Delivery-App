@@ -1,4 +1,4 @@
-package com.example.fooddeliveryapp.ui.screen.home_components
+/*package com.example.fooddeliveryapp.ui.screen.home_components
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -201,3 +201,5 @@ fun FeaturedCard(
     }
 }
 
+
+ */

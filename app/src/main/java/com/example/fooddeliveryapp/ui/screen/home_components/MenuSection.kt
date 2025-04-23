@@ -1,4 +1,4 @@
-package com.example.fooddeliveryapp.ui.screen.home_components
+/*package com.example.fooddeliveryapp.ui.screen.home_components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -129,3 +129,5 @@ data class MenuCategory(
     val imageResId: Int,
     val backgroundColor: Color
 )
+
+ */
