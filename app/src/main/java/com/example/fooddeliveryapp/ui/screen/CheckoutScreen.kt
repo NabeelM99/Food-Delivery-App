@@ -160,6 +160,7 @@ fun CheckoutScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // Order Summary Card with all items inside
                 item {
                     AnimatedVisibility(
                         visible = true,
@@ -188,31 +189,57 @@ fun CheckoutScreen(
 
                                 Spacer(modifier = Modifier.height(16.dp))
 
+                                // Items list inside the card
+                                cartItems.forEachIndexed { index, item ->
+                                    OrderItemRow(item = item)
+
+                                    // Add divider between items but not after the last one
+                                    if (index < cartItems.size - 1) {
+                                        Divider(
+                                            color = Color.LightGray,
+                                            thickness = 0.5.dp,
+                                            modifier = Modifier.padding(vertical = 8.dp)
+                                        )
+                                    }
+                                }
+
+                                if (cartItems.isEmpty()) {
+                                    Text(
+                                        text = "Your cart is empty",
+                                        fontSize = 16.sp,
+                                        textAlign = TextAlign.Center,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 16.dp)
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                // Subtotal section
                                 Divider(color = Color.LightGray, thickness = 1.dp)
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        text = "Subtotal",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                    Text(
+                                        text = "$${String.format("%.2f", totalPrice)}",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Orange
+                                    )
+                                }
                             }
                         }
                     }
-                }
-
-                itemsIndexed(cartItems) { index, item ->
-                    val animatedProgress = remember { Animatable(0f) }
-                    LaunchedEffect(Unit) {
-                        animatedProgress.animateTo(
-                            targetValue = 1f,
-                            animationSpec = tween(
-                                durationMillis = 300,
-                                delayMillis = index * 100,
-                                easing = FastOutSlowInEasing
-                            )
-                        )
-                    }
-
-                    EnhancedOrderItemRow(
-                        item = item,
-                        modifier = Modifier
-                            .scale(animatedProgress.value)
-                            .alpha(animatedProgress.value)
-                    )
                 }
 
                 item {
@@ -254,7 +281,6 @@ fun CheckoutScreen(
                                     },
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .shadow(2.dp, RoundedCornerShape(12.dp))
                                         .clickable {
                                             navController.navigate("locationScreen/checkout")
                                         },
@@ -295,13 +321,13 @@ fun CheckoutScreen(
                                     keyboardOptions = KeyboardOptions.Default.copy(
                                         keyboardType = KeyboardType.Phone
                                     ),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .shadow(2.dp, RoundedCornerShape(12.dp)),
+                                    modifier = Modifier.fillMaxWidth(),
                                     shape = RoundedCornerShape(12.dp),
                                     colors = OutlinedTextFieldDefaults.colors(
                                         focusedBorderColor = Orange,
-                                        cursorColor = Orange
+                                        cursorColor = Orange,
+                                        unfocusedBorderColor = Color.LightGray,
+                                        disabledBorderColor = Color.LightGray
                                     )
                                 )
 
@@ -315,9 +341,7 @@ fun CheckoutScreen(
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
                                         },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .shadow(2.dp, RoundedCornerShape(12.dp)),
+                                        modifier = Modifier.fillMaxWidth(),
                                         readOnly = true,
                                         trailingIcon = {
                                             Box(
@@ -384,8 +408,7 @@ fun CheckoutScreen(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                                .shadow(8.dp, RoundedCornerShape(16.dp)),
+                                .padding(vertical = 8.dp),
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                             shape = RoundedCornerShape(16.dp)
                         ) {
@@ -478,7 +501,7 @@ fun CheckoutScreen(
                                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                                     ) {
                                         Icon(
-                                            painter = painterResource(id = R.drawable.ic_plus), // Change this to an appropriate icon
+                                            painter = painterResource(id = R.drawable.ic_plus),
                                             contentDescription = null,
                                             tint = Color.White,
                                             modifier = Modifier.size(20.dp)
@@ -505,56 +528,47 @@ fun CheckoutScreen(
 }
 
 @Composable
-fun EnhancedOrderItemRow(item: CartItem, modifier: Modifier = Modifier) {
-    Card(
+fun OrderItemRow(item: CartItem, modifier: Modifier = Modifier) {
+    Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .shadow(4.dp, RoundedCornerShape(12.dp)),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(12.dp)
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
+            // Quantity circle
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+                    .background(Orange.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
             ) {
-                // Quantity circle
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(CircleShape)
-                        .background(Orange.copy(alpha = 0.1f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "${item.quantity}",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Orange
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(12.dp))
-
                 Text(
-                    text = item.name,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
+                    text = "${item.quantity}",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Orange
                 )
             }
 
+            Spacer(modifier = Modifier.width(12.dp))
+
             Text(
-                text = "$${String.format("%.2f", item.price * item.quantity)}",
+                text = item.name,
                 fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Orange
+                fontWeight = FontWeight.Medium
             )
         }
+
+        Text(
+            text = "$${String.format("%.2f", item.price * item.quantity)}",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = Orange
+        )
     }
 }

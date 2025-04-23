@@ -36,7 +36,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -60,13 +59,13 @@ fun SignInScreen(navController: NavController) {
     val ADMIN_EMAIL = "admin@culinario.com"
     val ADMIN_PASSWORD = "admin1234"
 
-    // Animation states
+    // Animation states - simplified
     val logoAnimatable = remember { Animatable(0.8f) }
     val formVisibility = remember { MutableTransitionState(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
-    // Initialize animation
+    // Initialize animation - but only once
     LaunchedEffect(Unit) {
         // Logo scaling animation
         delay(300)
@@ -81,9 +80,6 @@ fun SignInScreen(navController: NavController) {
         // Form appearance
         formVisibility.targetState = true
     }
-
-    // Particle animation for background
-    val particles = remember { List(20) { ParticleState() } }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -100,17 +96,15 @@ fun SignInScreen(navController: NavController) {
                         })
                     }
             ) {
-                // Animated background
+                // Simplified background - static image with overlay
                 Image(
                     painter = painterResource(id = R.drawable.bcground),
                     contentDescription = "Background",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .blur(3.dp),
+                    modifier = Modifier.fillMaxSize().blur(3.dp),
                     contentScale = ContentScale.Crop
                 )
 
-                // Semi-transparent overlay
+                // Semi-transparent overlay - simplified
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -125,10 +119,7 @@ fun SignInScreen(navController: NavController) {
                         )
                 )
 
-                // Floating food particles
-                particles.forEach { particle ->
-                    FoodParticle(particle)
-                }
+                // Removed floating food particles for performance
 
                 Column(
                     modifier = Modifier
@@ -137,7 +128,7 @@ fun SignInScreen(navController: NavController) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    // Animated logo
+                    // Logo with simple animation
                     Image(
                         painter = painterResource(id = R.drawable.food_logo1),
                         contentDescription = "App Logo",
@@ -145,30 +136,27 @@ fun SignInScreen(navController: NavController) {
                             .size(250.dp)
                             .padding(bottom = 16.dp)
                             .scale(logoAnimatable.value)
-                            .graphicsLayer {
-                                rotationZ = logoAnimatable.value * 10 * (if (logoAnimatable.value >= 0.95f) 0f else 1f)
-                            }
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Animated app name
-                    PulsatingText(
+                    // App name - static instead of pulsating
+                    Text(
                         text = "CULINARIO",
                         fontFamily = FontFamily.SansSerif,
                         fontWeight = FontWeight.ExtraBold,
                         textAlign = TextAlign.Center,
                         color = Color(0xFFFFA500),
-                        fontSize = 50.sp,
+                        fontSize = 30.sp,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Animated form
+                    // Animated form entry - kept for visual appeal
                     AnimatedVisibility(
                         visibleState = formVisibility,
-                        enter = fadeIn(animationSpec = tween(1000)) +
+                        enter = fadeIn(animationSpec = tween(800)) +
                                 expandVertically(
                                     animationSpec = spring(
                                         dampingRatio = Spring.DampingRatioMediumBouncy,
@@ -185,18 +173,13 @@ fun SignInScreen(navController: NavController) {
                                 .background(Color.White.copy(alpha = 0.7f))
                                 .border(
                                     width = 1.dp,
-                                    brush = Brush.linearGradient(
-                                        colors = listOf(
-                                            Color(0xFFFFA500).copy(alpha = 0.5f),
-                                            Color(0xFFFF6347).copy(alpha = 0.5f)
-                                        )
-                                    ),
+                                    color = Color(0xFFFFA500).copy(alpha = 0.5f),
                                     shape = RoundedCornerShape(24.dp)
                                 )
                                 .padding(24.dp)
                         ) {
-                            // Email field
-                            AnimatedShimmerTextField(
+                            // Optimized text fields
+                            OptimizedTextField(
                                 value = email,
                                 onValueChange = { email = it },
                                 label = "Email",
@@ -214,8 +197,8 @@ fun SignInScreen(navController: NavController) {
                                     .padding(bottom = 16.dp)
                             )
 
-                            // Password field
-                            AnimatedShimmerTextField(
+                            // Password field - optimized
+                            OptimizedTextField(
                                 value = password,
                                 onValueChange = { password = it },
                                 label = "Password",
@@ -250,14 +233,14 @@ fun SignInScreen(navController: NavController) {
                                     .padding(bottom = 24.dp)
                             )
 
-                            // Login Button with animation
-                            LoginButton(
+                            // Optimized login button
+                            OptimizedLoginButton(
                                 onClick = {
                                     if (email.isEmpty() || password.isEmpty()) {
                                         scope.launch {
                                             snackbarHostState.showSnackbar("Please fill all fields")
                                         }
-                                        return@LoginButton
+                                        return@OptimizedLoginButton
                                     }
 
                                     // Handle admin login
@@ -279,7 +262,7 @@ fun SignInScreen(navController: NavController) {
                                                     }
                                                 }
                                             }
-                                        return@LoginButton
+                                        return@OptimizedLoginButton
                                     }
 
                                     // Regular user login
@@ -306,7 +289,7 @@ fun SignInScreen(navController: NavController) {
 
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            // Sign-Up Redirect with animation
+                            // Sign-Up Redirect - simplified animation
                             val signUpScale = remember { Animatable(1f) }
                             TextButton(
                                 onClick = {
@@ -326,7 +309,7 @@ fun SignInScreen(navController: NavController) {
                             ) {
                                 Text(
                                     text = "Don't have an account? Click here",
-                                    color = Color.Black,
+                                    color = Color(0xFFFFA500),
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium,
                                     modifier = Modifier.alpha(0.8f)
@@ -340,9 +323,9 @@ fun SignInScreen(navController: NavController) {
     )
 }
 
-// Animated shimmer effect for text fields
+// Performance-optimized text field without shimmer animation
 @Composable
-fun AnimatedShimmerTextField(
+fun OptimizedTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
@@ -355,31 +338,8 @@ fun AnimatedShimmerTextField(
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
 
-    // Shimmer animation
-    val shimmerColors = listOf(
-        Color.LightGray.copy(alpha = 0.3f),
-        Color.LightGray.copy(alpha = 0.5f),
-        Color.LightGray.copy(alpha = 0.3f)
-    )
-
-    val transition = rememberInfiniteTransition()
-    val translateAnim = transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1000f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = 1000,
-                easing = LinearEasing
-            ),
-            repeatMode = RepeatMode.Reverse
-        )
-    )
-
-    // Border animation
-    val borderColor = animateColorAsState(
-        targetValue = if (isFocused) Color(0xFFFFA500) else Color.Transparent,
-        animationSpec = tween(300)
-    )
+    // Simplified border animation
+    val borderColor = if (isFocused) Color(0xFFFFA500) else Color.Transparent
 
     BasicTextField(
         value = value,
@@ -392,29 +352,12 @@ fun AnimatedShimmerTextField(
         modifier = modifier
             .height(60.dp)
             .background(
-                color = Color.Transparent,
+                color = Color.LightGray.copy(alpha = 0.3f),
                 shape = RoundedCornerShape(16.dp)
-            )
-            .then(
-                if (isFocused) {
-                    Modifier.background(
-                        brush = Brush.horizontalGradient(
-                            colors = shimmerColors,
-                            startX = translateAnim.value - 1000f,
-                            endX = translateAnim.value
-                        ),
-                        shape = RoundedCornerShape(16.dp)
-                    )
-                } else {
-                    Modifier.background(
-                        color = Color.LightGray.copy(alpha = 0.3f),
-                        shape = RoundedCornerShape(16.dp)
-                    )
-                }
             )
             .border(
                 width = 2.dp,
-                color = borderColor.value,
+                color = borderColor,
                 shape = RoundedCornerShape(16.dp)
             ),
         decorationBox = { innerTextField ->
@@ -451,9 +394,9 @@ fun AnimatedShimmerTextField(
     )
 }
 
-// Animated login button
+// Simplified login button with minimal animation
 @Composable
-fun LoginButton(
+fun OptimizedLoginButton(
     onClick: () -> Unit,
     text: String,
     modifier: Modifier = Modifier
@@ -461,6 +404,7 @@ fun LoginButton(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed = interactionSource.collectIsPressedAsState()
 
+    // Simplified animation - just scale
     val scale = animateFloatAsState(
         targetValue = if (isPressed.value) 0.95f else 1f,
         animationSpec = spring(
@@ -468,7 +412,6 @@ fun LoginButton(
             stiffness = Spring.StiffnessLow
         )
     )
-
     val shadowElevation = animateFloatAsState(
         targetValue = if (isPressed.value) 2f else 8f,
         animationSpec = tween(100)
@@ -486,15 +429,12 @@ fun LoginButton(
         )
     )
 
+
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .height(50.dp)
             .scale(scale.value)
-            .graphicsLayer {
-                this.shadowElevation = shadowElevation.value
-                shape = RoundedCornerShape(50.dp)
-            }
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
@@ -510,12 +450,7 @@ fun LoginButton(
             )
             .border(
                 width = 1.dp,
-                brush = Brush.horizontalGradient(
-                    colors = listOf(
-                        Color.White.copy(alpha = 0.5f),
-                        Color.Transparent
-                    )
-                ),
+                color = Color.White.copy(alpha = 0.5f),
                 shape = RoundedCornerShape(50.dp)
             )
     ) {
@@ -528,130 +463,6 @@ fun LoginButton(
             modifier = Modifier.padding(horizontal = 16.dp)
         )
     }
-}
-
-// Pulsating text animation
-@Composable
-fun PulsatingText(
-    text: String,
-    fontFamily: FontFamily,
-    fontWeight: FontWeight,
-    textAlign: TextAlign,
-    color: Color,
-    fontSize: TextUnit,
-    modifier: Modifier = Modifier
-) {
-    val infiniteTransition = rememberInfiniteTransition()
-    val scale = infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.05f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1000),
-            repeatMode = RepeatMode.Reverse
-        )
-    )
-
-    Text(
-        text = text,
-        fontFamily = fontFamily,
-        fontWeight = fontWeight,
-        textAlign = textAlign,
-        color = color,
-        //fontSize = fontSize.sp,
-        modifier = modifier
-            .scale(scale.value)
-            .graphicsLayer {
-                this.shadowElevation = 5f
-            }
-    )
-}
-
-// Gradient text
-@Composable
-fun GradientText(
-    text: String,
-    gradient: Brush,
-    fontSize: TextUnit,
-    modifier: Modifier = Modifier
-) {
-    Text(
-        text = text,
-        //fontSize = fontSize.sp,
-        fontWeight = FontWeight.Medium,
-        style = MaterialTheme.typography.bodyMedium.copy(
-            color = Color.Transparent
-        ),
-        modifier = modifier
-            .background(gradient)
-            .alpha(0.99f)
-    )
-}
-
-// Food particles for background animation
-data class ParticleState(
-    val x: Float = (0..1000).random().toFloat(),
-    val y: Float = (0..2000).random().toFloat(),
-    val scale: Float = (5..15).random() / 10f,
-    val speed: Float = (1..5).random() / 10f,
-    val rotationSpeed: Float = (-5..5).random().toFloat(),
-    val iconRes: Int = listOf(
-        R.drawable.ic_pizza,
-        R.drawable.ic_burger,
-        R.drawable.ic_sushi,
-        R.drawable.ic_salad,
-        R.drawable.ic_coffee
-    ).random() // You'll need to add these food icon resources
-)
-
-@Composable
-fun FoodParticle(particle: ParticleState) {
-    val infiniteTransition = rememberInfiniteTransition()
-
-    val yPosition = infiniteTransition.animateFloat(
-        initialValue = particle.y,
-        targetValue = -100f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = (15000 / particle.speed).toInt(),
-                easing = LinearEasing
-            )
-        )
-    )
-
-    val xPosition = infiniteTransition.animateFloat(
-        initialValue = particle.x,
-        targetValue = particle.x + 100f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = (20000 / particle.speed).toInt(),
-                easing = LinearEasing
-            ),
-            repeatMode = RepeatMode.Reverse
-        )
-    )
-
-    val rotation = infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = (5000 / particle.rotationSpeed.coerceAtLeast(0.1f)).toInt(),
-                easing = LinearEasing
-            )
-        )
-    )
-
-    Icon(
-        painter = painterResource(id = particle.iconRes),
-        contentDescription = null,
-        tint = Color(0xFFFFA500).copy(alpha = 0.2f),
-        modifier = Modifier
-            .offset(x = xPosition.value.dp, y = yPosition.value.dp)
-            .size((24 * particle.scale).dp)
-            .graphicsLayer {
-                rotationZ = if (particle.rotationSpeed != 0f) rotation.value else 0f
-            }
-    )
 }
 
 @Preview(showBackground = true)

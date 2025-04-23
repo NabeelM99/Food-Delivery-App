@@ -15,12 +15,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -33,7 +31,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -56,13 +54,13 @@ fun SignUpScreen(navController: NavController) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    // Animation states
+    // Animation states - simplified
     val logoAnimatable = remember { Animatable(0.8f) }
     val formVisibility = remember { MutableTransitionState(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
-    // Initialize animation
+    // Initialize animation - only once
     LaunchedEffect(Unit) {
         delay(300)
         logoAnimatable.animateTo(
@@ -74,9 +72,6 @@ fun SignUpScreen(navController: NavController) {
         )
         formVisibility.targetState = true
     }
-
-    // Particle animation for background
-    val particles = remember { List(20) { ParticleState() } }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -93,35 +88,22 @@ fun SignUpScreen(navController: NavController) {
                         })
                     }
             ) {
-                // Animated background
+                // Simplified background - static image with overlay
                 Image(
                     painter = painterResource(id = R.drawable.bcground),
                     contentDescription = "Background",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .blur(3.dp),
+                    modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
 
-                // Semi-transparent overlay
+                // Semi-transparent overlay - simplified
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(
-                                    Color.White.copy(alpha = 0.7f),
-                                    Color.White.copy(alpha = 0.85f),
-                                    Color.White.copy(alpha = 0.95f)
-                                )
-                            )
-                        )
+                        .background(Color.White.copy(alpha = 0.8f))
                 )
 
-                // Floating food particles
-                particles.forEach { particle ->
-                    FoodParticle(particle)
-                }
+                // Removed floating food particles for performance
 
                 Column(
                     modifier = Modifier
@@ -130,7 +112,7 @@ fun SignUpScreen(navController: NavController) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    // Animated logo
+                    // Logo with simple animation
                     Image(
                         painter = painterResource(id = R.drawable.food_logo1),
                         contentDescription = "App Logo",
@@ -138,30 +120,27 @@ fun SignUpScreen(navController: NavController) {
                             .size(250.dp)
                             .padding(bottom = 16.dp)
                             .scale(logoAnimatable.value)
-                            .graphicsLayer {
-                                rotationZ = logoAnimatable.value * 10 * (if (logoAnimatable.value >= 0.95f) 0f else 1f)
-                            }
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Animated header text
-                    PulsatingText(
+                    // App name - static instead of pulsating
+                    Text(
                         text = "CREATE ACCOUNT",
                         fontFamily = FontFamily.SansSerif,
                         fontWeight = FontWeight.ExtraBold,
                         textAlign = TextAlign.Center,
                         color = Color(0xFFFFA500),
-                        fontSize = 34.sp,
+                        fontSize = 30.sp,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Animated form
+                    // Animated form entry - kept for visual appeal
                     AnimatedVisibility(
                         visibleState = formVisibility,
-                        enter = fadeIn(animationSpec = tween(1000)) +
+                        enter = fadeIn(animationSpec = tween(800)) +
                                 expandVertically(
                                     animationSpec = spring(
                                         dampingRatio = Spring.DampingRatioMediumBouncy,
@@ -178,18 +157,13 @@ fun SignUpScreen(navController: NavController) {
                                 .background(Color.White.copy(alpha = 0.7f))
                                 .border(
                                     width = 1.dp,
-                                    brush = Brush.linearGradient(
-                                        colors = listOf(
-                                            Color(0xFFFFA500).copy(alpha = 0.5f),
-                                            Color(0xFFFF6347).copy(alpha = 0.5f)
-                                        )
-                                    ),
+                                    color = Color(0xFFFFA500).copy(alpha = 0.5f),
                                     shape = RoundedCornerShape(24.dp)
                                 )
                                 .padding(24.dp)
                         ) {
-                            // Name field
-                            AnimatedShimmerTextField(
+                            // Name field - optimized
+                            OptimizedTextField(
                                 value = name,
                                 onValueChange = { name = it },
                                 label = "Name",
@@ -207,8 +181,8 @@ fun SignUpScreen(navController: NavController) {
                                     .padding(bottom = 16.dp)
                             )
 
-                            // Email field
-                            AnimatedShimmerTextField(
+                            // Email field - optimized
+                            OptimizedTextField(
                                 value = email,
                                 onValueChange = { email = it },
                                 label = "Email",
@@ -226,8 +200,8 @@ fun SignUpScreen(navController: NavController) {
                                     .padding(bottom = 16.dp)
                             )
 
-                            // Password field
-                            AnimatedShimmerTextField(
+                            // Password field - optimized
+                            OptimizedTextField(
                                 value = password,
                                 onValueChange = { password = it },
                                 label = "Password",
@@ -262,14 +236,14 @@ fun SignUpScreen(navController: NavController) {
                                     .padding(bottom = 24.dp)
                             )
 
-                            // Create Account Button
-                            LoginButton(
+                            // Create Account Button - optimized
+                            OptimizedLoginButton(
                                 onClick = {
                                     if (email.isEmpty() || password.isEmpty() || name.isEmpty()) {
                                         scope.launch {
                                             snackbarHostState.showSnackbar("Please fill all fields")
                                         }
-                                        return@LoginButton
+                                        return@OptimizedLoginButton
                                     }
 
                                     auth.createUserWithEmailAndPassword(email, password)
@@ -312,27 +286,15 @@ fun SignUpScreen(navController: NavController) {
 
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            // Login Redirect with animation
-                            val loginScale = remember { Animatable(1f) }
+                            // Login Redirect - simplified animation
                             TextButton(
-                                onClick = {
-                                    scope.launch {
-                                        loginScale.animateTo(0.9f, tween(100))
-                                        loginScale.animateTo(1f, tween(100))
-                                        navController.navigate("signInScreen")
-                                    }
-                                },
-                                modifier = Modifier.scale(loginScale.value)
+                                onClick = { navController.navigate("signInScreen") }
                             ) {
-                                GradientText(
+                                Text(
                                     text = "Already have an account? Login Here",
-                                    gradient = Brush.horizontalGradient(
-                                        colors = listOf(
-                                            Color(0xFFFFA500),
-                                            Color(0xFFFF6347)
-                                        )
-                                    ),
-                                    fontSize = 14.sp
+                                    color = Color(0xFFFFA500),
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium
                                 )
                             }
                         }
@@ -341,4 +303,13 @@ fun SignUpScreen(navController: NavController) {
             }
         }
     )
+}
+
+// Preview
+@Preview(showBackground = true)
+@Composable
+fun PreviewSignUpScreen() {
+    AppTheme {
+        SignUpScreen(navController = NavController(LocalContext.current))
+    }
 }
