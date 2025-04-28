@@ -616,7 +616,7 @@ fun MenuSection(navController: NavController) {
         ),
         MenuCategory(
             "Fries",
-            R.drawable.img_fries,
+            R.drawable.image_fries,
             Color(0xFFFFA500)
         ),
         MenuCategory(
@@ -633,7 +633,23 @@ fun MenuSection(navController: NavController) {
             "Juices",
             R.drawable.img_juice,
             Color(0xFFFF6347)
+        ),
+        MenuCategory(
+            "Cheesecakes",
+            R.drawable.img_cheesecake,
+            Color(0xFFF06292)
+        ),
+        MenuCategory(
+            "Shawarmas",
+            R.drawable.image_shawarma,
+            Color(0xFF816152)
+        ),
+        MenuCategory(
+            "Donuts",
+            R.drawable.image_donut,
+            Color(0xFFFFBE00)
         )
+
     )
 
     Column(
@@ -707,13 +723,49 @@ fun StaggeredGrid(categories: List<MenuCategory>, navController: NavController) 
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        MenuCard(
-            category = categories[4],
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp),
-            onClick = { navController.navigate("JuiceScreen") }
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            MenuCard(
+                category = categories[4],
+                modifier = Modifier
+                    .weight(1f)
+                    .height(130.dp),
+                onClick = { navController.navigate("JuiceScreen") }
+            )
+            MenuCard(
+                category = categories[5],
+                modifier = Modifier
+                    .weight(1f)
+                    .height(130.dp),
+                onClick = { navController.navigate("CheesecakeScreen") }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            MenuCard(
+                category = categories[6],
+                modifier = Modifier
+                    .weight(2.2f)
+                    .height(130.dp),
+                onClick = { navController.navigate("ShawarmaScreen") }
+            )
+            MenuCard(
+                category = categories[7],
+                modifier = Modifier
+                    .weight(1.2f)
+                    .height(130.dp),
+                onClick = { navController.navigate("DonutScreen") }
+            )
+        }
+
+
     }
 }
 
