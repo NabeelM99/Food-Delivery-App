@@ -59,8 +59,8 @@ import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BurgerScreen(navController: NavController) {
-    val burgers = remember { mutableStateListOf<Product>() }
+fun DonutScreen(navController: NavController) {
+    val donuts = remember { mutableStateListOf<Product>() }
     var loading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val scrollState = rememberLazyListState()
@@ -82,9 +82,9 @@ fun BurgerScreen(navController: NavController) {
     var showFilters by remember { mutableStateOf(false) }
     var priceRange by remember { mutableStateOf(0f..50f) }
 
-    // Color scheme for burgers section
-    val primaryColor = Color(0xFFFF6B35) // Warm orange/red for burgers
-    val secondaryColor = Color(0xFFFFA500) // Classic burger orange
+    // Color scheme for donuts section
+    val primaryColor = Color(0xFFFF6B35) // Warm orange/red for donuts
+    val secondaryColor = Color(0xFFFFA500) // Classic donut orange
     val accentColor = Color(0xFF4CAF50) // Green for "fresh" elements
     val bgGradient = remember {
         Brush.verticalGradient(
@@ -97,10 +97,10 @@ fun BurgerScreen(navController: NavController) {
 
     LaunchedEffect(Unit) {
         val db = FirebaseFirestore.getInstance()
-        db.collection("burgers")
+        db.collection("donuts")
             .get()
             .addOnSuccessListener { result ->
-                val fetchedBurgers = result.documents.mapNotNull { doc ->
+                val fetchedDonuts = result.documents.mapNotNull { doc ->
                     try {
                         Product(
                             id = doc.id,
@@ -108,7 +108,7 @@ fun BurgerScreen(navController: NavController) {
                             price = doc.getDouble("price") ?: 0.0,
                             imageUrl = doc.getString("imageUrl") ?: "",
                             description = doc.getString("description") ?: "",
-                            type = "burgers", // Set collection type
+                            type = "donuts", // Set collection type
                             productDescription = doc.getString("productDescription") ?: ""
                         )
                     } catch (e: Exception) {
@@ -121,17 +121,17 @@ fun BurgerScreen(navController: NavController) {
                 coroutineScope.launch {
                     loading = false
                     delay(100)
-                    burgers.clear()
-                    fetchedBurgers.forEachIndexed { index, burger ->
+                    donuts.clear()
+                    fetchedDonuts.forEachIndexed { index, donut ->
                         delay(50L * index)
-                        burgers.add(burger)
+                        donuts.add(donut)
                     }
                 }
             }
             .addOnFailureListener { e ->
-                Log.e("Firestore", "Error fetching burgers", e)
+                Log.e("Firestore", "Error fetching donuts", e)
                 loading = false
-                errorMessage = "Failed to load burgers: ${e.localizedMessage}"
+                errorMessage = "Failed to load donuts: ${e.localizedMessage}"
             }
     }
 
@@ -177,10 +177,10 @@ fun BurgerScreen(navController: NavController) {
         ) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data("https://images.unsplash.com/photo-1561758033-d89a9ad46330")
+                    .data("https://unsplash.com/photos/assorted-flavor-donuts-6SMF42-JTAc")
                     .crossfade(true)
                     .build(),
-                contentDescription = "Burger Banner",
+                contentDescription = "Donut Banner",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -209,7 +209,7 @@ fun BurgerScreen(navController: NavController) {
             ) {
                 Column {
                     Text(
-                        text = "BURGERS",
+                        text = "DONUTS",
                         style = MaterialTheme.typography.headlineMedium,
                         color = Color.White,
                         fontWeight = FontWeight.Bold
@@ -218,7 +218,7 @@ fun BurgerScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = "Premium beef, fresh ingredients",
+                        text = "Amazing Donuts with great toppings",
                         style = MaterialTheme.typography.bodyLarge,
                         color = Color.White.copy(alpha = 0.9f)
                     )
@@ -228,14 +228,14 @@ fun BurgerScreen(navController: NavController) {
 
         // Top Bar
         CenterAlignedTopAppBar(
-            title = { /* Empty title */ },
+            title = {  },
             navigationIcon = {
                 IconButton(
                     onClick = { navController.navigateUp() },
                     modifier = Modifier
                         .padding(8.dp)
-                        //.shadow(4.dp, CircleShape)
-                        //.background(Color.White.copy(alpha = 0.8f), CircleShape)
+                    //.shadow(4.dp, CircleShape)
+                    //.background(Color.White.copy(alpha = 0.8f), CircleShape)
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.ArrowBack,
@@ -249,8 +249,8 @@ fun BurgerScreen(navController: NavController) {
                     onClick = { showFilters = !showFilters },
                     modifier = Modifier
                         .padding(8.dp)
-                        //.shadow(4.dp, CircleShape)
-                        //.background(Color.White.copy(alpha = 0.8f), CircleShape)
+                    //.shadow(4.dp, CircleShape)
+                    //.background(Color.White.copy(alpha = 0.8f), CircleShape)
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_filterlist),
@@ -274,7 +274,7 @@ fun BurgerScreen(navController: NavController) {
         ) {
             when {
                 loading -> {
-                    BurgerLoadingAnimation(
+                    DonutLoadingAnimation(
                         modifier = Modifier.align(Alignment.Center),
                         primaryColor = primaryColor
                     )
@@ -292,7 +292,7 @@ fun BurgerScreen(navController: NavController) {
                     )
                 }
 
-                burgers.isEmpty() -> {
+                donuts.isEmpty() -> {
                     EmptyStateView(
                         modifier = Modifier.align(Alignment.Center)
                     )
@@ -333,11 +333,11 @@ fun BurgerScreen(navController: NavController) {
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         items(
-                            items = burgers,
+                            items = donuts,
                             key = { it.id }
-                        ) { burger ->
-                            AnimatedBurgerCard(
-                                burger = burger,
+                        ) { donut ->
+                            AnimatedDonutCard(
+                                donut = donut,
                                 navController = navController,
                                 primaryColor = primaryColor,
                                 accentColor = accentColor
@@ -423,8 +423,8 @@ fun BurgerScreen(navController: NavController) {
 }
 
 @Composable
-fun AnimatedBurgerCard(
-    burger: Product,
+fun AnimatedDonutCard(
+    donut: Product,
     navController: NavController,
     primaryColor: Color,
     accentColor: Color,
@@ -435,7 +435,7 @@ fun AnimatedBurgerCard(
     val alpha = remember { Animatable(0f) }
     val offsetY = remember { Animatable(50f) }
 
-    LaunchedEffect(burger.id) {
+    LaunchedEffect(donut.id) {
         if (!animationPlayed) {
             launch { scale.animateTo(1f, animationSpec = spring(stiffness = Spring.StiffnessLow)) }
             launch { alpha.animateTo(1f, animationSpec = tween(300)) }
@@ -459,7 +459,7 @@ fun AnimatedBurgerCard(
                 spotColor = primaryColor.copy(alpha = 0.1f)
             )
             .clickable {
-                navController.navigate("productDetailsScreen/${burger.type}/${burger.id}")
+                navController.navigate("productDetailsScreen/${donut.type}/${donut.id}")
             },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
@@ -500,8 +500,8 @@ fun AnimatedBurgerCard(
 
                 // Product image
                 Image(
-                    painter = painterResource(id = getDrawableId(burger.imageUrl)),
-                    contentDescription = burger.name,
+                    painter = painterResource(id = getDrawableId(donut.imageUrl)),
+                    contentDescription = donut.name,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(100.dp)
@@ -534,7 +534,7 @@ fun AnimatedBurgerCard(
                     .padding(12.dp)
             ) {
                 Text(
-                    text = burger.name,
+                    text = donut.name,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = Color.DarkGray,
@@ -545,7 +545,7 @@ fun AnimatedBurgerCard(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = burger.description,
+                    text = donut.description,
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.Gray,
                     maxLines = 2,
@@ -561,7 +561,7 @@ fun AnimatedBurgerCard(
                 ) {
                     // Price
                     Text(
-                        text = "$${burger.price}",
+                        text = "$${donut.price}",
                         style = MaterialTheme.typography.titleMedium,
                         color = primaryColor,
                         fontWeight = FontWeight.Bold
@@ -592,7 +592,7 @@ fun AnimatedBurgerCard(
 }
 
 @Composable
-fun BurgerLoadingAnimation(
+fun DonutLoadingAnimation(
     modifier: Modifier = Modifier,
     primaryColor: Color
 ) {
@@ -649,9 +649,9 @@ fun BurgerLoadingAnimation(
             )
         }
 
-        // Center burger icon
+        // Center Donut icon
         Icon(
-            painter = painterResource(id = R.drawable.ic_close), // Replace with your burger icon
+            painter = painterResource(id = R.drawable.ic_close), // Replace with your donut icon
             contentDescription = "Loading",
             tint = primaryColor,
             modifier = Modifier.size(48.dp)
@@ -671,16 +671,9 @@ fun BurgerLoadingAnimation(
 }
 
 
-
-
-
-
-
-
-
-// Animated plate that shows the burger count
+// Animated plate that shows the donut count
 @Composable
-fun BurgerCountBadge(
+fun DonutCountBadge(
     count: Int,
     modifier: Modifier = Modifier
 ) {
@@ -730,10 +723,10 @@ fun BurgerCountBadge(
     }
 }
 
-// BurgerHighlightCard to show featured or popular items with special styling
+// DonutHighlightCard to show featured or popular items with special styling
 @Composable
-fun BurgerHighlightCard(
-    burger: Product,
+fun DonutHighlightCard(
+    donut: Product,
     navController: NavController,
     modifier: Modifier = Modifier,
     primaryColor: Color = Color(0xFFFF6B35)
@@ -768,7 +761,7 @@ fun BurgerHighlightCard(
                 shape = RoundedCornerShape(16.dp)
             )
             .clickable {
-                navController.navigate("productDetailsScreen/${burger.type}/${burger.id}")
+                navController.navigate("productDetailsScreen/${donut.type}/${donut.id}")
             },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
@@ -812,7 +805,7 @@ fun BurgerHighlightCard(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = burger.name,
+                        text = donut.name,
                         style = MaterialTheme.typography.titleLarge,
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
@@ -823,7 +816,7 @@ fun BurgerHighlightCard(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = burger.description,
+                        text = donut.description,
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.White.copy(alpha = 0.9f),
                         maxLines = 2,
@@ -841,7 +834,7 @@ fun BurgerHighlightCard(
                         shape = RoundedCornerShape(20.dp)
                     ) {
                         Text(
-                            text = "$${burger.price} - Add to Cart",
+                            text = "$${donut.price} - Add to Cart",
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -850,10 +843,10 @@ fun BurgerHighlightCard(
                 // Image
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(burger.imageUrl)
+                        .data(donut.imageUrl)
                         .crossfade(true)
                         .build(),
-                    contentDescription = burger.name,
+                    contentDescription = donut.name,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(120.dp)
@@ -886,3 +879,48 @@ fun BurgerHighlightCard(
         }
     }
 }
+
+// Extension for the IconButton with animation
+@Composable
+fun AnimatedIconButton(
+    onClick: () -> Unit,
+    icon: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    contentDescription: String? = null,
+    tint: Color = Color.Unspecified
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed = interactionSource.collectIsPressedAsState()
+    val scale = animateFloatAsState(
+        targetValue = if (isPressed.value) 0.85f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "scale"
+    )
+
+    Box(
+        modifier = modifier
+            .size(48.dp)
+            .graphicsLayer {
+                scaleX = scale.value
+                scaleY = scale.value
+            }
+            .clip(CircleShape)
+            .background(Color.White, CircleShape)
+            .shadow(4.dp, CircleShape)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = ripple(
+                    bounded = false,
+                    color = tint
+                ),
+                onClick = onClick
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        icon()
+    }
+}
+

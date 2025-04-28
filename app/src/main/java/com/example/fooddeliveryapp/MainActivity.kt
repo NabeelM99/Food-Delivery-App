@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.foundation.layout.statusBarsPadding
 import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.BurgerScreen
+import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.DonutScreen
 import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.DrinkScreen
 import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.FryScreen
 import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.JuiceScreen
@@ -56,6 +57,10 @@ class MainActivity : ComponentActivity() {
                         // Burger Screen
                         composable("BurgerScreen") {
                             BurgerScreen(navController)
+                        }
+
+                        composable("DonutScreen") {
+                            DonutScreen(navController)
                         }
 
                         // Fries Screen

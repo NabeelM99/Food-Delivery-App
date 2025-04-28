@@ -178,7 +178,7 @@ fun AddProductForm(
     var description by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
 
-    val categories = listOf("Burger", "Juice", "Fry", "Pasta", "Drink")
+    val categories = listOf("Burger", "Juice", "Fry", "Pasta", "Drink", "Donut")
     var categoryExpanded by remember { mutableStateOf(false) }
 
     Column(
