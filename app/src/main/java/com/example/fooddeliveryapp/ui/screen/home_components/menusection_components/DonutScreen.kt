@@ -177,7 +177,7 @@ fun DonutScreen(navController: NavController) {
         ) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data("https://unsplash.com/photos/assorted-flavor-donuts-6SMF42-JTAc")
+                    .data("https://images.unsplash.com/photo-1644752122705-28ef1e96d2ef")
                     .crossfade(true)
                     .build(),
                 contentDescription = "Donut Banner",
