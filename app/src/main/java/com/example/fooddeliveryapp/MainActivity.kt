@@ -54,7 +54,6 @@ class MainActivity : ComponentActivity() {
                             }
                         }
 
-                        // Burger Screen
                         composable("BurgerScreen") {
                             BurgerScreen(navController)
                         }
@@ -63,22 +62,19 @@ class MainActivity : ComponentActivity() {
                             DonutScreen(navController)
                         }
 
-                        // Fries Screen
+
                         composable("FryScreen") {
                             FryScreen(navController)
                         }
 
-                        // Drinks Screen
                         composable("DrinkScreen") {
                             DrinkScreen(navController)
                         }
 
-                        // Juices Screen
                         composable("JuiceScreen") {
                             JuiceScreen(navController)
                         }
 
-                        // Pasta Screen
                         composable("PastaScreen") {
                             PastaScreen(navController)
                         }
