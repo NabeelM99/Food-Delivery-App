@@ -177,7 +177,7 @@ fun FryScreen(navController: NavController) {
         ) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data("https://images.unsplash.com/photo-1561758033-d89a9ad46330")
+                    .data("https://images.unsplash.com/photo-1541592391523-5ae8c2c88d10")
                     .crossfade(true)
                     .build(),
                 contentDescription = "Fry Banner",
@@ -218,7 +218,7 @@ fun FryScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = "Premium beef, fresh ingredients",
+                        text = "Golden, crispy fries with a fluffy center and irresistible flavor",
                         style = MaterialTheme.typography.bodyLarge,
                         color = Color.White.copy(alpha = 0.9f)
                     )
