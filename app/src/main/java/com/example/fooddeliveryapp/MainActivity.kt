@@ -18,11 +18,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.foundation.layout.statusBarsPadding
 import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.BurgerScreen
+import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.CheesecakeScreen
 import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.DonutScreen
 import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.DrinkScreen
 import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.FryScreen
 import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.JuiceScreen
 import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.PastaScreen
+import com.example.fooddeliveryapp.ui.screen.home_components.menusection_components.ShawarmaScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -60,6 +62,14 @@ class MainActivity : ComponentActivity() {
 
                         composable("DonutScreen") {
                             DonutScreen(navController)
+                        }
+
+                        composable("ShawarmaScreen") {
+                            ShawarmaScreen(navController)
+                        }
+
+                        composable("CheesecakeScreen") {
+                            CheesecakeScreen(navController)
                         }
 
 
