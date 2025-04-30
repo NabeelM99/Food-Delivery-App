@@ -177,7 +177,7 @@ fun ShawarmaScreen(navController: NavController) {
         ) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data("https://images.unsplash.com/photo-1561758033-d89a9ad46330")
+                    .data("https://plus.unsplash.com/premium_photo-1723921226499-9309781ff0f3")
                     .crossfade(true)
                     .build(),
                 contentDescription = "Shawarma Banner",
@@ -218,7 +218,7 @@ fun ShawarmaScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = "Premium beef, fresh ingredients",
+                        text = "Juicy, marinated meat wrapped in warm pita bread",
                         style = MaterialTheme.typography.bodyLarge,
                         color = Color.White.copy(alpha = 0.9f)
                     )

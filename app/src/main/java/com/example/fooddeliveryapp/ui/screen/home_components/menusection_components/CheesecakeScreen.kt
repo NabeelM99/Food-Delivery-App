@@ -177,7 +177,7 @@ fun CheesecakeScreen(navController: NavController) {
         ) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data("https://images.unsplash.com/photo-1561758033-d89a9ad46330")
+                    .data("https://plus.unsplash.com/premium_photo-1672192166287-af9bb2c4b979")
                     .crossfade(true)
                     .build(),
                 contentDescription = "Cheesecake Banner",
@@ -218,7 +218,7 @@ fun CheesecakeScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = "Premium beef, fresh ingredients",
+                        text = "Decadent dessert with the perfect balance of sweet and tangy",
                         style = MaterialTheme.typography.bodyLarge,
                         color = Color.White.copy(alpha = 0.9f)
                     )
